@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Astro.Api</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.11" />
+    <PackageReference Include="HotChocolate.Data" Version="15.1.11" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Astro.ServiceDefaults\Astro.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Astro.Application\Astro.Application.csproj" />
+    <ProjectReference Include="..\Astro.Infrastructure\Astro.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
