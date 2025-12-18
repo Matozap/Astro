@@ -1,6 +1,6 @@
 # Astro
 
-*Not a a brainrot but close enough ☠️*
+*Not a brainrot ☠️*
 
 ---
 
