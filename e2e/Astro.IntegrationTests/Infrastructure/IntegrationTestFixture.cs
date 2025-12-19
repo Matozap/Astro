@@ -3,6 +3,7 @@ using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Astro.IntegrationTests.Infrastructure;
@@ -13,6 +14,7 @@ namespace Astro.IntegrationTests.Infrastructure;
 public sealed class IntegrationTestFixture : IAsyncLifetime
 {
     private const int CancellationTimeoutInSeconds = 180;
+    private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(120);
     private DistributedApplication? _app;
     private HttpClient? _httpClient;
 
@@ -24,15 +26,33 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
         using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(CancellationTimeoutInSeconds));
         var appHost = await DistributedApplicationTestingBuilder
             .CreateAsync<Projects.Astro_AppHost>(cancellationTokenSource.Token);
+        appHost.Services.AddLogging(logging =>
+        {
+            logging.SetMinimumLevel(LogLevel.Debug);
+            logging.AddFilter(appHost.Environment.ApplicationName, LogLevel.Debug);
+            logging.AddFilter("Aspire.", LogLevel.Debug);
+        });
+        appHost.Services.ConfigureHttpClientDefaults(clientBuilder =>
+        {
+            clientBuilder.AddStandardResilienceHandler();
+        });
 
-        _app = await appHost.BuildAsync(cancellationTokenSource.Token);
+        _app = await appHost.BuildAsync(cancellationTokenSource.Token)
+            .WaitAsync(DefaultTimeout, cancellationTokenSource.Token);
 
         var resourceNotificationService = _app.Services.GetRequiredService<ResourceNotificationService>();
-        await _app.StartAsync(cancellationTokenSource.Token);
+        await _app.StartAsync(cancellationTokenSource.Token)
+            .WaitAsync(DefaultTimeout, cancellationTokenSource.Token);
+        
+        await resourceNotificationService.WaitForResourceAsync("postgres", KnownResourceStates.Running, cancellationTokenSource.Token)
+            .WaitAsync(DefaultTimeout, cancellationTokenSource.Token);
+        
+        await resourceNotificationService.WaitForResourceAsync("astrodb", KnownResourceStates.Running, cancellationTokenSource.Token)
+            .WaitAsync(DefaultTimeout, cancellationTokenSource.Token);
 
         // Wait for the API to be running
         await resourceNotificationService.WaitForResourceAsync("astro-api", KnownResourceStates.Running, cancellationTokenSource.Token)
-            .WaitAsync(TimeSpan.FromSeconds(120), cancellationTokenSource.Token);
+            .WaitAsync(DefaultTimeout, cancellationTokenSource.Token);
 
         // Create HTTP client for the API
         _httpClient = _app.CreateHttpClient("astro-api");
