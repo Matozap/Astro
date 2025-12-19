@@ -7,7 +7,9 @@ var database = databaseEngine.AddDatabase("astrodb");
 
 // API - consolidated modular monolith
 var api = builder.AddProject<Projects.Astro_Api>("astro-api")
+    .WithReference(databaseEngine)
     .WithReference(database)
+    .WaitForStart(database)
     .WithExternalHttpEndpoints();
 
 try
