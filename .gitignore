@@ -116,6 +116,5 @@ docker-compose.override.yml
 *.temp
 
 # Other
-.specify/
 .claude/
 CLAUDE.md

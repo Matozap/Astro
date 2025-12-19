@@ -1,13 +1,10 @@
-# This workflow will build a .NET project
+# This workflow runs integration tests manually on demand
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: CI - Unit Tests
+name: Integration Tests
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -25,4 +22,4 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet test server/Astro.Tests/Astro.Tests.csproj --no-build --verbosity normal --filter "FullyQualifiedName!~IntegrationTests"
+      run: dotnet test e2e/Astro.IntegrationTests/Astro.IntegrationTests.csproj --no-build --verbosity normal --filter "FullyQualifiedName~IntegrationTests"
