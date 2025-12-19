@@ -157,8 +157,8 @@
 
 **Purpose**: Final verification and cleanup
 
-- [ ] T050 Run all integration tests with `dotnet test tests/Astro.IntegrationTests/` (Requires Docker)
-- [ ] T051 Verify all snapshot files are committed and properly formatted (Requires Docker - snapshots generated on first test run)
+- [X] T050 Run all integration tests with `dotnet test tests/Astro.IntegrationTests/` (Requires Docker)
+- [X] T051 Verify all snapshot files are committed and properly formatted (Requires Docker - snapshots generated on first test run)
 - [X] T052 Ensure CI pipeline can execute tests (verify Docker availability for Aspire PostgreSQL)
 
 ---
