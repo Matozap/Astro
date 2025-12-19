@@ -1,0 +1,26 @@
+mutation UpdateOrder($input: UpdateOrderInput!) {
+  updateOrder(input: $input) {
+    order {
+      id
+      orderNumber
+      customerName
+      customerEmail
+      shippingAddress {
+        street
+        city
+        state
+        postalCode
+        country
+      }
+      notes
+      updatedAt
+      modifiedBy
+    }
+    errors {
+      __typename
+      ... on Error {
+        message
+      }
+    }
+  }
+}

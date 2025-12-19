@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/e2e/">
+    <Project Path="e2e/Astro.IntegrationTests/Astro.IntegrationTests.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Astro.Domain/Astro.Domain.csproj" />
     <Project Path="src/Astro.Application/Astro.Application.csproj" />

@@ -1,0 +1,17 @@
+mutation UpdateStock($input: UpdateStockInput!) {
+  updateStock(input: $input) {
+    product {
+      id
+      name
+      stockQuantity
+      updatedAt
+      modifiedBy
+    }
+    errors {
+      __typename
+      ... on Error {
+        message
+      }
+    }
+  }
+}

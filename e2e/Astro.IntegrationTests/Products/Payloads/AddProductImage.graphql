@@ -1,0 +1,17 @@
+mutation AddProductImage($input: AddProductImageInput!) {
+  addProductImage(input: $input) {
+    productImage {
+      id
+      fileName
+      url
+      storageMode
+      isPrimary
+    }
+    errors {
+      __typename
+      ... on Error {
+        message
+      }
+    }
+  }
+}
