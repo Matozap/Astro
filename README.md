@@ -75,6 +75,26 @@ The database creates itself. Seed data appears: 10 products with descriptions an
 
 ---
 
+## CI/CD Workflows
+
+This project uses GitHub Actions with two separate workflows:
+
+**CI - Unit Tests** (automatic)
+- Triggers on every push and pull request to `main`
+- Runs only unit tests from `server/Astro.Tests`
+- Provides fast feedback (typically < 3 minutes)
+- Must pass before merging
+
+**Integration Tests** (manual)
+- Triggered manually via GitHub Actions UI (workflow_dispatch)
+- Runs integration tests from `e2e/Astro.IntegrationTests`
+- Use before releases or after significant changes
+- To run: Go to Actions tab → Integration Tests → Run workflow
+
+Both workflows use .NET 10.0.x and include: checkout, restore, build, and test steps.
+
+---
+
 ## A Final Thought
 
 It is hard to find a way of thinking about problems. They make certain solutions easy and certain mistakes hard.
