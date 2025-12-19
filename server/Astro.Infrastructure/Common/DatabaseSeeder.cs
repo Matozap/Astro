@@ -27,6 +27,10 @@ public static class DatabaseSeeder
         try
         {
             logger.LogInformation("Ensuring database is created...");
+            if (!(await context.Database.CanConnectAsync()))
+            {
+                throw new Exception("Database is not available");
+            }
             await context.Database.EnsureCreatedAsync();
 
             if (!await context.Products.AnyAsync())
@@ -41,11 +45,11 @@ public static class DatabaseSeeder
                 await SeedOrdersAsync(context);
             }
 
-            logger.LogInformation("Database seeding completed.");
+            logger.LogInformation("Database seeding completed");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An error occurred while seeding the database.");
+            logger.LogError(ex, "An error occurred while seeding the database");
             throw;
         }
     }

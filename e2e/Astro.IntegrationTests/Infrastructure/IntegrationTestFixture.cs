@@ -14,7 +14,8 @@ namespace Astro.IntegrationTests.Infrastructure;
 public sealed class IntegrationTestFixture : IAsyncLifetime
 {
     private const int CancellationTimeoutInSeconds = 180;
-    private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(120);
+    private static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan LongTimeout = TimeSpan.FromSeconds(120);
     private DistributedApplication? _app;
     private HttpClient? _httpClient;
 
@@ -32,10 +33,6 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
             logging.AddFilter(appHost.Environment.ApplicationName, LogLevel.Debug);
             logging.AddFilter("Aspire.", LogLevel.Debug);
         });
-        appHost.Services.ConfigureHttpClientDefaults(clientBuilder =>
-        {
-            clientBuilder.AddStandardResilienceHandler();
-        });
 
         _app = await appHost.BuildAsync(cancellationTokenSource.Token)
             .WaitAsync(DefaultTimeout, cancellationTokenSource.Token);
@@ -52,10 +49,11 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
 
         // Wait for the API to be running
         await resourceNotificationService.WaitForResourceAsync("astro-api", KnownResourceStates.Running, cancellationTokenSource.Token)
-            .WaitAsync(DefaultTimeout, cancellationTokenSource.Token);
+            .WaitAsync(LongTimeout, cancellationTokenSource.Token);
 
         // Create HTTP client for the API
         _httpClient = _app.CreateHttpClient("astro-api");
+        _httpClient.Timeout = DefaultTimeout;
     }
 
     public async Task DisposeAsync()

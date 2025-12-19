@@ -1,8 +1,7 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 // database - single unified database for modular monolith
-var databaseEngine = builder.AddPostgres("postgres")
-    .WithPgAdmin();
+var databaseEngine = builder.AddPostgres("postgres");
 
 var database = databaseEngine.AddDatabase("astrodb");
 
