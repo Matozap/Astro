@@ -12,7 +12,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\src\Astro.Api\Astro.Api.csproj" />
+        <ProjectReference Include="..\server\Astro.Api\Astro.Api.csproj" />
     </ItemGroup>
 
     <ItemGroup>
