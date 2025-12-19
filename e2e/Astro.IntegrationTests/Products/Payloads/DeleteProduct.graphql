@@ -1,0 +1,14 @@
+mutation DeleteProduct($input: DeleteProductInput!) {
+  deleteProduct(input: $input) {
+    deleteResponse {
+      executedAt
+      objectDeleted
+    }
+    errors {
+      __typename
+      ... on Error {
+        message
+      }
+    }
+  }
+}

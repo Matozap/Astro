@@ -1,0 +1,41 @@
+query GetOrderById($id: UUID!) {
+  orders(where: { id: { eq: $id } }) {
+    id
+    orderNumber
+    customerName
+    customerEmail
+    shippingAddress {
+      street
+      city
+      state
+      postalCode
+      country
+    }
+    status
+    totalAmount {
+      amount
+      currency
+    }
+    notes
+    itemCount
+    createdAt
+    updatedAt
+    createdBy
+    modifiedBy
+    details {
+      id
+      productId
+      productName
+      productSku
+      quantity
+      unitPrice {
+        amount
+        currency
+      }
+      lineTotal {
+        amount
+        currency
+      }
+    }
+  }
+}

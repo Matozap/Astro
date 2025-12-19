@@ -1,0 +1,45 @@
+mutation CreateProduct($input: CreateProductInput!) {
+  createProduct(input: $input) {
+    product {
+      id
+      name
+      description
+      sku
+      stockQuantity
+      lowStockThreshold
+      isActive
+      isLowStock
+      createdAt
+      createdBy
+      updatedAt
+      modifiedBy
+      price {
+        amount
+        currency
+      }
+      details {
+        id
+        key
+        value
+      }
+      images {
+        id
+        fileName
+        url
+        storageMode
+        isPrimary
+      }
+    }
+    errors {
+      ... on ValidationError {
+        message
+        errors {
+          errorCode
+          errorMessage
+          propertyName
+          severity
+        }
+      }
+    }
+  }
+}

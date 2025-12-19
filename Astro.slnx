@@ -1,10 +1,13 @@
 <Solution>
-  <Folder Name="/src/">
-    <Project Path="src/Astro.Domain/Astro.Domain.csproj" />
-    <Project Path="src/Astro.Application/Astro.Application.csproj" />
-    <Project Path="src/Astro.Infrastructure/Astro.Infrastructure.csproj" />
-    <Project Path="src/Astro.Api/Astro.Api.csproj" />
-    <Project Path="src/Astro.Tests/Astro.Tests.csproj" />
+  <Folder Name="/e2e/">
+    <Project Path="e2e/Astro.IntegrationTests/Astro.IntegrationTests.csproj" />
+  </Folder>
+  <Folder Name="/server/">
+    <Project Path="server/Astro.Api/Astro.Api.csproj" />
+    <Project Path="server/Astro.Application/Astro.Application.csproj" />
+    <Project Path="server/Astro.Domain/Astro.Domain.csproj" />
+    <Project Path="server/Astro.Infrastructure/Astro.Infrastructure.csproj" />
+    <Project Path="server/Astro.Tests/Astro.Tests.csproj" />
   </Folder>
 
   <Project Path="Astro.AppHost/Astro.AppHost.csproj" />

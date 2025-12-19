@@ -1,14 +1,21 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-// PostgreSQL database - single unified database for modular monolith
-var postgres = builder.AddPostgres("postgres")
+// database - single unified database for modular monolith
+var databaseEngine = builder.AddPostgres("postgres")
     .WithPgAdmin();
 
-var astrodb = postgres.AddDatabase("astrodb");
+var database = databaseEngine.AddDatabase("astrodb");
 
-// Astro API - consolidated modular monolith
-var astroApi = builder.AddProject<Projects.Astro_Api>("astro-api")
-    .WithReference(astrodb)
+// API - consolidated modular monolith
+var api = builder.AddProject<Projects.Astro_Api>("astro-api")
+    .WithReference(database)
     .WithExternalHttpEndpoints();
 
-builder.Build().Run();
+try
+{
+    builder.Build().Run();
+}
+catch (AggregateException ex)
+{
+    ex.Handle(innerEx => innerEx is TaskCanceledException or OperationCanceledException);
+}

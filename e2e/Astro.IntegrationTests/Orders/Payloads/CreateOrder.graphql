@@ -1,0 +1,47 @@
+mutation CreateOrder($input: CreateOrderInput!) {
+  createOrder(input: $input) {
+    order {
+      id
+      orderNumber
+      customerName
+      customerEmail
+      shippingAddress {
+        street
+        city
+        state
+        postalCode
+        country
+      }
+      status
+      totalAmount {
+        amount
+        currency
+      }
+      notes
+      itemCount
+      createdAt
+      createdBy
+      details {
+        id
+        productId
+        productName
+        productSku
+        quantity
+        unitPrice {
+          amount
+          currency
+        }
+        lineTotal {
+          amount
+          currency
+        }
+      }
+    }
+    errors {
+      __typename
+      ... on Error {
+        message
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+mutation RemoveProductImage($input: RemoveProductImageInput!) {
+  removeProductImage(input: $input) {
+    deleteResponse {
+      id
+      success
+    }
+    errors {
+      __typename
+      ... on Error {
+        message
+      }
+    }
+  }
+}
