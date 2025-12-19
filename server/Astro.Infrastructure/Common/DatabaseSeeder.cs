@@ -24,33 +24,47 @@ public static class DatabaseSeeder
         var logger = services.GetRequiredService<ILogger<AstroDbContext>>();
         var context = services.GetRequiredService<AstroDbContext>();
 
-        try
+        const int maxRetries = 5;
+        const int delayMs = 2000;
+
+        for (var attempt = 1; attempt <= maxRetries; attempt++)
         {
-            logger.LogInformation("Ensuring database is created...");
-            if (!(await context.Database.CanConnectAsync()))
+            try
             {
-                throw new Exception("Database is not available");
-            }
-            await context.Database.EnsureCreatedAsync();
+                logger.LogInformation("Ensuring database is created (attempt {Attempt}/{MaxRetries})...", attempt, maxRetries);
 
-            if (!await context.Products.AnyAsync())
+                if (!await context.Database.CanConnectAsync())
+                {
+                    throw new InvalidOperationException("Database is not available");
+                }
+
+                await context.Database.EnsureCreatedAsync();
+
+                if (!await context.Products.AnyAsync())
+                {
+                    logger.LogInformation("Seeding products...");
+                    await SeedProductsAsync(context);
+                }
+
+                if (!await context.Orders.AnyAsync())
+                {
+                    logger.LogInformation("Seeding orders...");
+                    await SeedOrdersAsync(context);
+                }
+
+                logger.LogInformation("Database seeding completed");
+                return;
+            }
+            catch (Exception ex) when (attempt < maxRetries)
             {
-                logger.LogInformation("Seeding products...");
-                await SeedProductsAsync(context);
+                logger.LogWarning(ex, "Database seeding attempt {Attempt} failed, retrying in {DelayMs}ms...", attempt, delayMs);
+                await Task.Delay(delayMs);
             }
-
-            if (!await context.Orders.AnyAsync())
+            catch (Exception ex)
             {
-                logger.LogInformation("Seeding orders...");
-                await SeedOrdersAsync(context);
+                logger.LogError(ex, "An error occurred while seeding the database after {MaxRetries} attempts", maxRetries);
+                throw;
             }
-
-            logger.LogInformation("Database seeding completed");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "An error occurred while seeding the database");
-            throw;
         }
     }
 

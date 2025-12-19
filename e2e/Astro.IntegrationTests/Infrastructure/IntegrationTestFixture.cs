@@ -34,26 +34,21 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
             logging.AddFilter("Aspire.", LogLevel.Debug);
         });
 
-        _app = await appHost.BuildAsync(cancellationTokenSource.Token)
-            .WaitAsync(DefaultTimeout, cancellationTokenSource.Token);
+        _app = await appHost.BuildAsync(cancellationTokenSource.Token);
 
         var resourceNotificationService = _app.Services.GetRequiredService<ResourceNotificationService>();
-        await _app.StartAsync(cancellationTokenSource.Token)
-            .WaitAsync(DefaultTimeout, cancellationTokenSource.Token);
+        await _app.StartAsync(cancellationTokenSource.Token);
         
-        await resourceNotificationService.WaitForResourceAsync("postgres", KnownResourceStates.Running, cancellationTokenSource.Token)
-            .WaitAsync(DefaultTimeout, cancellationTokenSource.Token);
-        
-        await resourceNotificationService.WaitForResourceAsync("astrodb", KnownResourceStates.Running, cancellationTokenSource.Token)
-            .WaitAsync(DefaultTimeout, cancellationTokenSource.Token);
+        // Wait for postgres to be healthy (not just running)
+        await resourceNotificationService.WaitForResourceHealthyAsync("postgres", cancellationTokenSource.Token)
+            .WaitAsync(LongTimeout, cancellationTokenSource.Token);
 
-        // Wait for the API to be running
-        await resourceNotificationService.WaitForResourceAsync("astro-api", KnownResourceStates.Running, cancellationTokenSource.Token)
+        // Wait for the API to be healthy (ensures database seeding completed successfully)
+        await resourceNotificationService.WaitForResourceHealthyAsync("astro-api", cancellationTokenSource.Token)
             .WaitAsync(LongTimeout, cancellationTokenSource.Token);
 
         // Create HTTP client for the API
         _httpClient = _app.CreateHttpClient("astro-api");
-        _httpClient.Timeout = DefaultTimeout;
     }
 
     public async Task DisposeAsync()
