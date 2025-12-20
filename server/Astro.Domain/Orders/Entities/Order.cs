@@ -1,6 +1,7 @@
 using Astro.Domain.Orders.Enums;
 using Astro.Domain.Orders.Events;
 using Astro.Domain.Orders.ValueObjects;
+using Astro.Domain.Payments.Entities;
 using Astro.Domain.Shared;
 using Astro.Domain.Shared.ValueObjects;
 
@@ -13,6 +14,7 @@ public class Order : Entity, IAggregateRoot
 {
     private readonly List<IDomainEvent> _domainEvents = [];
     private readonly List<OrderDetail> _details = [];
+    private readonly List<Payment> _payments = [];
 
     public OrderNumber OrderNumber { get; private set; } = null!;
     public string CustomerName { get; private set; } = null!;
@@ -27,6 +29,7 @@ public class Order : Entity, IAggregateRoot
     public string? ModifiedBy { get; private set; }
 
     public IReadOnlyCollection<OrderDetail> Details => _details.AsReadOnly();
+    public IReadOnlyCollection<Payment> Payments => _payments.AsReadOnly();
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     // EF Core constructor

@@ -1,4 +1,5 @@
 using Astro.Domain.Orders.Entities;
+using Astro.Domain.Payments.Entities;
 using Astro.Domain.Products.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +24,11 @@ public class AstroDbContext : DbContext
     /// Orders aggregate roots.
     /// </summary>
     public DbSet<Order> Orders => Set<Order>();
+
+    /// <summary>
+    /// Payments aggregate roots.
+    /// </summary>
+    public DbSet<Payment> Payments => Set<Payment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
