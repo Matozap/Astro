@@ -1,6 +1,7 @@
 using Astro.Api.Base;
 using Astro.Api.Base.Options;
 using Astro.Api.Orders.GraphQL;
+using Astro.Api.Payments.GraphQL;
 using Astro.Api.Products.GraphQL;
 using Astro.Application.Common;
 using Astro.Infrastructure.Common;
@@ -39,6 +40,9 @@ builder.Services
     .AddTypeExtension<OrderQuery>()
     .AddTypeExtension<OrderMutation>()
     .AddTypeExtension<OrderSubscription>()
+    // Register Payments module as type extensions
+    .AddTypeExtension<PaymentMutation>()
+    .AddTypeExtension<PaymentSubscription>()
     // Register Products module types
     .AddType<Astro.Api.Products.GraphQL.Types.ProductType>()
     .AddType<Astro.Api.Products.GraphQL.Types.ProductDetailType>()
@@ -48,6 +52,9 @@ builder.Services
     .AddType<Astro.Api.Orders.GraphQL.Types.OrderType>()
     .AddType<Astro.Api.Orders.GraphQL.Types.OrderDetailType>()
     .AddType<Astro.Api.Orders.GraphQL.Types.OrderStatusType>()
+    // Register Payments module types
+    .AddType<Astro.Api.Payments.GraphQL.Types.PaymentType>()
+    .AddType<Astro.Api.Payments.GraphQL.Types.PaymentStatusType>()
     .AddProjections()
     .AddFiltering()
     .AddSorting()

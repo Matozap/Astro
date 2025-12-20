@@ -1,5 +1,7 @@
 using Astro.Domain.Orders.Entities;
 using Astro.Domain.Orders.Enums;
+using Astro.Domain.Payments.Entities;
+using Astro.Domain.Payments.Enums;
 using Astro.Domain.Products.Entities;
 using Astro.Domain.Products.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -50,6 +52,12 @@ public static class DatabaseSeeder
                 {
                     logger.LogInformation("Seeding orders...");
                     await SeedOrdersAsync(context);
+                }
+
+                if (!await context.Payments.AnyAsync())
+                {
+                    logger.LogInformation("Seeding payments...");
+                    await SeedPaymentsAsync(context);
                 }
 
                 logger.LogInformation("Database seeding completed");
@@ -402,5 +410,75 @@ public static class DatabaseSeeder
         }
 
         return order;
+    }
+
+    private static async Task SeedPaymentsAsync(AstroDbContext context)
+    {
+        var orders = await context.Orders.ToListAsync();
+        var random = new Random(42); // Fixed seed for reproducibility
+
+        var payments = new List<Payment>();
+
+        // Create payments for orders with a mix of statuses
+        // 30% Pending, 50% Successful, 20% Failed
+        var paymentScenarios = new[]
+        {
+            // Order 1: Successful payment on first attempt
+            (orders[0].Id, PaymentStatus.Successful),
+
+            // Order 2: Failed first attempt, successful second attempt (retry scenario)
+            (orders[1].Id, PaymentStatus.Failed),
+            (orders[1].Id, PaymentStatus.Successful),
+
+            // Order 3: Still pending
+            (orders[2].Id, PaymentStatus.Pending),
+
+            // Order 4: Multiple failed attempts, still pending
+            (orders[3].Id, PaymentStatus.Failed),
+            (orders[3].Id, PaymentStatus.Failed),
+            (orders[3].Id, PaymentStatus.Pending),
+
+            // Order 5: Successful
+            (orders[4].Id, PaymentStatus.Successful),
+
+            // Order 6: Pending
+            (orders[5].Id, PaymentStatus.Pending),
+
+            // Order 7: Successful
+            (orders[6].Id, PaymentStatus.Successful),
+
+            // Order 8: Failed then successful
+            (orders[7].Id, PaymentStatus.Failed),
+            (orders[7].Id, PaymentStatus.Successful),
+
+            // Order 9: Pending
+            (orders[8].Id, PaymentStatus.Pending),
+
+            // Order 10: Successful
+            (orders[9].Id, PaymentStatus.Successful),
+
+            // Additional payments for variety
+            (orders[0].Id, PaymentStatus.Pending), // Order 1 has another pending payment
+            (orders[2].Id, PaymentStatus.Failed),  // Order 3 also has a failed payment
+            (orders[5].Id, PaymentStatus.Successful), // Order 6 has successful payment
+            (orders[8].Id, PaymentStatus.Failed)   // Order 9 has a failed payment
+        };
+
+        foreach (var (orderId, status) in paymentScenarios)
+        {
+            var payment = Payment.Create(orderId);
+
+            // Update status if not Pending
+            if (status != PaymentStatus.Pending)
+            {
+                payment.UpdateStatus(status);
+            }
+
+            payment.ClearDomainEvents();
+            payments.Add(payment);
+        }
+
+        context.Payments.AddRange(payments);
+        await context.SaveChangesAsync();
     }
 }

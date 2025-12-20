@@ -107,6 +107,12 @@ public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasForeignKey("OrderId")
             .OnDelete(DeleteBehavior.Cascade);
 
+        // Configure relationship with Payments
+        builder.HasMany(o => o.Payments)
+            .WithOne(p => p.Order)
+            .HasForeignKey(p => p.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         // Ignore domain events collection
         builder.Ignore(o => o.DomainEvents);
     }
