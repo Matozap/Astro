@@ -1,0 +1,69 @@
+mutation UpdateShipment($input: UpdateShipmentInput!) {
+  updateShipment(input: $input) {
+    shipment {
+      id
+      orderId
+      trackingNumber
+      carrier
+      status
+      originAddress {
+        street
+        city
+        state
+        postalCode
+        country
+        contactName
+        contactPhone
+      }
+      destinationAddress {
+        street
+        city
+        state
+        postalCode
+        country
+        contactName
+        contactPhone
+      }
+      weight {
+        value
+        unit
+      }
+      dimensions {
+        length
+        width
+        height
+        unit
+      }
+      shippingCost {
+        amount
+        currency
+      }
+      estimatedDeliveryDate
+      actualDeliveryDate
+      itemCount
+      updatedAt
+      modifiedBy
+      trackingDetails {
+        id
+        status
+        location
+        notes
+        timestamp
+      }
+      items {
+        id
+        orderDetailId
+        productId
+        productName
+        productSku
+        quantity
+      }
+    }
+    errors {
+      __typename
+      ... on Error {
+        message
+      }
+    }
+  }
+}

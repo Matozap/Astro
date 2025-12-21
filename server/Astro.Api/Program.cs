@@ -3,6 +3,7 @@ using Astro.Api.Base.Options;
 using Astro.Api.Orders.GraphQL;
 using Astro.Api.Payments.GraphQL;
 using Astro.Api.Products.GraphQL;
+using Astro.Api.Shipments.GraphQL;
 using Astro.Application.Common;
 using Astro.Infrastructure.Common;
 using Astro.ServiceDefaults;
@@ -55,9 +56,21 @@ builder.Services
     // Register Payments module types
     .AddType<Astro.Api.Payments.GraphQL.Types.PaymentType>()
     .AddType<Astro.Api.Payments.GraphQL.Types.PaymentStatusType>()
+    // Register Shipments module as type extensions
+    .AddTypeExtension<ShipmentQuery>()
+    .AddTypeExtension<ShipmentMutation>()
+    .AddTypeExtension<ShipmentSubscription>()
+    // Register Shipments module types
+    .AddType<Astro.Api.Shipments.GraphQL.Types.ShipmentType>()
+    .AddType<Astro.Api.Shipments.GraphQL.Types.ShipmentAddressType>()
+    .AddType<Astro.Api.Shipments.GraphQL.Types.ShipmentAddressSortInputType>()
+    .AddType<Astro.Api.Shipments.GraphQL.Types.ShipmentAddressFilterInputType>()
+    .AddType<Astro.Api.Shipments.GraphQL.Types.TrackingDetailType>()
+    .AddType<Astro.Api.Shipments.GraphQL.Types.ShipmentItemType>()
     .AddProjections()
     .AddFiltering()
     .AddSorting()
+    .BindRuntimeType<Astro.Domain.Shipments.ValueObjects.Address, Astro.Api.Shipments.GraphQL.Types.ShipmentAddressType>()
     .AddMutationConventions()
     .AddInMemorySubscriptions()
     .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = builder.Environment.IsDevelopment())
