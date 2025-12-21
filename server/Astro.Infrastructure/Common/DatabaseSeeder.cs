@@ -4,6 +4,8 @@ using Astro.Domain.Payments.Entities;
 using Astro.Domain.Payments.Enums;
 using Astro.Domain.Products.Entities;
 using Astro.Domain.Products.Enums;
+using Astro.Domain.Shipments.Entities;
+using Astro.Domain.Shipments.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -58,6 +60,12 @@ public static class DatabaseSeeder
                 {
                     logger.LogInformation("Seeding payments...");
                     await SeedPaymentsAsync(context);
+                }
+
+                if (!await context.Shipments.AnyAsync())
+                {
+                    logger.LogInformation("Seeding shipments...");
+                    await SeedShipmentsAsync(context);
                 }
 
                 logger.LogInformation("Database seeding completed");
@@ -479,6 +487,125 @@ public static class DatabaseSeeder
         }
 
         context.Payments.AddRange(payments);
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task SeedShipmentsAsync(AstroDbContext context)
+    {
+        var orders = await context.Orders
+            .Include(o => o.Details)
+            .Where(o => o.Status == OrderStatus.Shipped || o.Status == OrderStatus.Delivered)
+            .ToListAsync();
+
+        var shipments = new List<Shipment>();
+        var carriers = new[] { "FedEx", "UPS", "USPS", "DHL" };
+        var random = new Random(42); // Fixed seed for reproducibility
+
+        foreach (var order in orders)
+        {
+            var carrier = carriers[random.Next(carriers.Length)];
+            var shipment = Shipment.Create(
+                orderId: order.Id,
+                carrier: carrier,
+                originStreet: "100 Warehouse Drive",
+                originCity: "Memphis",
+                originState: "TN",
+                originPostalCode: "38118",
+                originCountry: "USA",
+                destinationStreet: order.ShippingAddress.Street,
+                destinationCity: order.ShippingAddress.City,
+                destinationState: order.ShippingAddress.State,
+                destinationPostalCode: order.ShippingAddress.PostalCode,
+                destinationCountry: order.ShippingAddress.Country,
+                weightValue: random.Next(1, 20) + random.Next(0, 99) / 100m,
+                weightUnit: WeightUnit.Pounds,
+                length: random.Next(6, 24),
+                width: random.Next(6, 18),
+                height: random.Next(4, 12),
+                dimensionUnit: DimensionUnit.Inches,
+                shippingCost: random.Next(5, 50) + random.Next(0, 99) / 100m,
+                estimatedDeliveryDate: DateTimeOffset.UtcNow.AddDays(random.Next(3, 10)),
+                createdBy: "System");
+
+            // Add items from order details
+            foreach (var detail in order.Details)
+            {
+                shipment.AddItem(
+                    detail.Id,
+                    detail.ProductId,
+                    detail.ProductName,
+                    detail.ProductSku,
+                    detail.Quantity);
+            }
+
+            // Update shipment status based on order status
+            if (order.Status == OrderStatus.Shipped)
+            {
+                shipment.UpdateStatus(ShipmentStatus.Shipped, "Distribution Center", "Package picked up by carrier", "System");
+                shipment.UpdateStatus(ShipmentStatus.InTransit, "Regional Hub", "Package in transit to destination", "System");
+            }
+            else if (order.Status == OrderStatus.Delivered)
+            {
+                shipment.UpdateStatus(ShipmentStatus.Shipped, "Distribution Center", "Package picked up by carrier", "System");
+                shipment.UpdateStatus(ShipmentStatus.InTransit, "Regional Hub", "Package in transit", "System");
+                shipment.UpdateStatus(ShipmentStatus.OutForDelivery, "Local Delivery Center", "Out for delivery", "System");
+                shipment.UpdateStatus(ShipmentStatus.Delivered, "Customer Location", "Delivered to recipient", "System");
+            }
+
+            shipment.ClearDomainEvents();
+            shipments.Add(shipment);
+        }
+
+        // Add some additional shipments for variety
+        var allOrders = await context.Orders
+            .Include(o => o.Details)
+            .Where(o => o.Status == OrderStatus.Processing)
+            .Take(3)
+            .ToListAsync();
+
+        foreach (var order in allOrders)
+        {
+            var carrier = carriers[random.Next(carriers.Length)];
+            var shipment = Shipment.Create(
+                orderId: order.Id,
+                carrier: carrier,
+                originStreet: "200 Fulfillment Lane",
+                originCity: "Louisville",
+                originState: "KY",
+                originPostalCode: "40213",
+                originCountry: "USA",
+                destinationStreet: order.ShippingAddress.Street,
+                destinationCity: order.ShippingAddress.City,
+                destinationState: order.ShippingAddress.State,
+                destinationPostalCode: order.ShippingAddress.PostalCode,
+                destinationCountry: order.ShippingAddress.Country,
+                weightValue: random.Next(1, 15) + random.Next(0, 99) / 100m,
+                weightUnit: WeightUnit.Pounds,
+                length: random.Next(8, 20),
+                width: random.Next(6, 14),
+                height: random.Next(4, 10),
+                dimensionUnit: DimensionUnit.Inches,
+                shippingCost: random.Next(8, 35) + random.Next(0, 99) / 100m,
+                estimatedDeliveryDate: DateTimeOffset.UtcNow.AddDays(random.Next(2, 7)),
+                createdBy: "System");
+
+            // Add items from order details
+            foreach (var detail in order.Details)
+            {
+                shipment.AddItem(
+                    detail.Id,
+                    detail.ProductId,
+                    detail.ProductName,
+                    detail.ProductSku,
+                    detail.Quantity);
+            }
+
+            // These shipments are still pending (awaiting pickup)
+            shipment.ClearDomainEvents();
+            shipments.Add(shipment);
+        }
+
+        context.Shipments.AddRange(shipments);
         await context.SaveChangesAsync();
     }
 }

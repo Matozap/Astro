@@ -2,9 +2,11 @@ using Astro.Application.Common;
 using Astro.Domain.Orders.Abstractions;
 using Astro.Domain.Payments.Abstractions;
 using Astro.Domain.Products.Abstractions;
+using Astro.Domain.Shipments.Abstractions;
 using Astro.Infrastructure.Orders.Persistence;
 using Astro.Infrastructure.Payments.Persistence;
 using Astro.Infrastructure.Products.Persistence;
+using Astro.Infrastructure.Shipments.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,6 +30,7 @@ public static class DependencyInjection
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<IShipmentRepository, ShipmentRepository>();
 
         return services;
     }
