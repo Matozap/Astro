@@ -1,5 +1,5 @@
 using Astro.Api.Base;
-using Astro.Api.Common;
+using Astro.Api.Base.Models;
 using Astro.Application.Products.Commands.AddProductImage;
 using Astro.Application.Products.Commands.CreateProduct;
 using Astro.Application.Products.Commands.DeleteProduct;

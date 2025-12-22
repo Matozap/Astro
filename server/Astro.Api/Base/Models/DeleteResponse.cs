@@ -1,4 +1,4 @@
-﻿namespace Astro.Api.Common;
+﻿namespace Astro.Api.Base.Models;
 
 public class DeleteResponse(Guid objectDeleted)
 {
