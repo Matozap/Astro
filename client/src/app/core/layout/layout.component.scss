@@ -8,6 +8,7 @@
   width: 260px;
   background-color: var(--surface-color);
   border-right: 1px solid var(--border-color);
+  border-top-right-radius: 0;
 }
 
 .sidenav-header {
@@ -121,8 +122,10 @@
 .toolbar {
   background-color: var(--surface-color);
   border-bottom: 1px solid var(--border-color);
-  height: 64px;
+  height: 74px;
   padding: 0 16px;
+  margin-left: 5px;
+  padding-right: 30px;
 }
 
 .toolbar-spacer {

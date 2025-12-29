@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, TemplateRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, inject, signal, TemplateRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -38,9 +38,10 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
   styleUrl: './shipments-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ShipmentsListComponent implements OnInit {
+export class ShipmentsListComponent implements OnInit, AfterViewInit {
   private readonly shipmentService = inject(ShipmentService);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   @ViewChild('trackingTemplate') trackingTemplate!: TemplateRef<unknown>;
   @ViewChild('carrierTemplate') carrierTemplate!: TemplateRef<unknown>;
@@ -79,7 +80,6 @@ export class ShipmentsListComponent implements OnInit {
   columns: ColumnDef[] = [];
 
   ngOnInit(): void {
-    this.initColumns();
     this.loadShipments();
 
     this.searchSubject
@@ -88,6 +88,11 @@ export class ShipmentsListComponent implements OnInit {
         this.pageIndex = 0;
         this.loadShipments();
       });
+  }
+
+  ngAfterViewInit(): void {
+    this.initColumns();
+    this.cdr.detectChanges();
   }
 
   private initColumns(): void {
