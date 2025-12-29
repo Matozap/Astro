@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, TemplateRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, inject, signal, TemplateRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -36,8 +36,9 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
   styleUrl: './products-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductsListComponent implements OnInit {
+export class ProductsListComponent implements OnInit, AfterViewInit {
   private readonly productService = inject(ProductService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   @ViewChild('priceTemplate') priceTemplate!: TemplateRef<unknown>;
   @ViewChild('stockTemplate') stockTemplate!: TemplateRef<unknown>;
@@ -57,7 +58,6 @@ export class ProductsListComponent implements OnInit {
   columns: ColumnDef[] = [];
 
   ngOnInit(): void {
-    this.initColumns();
     this.loadProducts();
 
     this.searchSubject
@@ -66,6 +66,11 @@ export class ProductsListComponent implements OnInit {
         this.pageIndex = 0;
         this.loadProducts();
       });
+  }
+
+  ngAfterViewInit(): void {
+    this.initColumns();
+    this.cdr.detectChanges();
   }
 
   private initColumns(): void {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, TemplateRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, inject, signal, TemplateRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -38,9 +38,10 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
   styleUrl: './orders-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class OrdersListComponent implements OnInit {
+export class OrdersListComponent implements OnInit, AfterViewInit {
   private readonly orderService = inject(OrderService);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   @ViewChild('orderNumberTemplate') orderNumberTemplate!: TemplateRef<unknown>;
   @ViewChild('customerTemplate') customerTemplate!: TemplateRef<unknown>;
@@ -73,7 +74,6 @@ export class OrdersListComponent implements OnInit {
   columns: ColumnDef[] = [];
 
   ngOnInit(): void {
-    this.initColumns();
     this.loadOrders();
 
     this.searchSubject
@@ -82,6 +82,11 @@ export class OrdersListComponent implements OnInit {
         this.pageIndex = 0;
         this.loadOrders();
       });
+  }
+
+  ngAfterViewInit(): void {
+    this.initColumns();
+    this.cdr.detectChanges();
   }
 
   private initColumns(): void {

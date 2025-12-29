@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, TemplateRef, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, inject, signal, TemplateRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -37,8 +37,9 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
   styleUrl: './payments-list.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PaymentsListComponent implements OnInit {
+export class PaymentsListComponent implements OnInit, AfterViewInit {
   private readonly paymentService = inject(PaymentService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   @ViewChild('transactionTemplate') transactionTemplate!: TemplateRef<unknown>;
   @ViewChild('orderTemplate') orderTemplate!: TemplateRef<unknown>;
@@ -63,7 +64,6 @@ export class PaymentsListComponent implements OnInit {
   columns: ColumnDef[] = [];
 
   ngOnInit(): void {
-    this.initColumns();
     this.loadPayments();
 
     this.searchSubject
@@ -72,6 +72,11 @@ export class PaymentsListComponent implements OnInit {
         this.pageIndex = 0;
         this.loadPayments();
       });
+  }
+
+  ngAfterViewInit(): void {
+    this.initColumns();
+    this.cdr.detectChanges();
   }
 
   private initColumns(): void {

@@ -98,7 +98,7 @@
   <ng-template #etaTemplate let-row let-value="value">
     @if (value) {
       <span class="eta-cell" [class.overdue]="isOverdue(value, row.status)">
-        {{ value | date:'MMM d, y' }}
+        {{ value | date:'yyyy-MM-dd \'at\' h:mm a' }}
       </span>
     } @else {
       <span class="no-value">-</span>

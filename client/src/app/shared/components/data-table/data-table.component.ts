@@ -7,6 +7,8 @@ import {
   QueryList,
   TemplateRef,
   AfterContentInit,
+  OnChanges,
+  SimpleChanges,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -37,7 +39,7 @@ export interface ColumnDef {
   styleUrl: './data-table.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class DataTableComponent<T> implements AfterContentInit {
+export class DataTableComponent<T> implements AfterContentInit, OnChanges {
   @Input() data: T[] = [];
   @Input() columns: ColumnDef[] = [];
   @Input() totalCount = 0;
@@ -55,6 +57,16 @@ export class DataTableComponent<T> implements AfterContentInit {
   displayedColumns: string[] = [];
 
   ngAfterContentInit(): void {
+    this.updateDisplayedColumns();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['columns']) {
+      this.updateDisplayedColumns();
+    }
+  }
+
+  private updateDisplayedColumns(): void {
     this.displayedColumns = this.columns.map((col) => col.field);
   }
 
