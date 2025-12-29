@@ -1,0 +1,26 @@
+<mat-card class="metric-card" [ngClass]="'variant-' + variant">
+  <mat-card-content>
+    <div class="metric-header">
+      <div class="metric-icon-wrapper">
+        <mat-icon class="metric-icon">{{ icon }}</mat-icon>
+      </div>
+      <span class="metric-title">{{ title }}</span>
+    </div>
+
+    <div class="metric-body">
+      @if (loading) {
+        <div class="skeleton-loader"></div>
+      } @else {
+        <span class="metric-value">{{ formattedValue }}</span>
+      }
+    </div>
+
+    @if (change !== undefined && !loading) {
+      <div class="metric-footer" [class.positive]="isPositiveChange" [class.negative]="!isPositiveChange">
+        <mat-icon class="change-icon">{{ changeIcon }}</mat-icon>
+        <span class="change-value">{{ change | number:'1.1-1' }}%</span>
+        <span class="change-label">{{ changeLabel }}</span>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

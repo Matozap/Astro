@@ -1,0 +1,107 @@
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+// Page Header
+.page-header {
+  margin-bottom: 8px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+// Metrics Grid - 4 columns on desktop
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+// Charts Grid - 2:1 ratio
+.charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.chart-main,
+.chart-side {
+  min-height: 380px;
+}
+
+// Widgets Grid - 2:1 ratio
+.widgets-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.widget-main,
+.widget-side {
+  min-height: 360px;
+}
+
+// Responsive Breakpoints
+@media (max-width: 1400px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .charts-grid,
+  .widgets-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-side,
+  .widget-side {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    gap: 16px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .charts-grid,
+  .widgets-grid {
+    gap: 16px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-title {
+    font-size: 22px;
+  }
+
+  .page-subtitle {
+    font-size: 13px;
+  }
+}

@@ -10,11 +10,16 @@
 A modular monolith built on .NET 10 and C# 14, exposing a GraphQL API for managing products and orders. Orchestrated through .NET Aspire.
 
 ```
-src/
+server/
 ├── Astro.Api/            # GraphQL gateway (HotChocolate)
 ├── Astro.Application/    # Commands, queries, handlers (MediatR)
 ├── Astro.Domain/         # Entities, value objects, domain events
 ├── Astro.Infrastructure/ # Persistence, repositories (EF Core)
+
+client/                   # Angular 19 frontend
+├── src/app/core/         # Auth, layout, GraphQL config
+├── src/app/features/     # Dashboard, products, orders, payments, shipments
+├── src/app/shared/       # Reusable components and models
 ```
 
 ---
@@ -64,6 +69,8 @@ The database creates itself. Seed data appears: 10 products with descriptions an
 
 ## The Stack
 
+### Backend
+
 | Layer | Technology |
 |-------|------------|
 | API | HotChocolate 15 (GraphQL) |
@@ -72,6 +79,18 @@ The database creates itself. Seed data appears: 10 products with descriptions an
 | Infrastructure | EF Core, PostgreSQL |
 | Orchestration | .NET Aspire |
 | Messaging | MassTransit 8 |
+
+### Frontend
+
+| Layer | Technology |
+|-------|------------|
+| Framework | Angular 19 (standalone components) |
+| UI | Angular Material 19 (Material 3, dark theme) |
+| State | Angular Signals |
+| API Client | Apollo Angular 8 / @apollo/client 4 |
+| Styling | SCSS with CSS custom properties |
+
+The frontend follows a feature-based architecture with lazy-loaded routes. Each feature module (dashboard, products, orders, payments, shipments) is self-contained with its own components, services, and GraphQL queries. Shared components like `DataTableComponent`, `StatusBadgeComponent`, and `MetricCardComponent` promote consistency across the application.
 
 ---
 

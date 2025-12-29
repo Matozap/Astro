@@ -1,0 +1,81 @@
+// Breakpoints (Material Design)
+$breakpoint-xs: 0;
+$breakpoint-sm: 600px;
+$breakpoint-md: 960px;
+$breakpoint-lg: 1280px;
+$breakpoint-xl: 1920px;
+
+// Spacing scale
+$spacing-1: 4px;
+$spacing-2: 8px;
+$spacing-3: 12px;
+$spacing-4: 16px;
+$spacing-5: 20px;
+$spacing-6: 24px;
+$spacing-8: 32px;
+$spacing-10: 40px;
+$spacing-12: 48px;
+
+// Font sizes
+$font-size-xs: 0.75rem;    // 12px
+$font-size-sm: 0.875rem;   // 14px
+$font-size-base: 1rem;     // 16px
+$font-size-lg: 1.125rem;   // 18px
+$font-size-xl: 1.25rem;    // 20px
+$font-size-2xl: 1.5rem;    // 24px
+$font-size-3xl: 1.875rem;  // 30px
+$font-size-4xl: 2.25rem;   // 36px
+
+// Font weights
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Mixins for responsive design
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == xs {
+    @media (max-width: #{$breakpoint-sm - 1}) { @content; }
+  }
+  @else if $breakpoint == sm {
+    @media (min-width: $breakpoint-sm) { @content; }
+  }
+  @else if $breakpoint == md {
+    @media (min-width: $breakpoint-md) { @content; }
+  }
+  @else if $breakpoint == lg {
+    @media (min-width: $breakpoint-lg) { @content; }
+  }
+  @else if $breakpoint == xl {
+    @media (min-width: $breakpoint-xl) { @content; }
+  }
+}
+
+// Card mixin for consistent styling
+@mixin card {
+  background-color: var(--surface-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: $spacing-6;
+}
+
+// Scrollbar styling for dark theme
+@mixin dark-scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--background-color);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--surface-variant);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--text-muted);
+    }
+  }
+}

@@ -1,0 +1,102 @@
+<div class="payments-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Payments</h1>
+      <p class="page-subtitle">Track and manage payment transactions</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearch($event)"
+            placeholder="Search by order number or transaction ID..."
+          />
+          <mat-icon matPrefix>search</mat-icon>
+          @if (searchTerm) {
+            <button mat-icon-button matSuffix (click)="searchTerm = ''; onSearch('')">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="status-filter">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange()">
+            <mat-option [value]="null">All Statuses</mat-option>
+            @for (status of paymentStatuses; track status) {
+              <mat-option [value]="status">{{ status }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        @if (searchTerm || statusFilter !== null) {
+          <button mat-button color="primary" (click)="clearFilters()">
+            <mat-icon>filter_alt_off</mat-icon>
+            Clear Filters
+          </button>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Payments Table -->
+  <app-data-table
+    [data]="payments()"
+    [columns]="columns"
+    [totalCount]="totalCount()"
+    [pageSize]="pageSize"
+    [pageIndex]="pageIndex"
+    [loading]="loading()"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (rowClick)="onRowClick($event)"
+  ></app-data-table>
+
+  <!-- Column Templates -->
+  <ng-template #transactionTemplate let-row let-value="value">
+    @if (value) {
+      <span class="transaction-id">{{ value }}</span>
+    } @else {
+      <span class="no-value">-</span>
+    }
+  </ng-template>
+
+  <ng-template #orderTemplate let-row>
+    <div class="order-cell">
+      <span class="order-number">{{ row.order?.orderNumber }}</span>
+      <span class="customer-name">{{ row.order?.customerName }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template #amountTemplate let-row let-value="value">
+    @if (value) {
+      <span class="amount-cell">{{ value.amount | currency:value.currency }}</span>
+    }
+  </ng-template>
+
+  <ng-template #methodTemplate let-row let-value="value">
+    <div class="method-cell">
+      <mat-icon class="method-icon">{{ getMethodIcon(value) }}</mat-icon>
+      <span>{{ value || 'Unknown' }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template #statusTemplate let-row let-value="value">
+    <app-status-badge
+      [label]="value"
+      [variant]="getStatusVariant(value)"
+    ></app-status-badge>
+  </ng-template>
+
+  <ng-template #dateTemplate let-row let-value="value">
+    <span class="date-cell">{{ value | date:'MMM d, y, h:mm a' }}</span>
+  </ng-template>
+</div>

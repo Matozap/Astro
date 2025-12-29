@@ -1,0 +1,95 @@
+<div class="orders-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Orders</h1>
+      <p class="page-subtitle">Manage customer orders and track fulfillment</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearch($event)"
+            placeholder="Search by order number, customer..."
+          />
+          <mat-icon matPrefix>search</mat-icon>
+          @if (searchTerm) {
+            <button mat-icon-button matSuffix (click)="searchTerm = ''; onSearch('')">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="status-filter">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange()">
+            <mat-option [value]="null">All Statuses</mat-option>
+            @for (status of orderStatuses; track status) {
+              <mat-option [value]="status">{{ status }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        @if (searchTerm || statusFilter !== null) {
+          <button mat-button color="primary" (click)="clearFilters()">
+            <mat-icon>filter_alt_off</mat-icon>
+            Clear Filters
+          </button>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Orders Table -->
+  <app-data-table
+    [data]="orders()"
+    [columns]="columns"
+    [totalCount]="totalCount()"
+    [pageSize]="pageSize"
+    [pageIndex]="pageIndex"
+    [loading]="loading()"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (rowClick)="onRowClick($event)"
+  ></app-data-table>
+
+  <!-- Column Templates -->
+  <ng-template #orderNumberTemplate let-row let-value="value">
+    <span class="order-number">{{ value }}</span>
+  </ng-template>
+
+  <ng-template #customerTemplate let-row>
+    <div class="customer-cell">
+      <span class="customer-name">{{ row.customerName }}</span>
+      <span class="customer-email">{{ row.customerEmail }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template #totalTemplate let-row let-value="value">
+    @if (value) {
+      <span class="price-cell">{{ value.amount | currency:value.currency }}</span>
+    }
+  </ng-template>
+
+  <ng-template #itemCountTemplate let-row let-value="value">
+    <span class="item-count">{{ value }} {{ value === 1 ? 'item' : 'items' }}</span>
+  </ng-template>
+
+  <ng-template #statusTemplate let-row let-value="value">
+    <app-status-badge
+      [label]="value"
+      [variant]="getStatusVariant(value)"
+    ></app-status-badge>
+  </ng-template>
+
+  <ng-template #dateTemplate let-row let-value="value">
+    <span class="date-cell">{{ value | date:'MMM d, y, h:mm a' }}</span>
+  </ng-template>
+</div>

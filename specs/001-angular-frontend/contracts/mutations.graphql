@@ -1,0 +1,149 @@
+# GraphQL Mutations: Angular Frontend Application
+# Feature: 001-angular-frontend | Date: 2025-12-21
+# These mutations define all write operations for the frontend
+# Note: Initial implementation is read-only per spec, but mutations documented for future use
+
+#import "./fragments.graphql"
+
+# =============================================================================
+# API Test Mutation
+# =============================================================================
+
+mutation Echo($message: String!) {
+  echo(message: $message)
+}
+
+# =============================================================================
+# Product Mutations (Future: CRUD operations)
+# =============================================================================
+
+mutation CreateProduct($command: CreateProductCommand!) {
+  createProduct(command: $command) {
+    ...ProductFullFields
+  }
+}
+
+mutation UpdateProduct($command: UpdateProductCommand!) {
+  updateProduct(command: $command) {
+    ...ProductFullFields
+  }
+}
+
+mutation DeleteProduct($command: DeleteProductCommand!) {
+  deleteProduct(command: $command) {
+    success
+    message
+  }
+}
+
+mutation UpdateStock($command: UpdateStockCommand!) {
+  updateStock(command: $command) {
+    ...ProductFullFields
+  }
+}
+
+mutation AddProductImage($command: AddProductImageCommand!) {
+  addProductImage(command: $command) {
+    ...ProductImageFields
+  }
+}
+
+mutation RemoveProductImage($command: RemoveProductImageCommand!) {
+  removeProductImage(command: $command) {
+    success
+    message
+  }
+}
+
+# =============================================================================
+# Order Mutations (Future: Order management)
+# =============================================================================
+
+mutation CreateOrder($command: CreateOrderCommand!) {
+  createOrder(command: $command) {
+    ...OrderFullFields
+  }
+}
+
+mutation UpdateOrder($command: UpdateOrderCommand!) {
+  updateOrder(command: $command) {
+    ...OrderFullFields
+  }
+}
+
+mutation UpdateOrderStatus($command: UpdateOrderStatusCommand!) {
+  updateOrderStatus(command: $command) {
+    ...OrderFullFields
+  }
+}
+
+mutation CancelOrder($command: CancelOrderCommand!) {
+  cancelOrder(command: $command) {
+    ...OrderFullFields
+  }
+}
+
+# =============================================================================
+# Payment Mutations
+# =============================================================================
+
+mutation CreatePayment($command: CreatePaymentCommand!) {
+  createPayment(command: $command) {
+    ...PaymentListFields
+  }
+}
+
+mutation UpdatePaymentStatus($command: UpdatePaymentStatusCommand!) {
+  updatePaymentStatus(command: $command) {
+    ...PaymentListFields
+  }
+}
+
+# =============================================================================
+# Shipment Mutations
+# =============================================================================
+
+mutation CreateShipment($command: CreateShipmentCommand!) {
+  createShipment(command: $command) {
+    ...ShipmentFullFields
+  }
+}
+
+mutation UpdateShipment($command: UpdateShipmentCommand!) {
+  updateShipment(command: $command) {
+    ...ShipmentFullFields
+  }
+}
+
+# =============================================================================
+# Authentication Mutations (Future: When backend implements auth)
+# =============================================================================
+
+# Note: These mutations are placeholders for when backend authentication is implemented
+# Frontend will implement the UI and service structure, using mock authentication initially
+
+# mutation Login($input: LoginInput!) {
+#   login(input: $input) {
+#     token
+#     user {
+#       id
+#       email
+#       name
+#       role
+#     }
+#     expiresAt
+#   }
+# }
+
+# mutation Logout {
+#   logout {
+#     success
+#   }
+# }
+
+# mutation RefreshToken {
+#   refreshToken {
+#     token
+#     expiresAt
+#   }
+# }

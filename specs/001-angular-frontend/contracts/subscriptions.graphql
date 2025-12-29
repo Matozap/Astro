@@ -1,0 +1,129 @@
+# GraphQL Subscriptions: Angular Frontend Application
+# Feature: 001-angular-frontend | Date: 2025-12-21
+# These subscriptions define real-time update operations
+# Note: Out of scope for initial implementation per spec, but documented for future use
+
+#import "./fragments.graphql"
+
+# =============================================================================
+# System Subscriptions
+# =============================================================================
+
+subscription OnHeartbeat {
+  onHeartbeat
+}
+
+# =============================================================================
+# Product Subscriptions
+# =============================================================================
+
+subscription OnProductCreated {
+  onProductCreated {
+    ...ProductListFields
+  }
+}
+
+subscription OnProductUpdated {
+  onProductUpdated {
+    ...ProductListFields
+  }
+}
+
+subscription OnProductDeleted {
+  onProductDeleted
+}
+
+subscription OnStockUpdated {
+  onStockUpdated {
+    id
+    stockQuantity
+    isLowStock
+  }
+}
+
+subscription OnProductImageAdded {
+  onProductImageAdded {
+    ...ProductImageFields
+  }
+}
+
+subscription OnProductImageRemoved {
+  onProductImageRemoved
+}
+
+# =============================================================================
+# Order Subscriptions
+# =============================================================================
+
+subscription OnOrderCreated {
+  onOrderCreated {
+    ...OrderListFields
+  }
+}
+
+subscription OnOrderUpdated {
+  onOrderUpdated {
+    ...OrderListFields
+  }
+}
+
+subscription OnOrderStatusChanged {
+  onOrderStatusChanged {
+    id
+    orderNumber
+    status
+    updatedAt
+  }
+}
+
+subscription OnOrderCancelled {
+  onOrderCancelled {
+    id
+    orderNumber
+    status
+  }
+}
+
+# =============================================================================
+# Payment Subscriptions
+# =============================================================================
+
+subscription OnPaymentCreated {
+  onPaymentCreated {
+    ...PaymentListFields
+  }
+}
+
+subscription OnPaymentStatusChanged {
+  onPaymentStatusChanged {
+    id
+    orderId
+    status
+    updatedAt
+  }
+}
+
+# =============================================================================
+# Shipment Subscriptions
+# =============================================================================
+
+subscription OnShipmentCreated {
+  onShipmentCreated {
+    ...ShipmentListFields
+  }
+}
+
+subscription OnShipmentUpdated {
+  onShipmentUpdated {
+    ...ShipmentListFields
+  }
+}
+
+subscription OnShipmentStatusChanged {
+  onShipmentStatusChanged {
+    id
+    trackingNumber
+    status
+    updatedAt
+  }
+}

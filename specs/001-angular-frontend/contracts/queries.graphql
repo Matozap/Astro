@@ -1,0 +1,223 @@
+# GraphQL Queries: Angular Frontend Application
+# Feature: 001-angular-frontend | Date: 2025-12-21
+# These queries define all read operations for the frontend
+
+#import "./fragments.graphql"
+
+# =============================================================================
+# API Info & Health
+# =============================================================================
+
+query GetServerTime {
+  serverTime
+}
+
+query GetApiInfo {
+  apiInfo {
+    name
+    version
+    description
+  }
+}
+
+# =============================================================================
+# Product Queries
+# =============================================================================
+
+query GetProducts(
+  $where: ProductFilterInput
+  $order: [ProductSortInput!]
+  $first: Int
+  $after: String
+) {
+  products(where: $where, order: $order, first: $first, after: $after) {
+    ...ProductListFields
+  }
+}
+
+query GetProductById($id: UUID!) {
+  products(where: { id: { eq: $id } }) {
+    ...ProductFullFields
+  }
+}
+
+query GetProductsBySku($sku: String!) {
+  products(where: { sku: { eq: $sku } }) {
+    ...ProductFullFields
+  }
+}
+
+query GetActiveProducts($order: [ProductSortInput!]) {
+  products(where: { isActive: { eq: true } }, order: $order) {
+    ...ProductListFields
+  }
+}
+
+query GetLowStockProducts {
+  products(where: { isLowStock: { eq: true } }) {
+    ...ProductListFields
+  }
+}
+
+query GetProductCount {
+  products {
+    id
+  }
+}
+
+# =============================================================================
+# Order Queries
+# =============================================================================
+
+query GetOrders(
+  $where: OrderFilterInput
+  $order: [OrderSortInput!]
+  $first: Int
+  $after: String
+) {
+  orders(where: $where, order: $order, first: $first, after: $after) {
+    ...OrderListFields
+  }
+}
+
+query GetOrderById($id: UUID!) {
+  orders(where: { id: { eq: $id } }) {
+    ...OrderFullFields
+  }
+}
+
+query GetOrderByNumber($orderNumber: String!) {
+  orders(where: { orderNumber: { eq: $orderNumber } }) {
+    ...OrderFullFields
+  }
+}
+
+query GetOrdersByStatus($status: OrderStatus!) {
+  orders(where: { status: { eq: $status } }) {
+    ...OrderListFields
+  }
+}
+
+query GetOrdersByCustomerEmail($email: String!) {
+  orders(where: { customerEmail: { eq: $email } }) {
+    ...OrderListFields
+  }
+}
+
+query GetRecentOrders($limit: Int = 10) {
+  orders(order: [{ createdAt: DESC }], first: $limit) {
+    ...OrderListFields
+  }
+}
+
+# =============================================================================
+# Payment Queries (Note: Backend may not expose payment queries yet)
+# =============================================================================
+
+# Payment queries will be implemented when backend exposes them
+# For now, payments are accessed through order relationships
+
+# =============================================================================
+# Shipment Queries
+# =============================================================================
+
+query GetShipments(
+  $where: ShipmentFilterInput
+  $order: [ShipmentSortInput!]
+  $first: Int
+  $after: String
+) {
+  shipments(where: $where, order: $order, first: $first, after: $after) {
+    ...ShipmentListFields
+  }
+}
+
+query GetShipmentById($id: UUID!) {
+  shipments(where: { id: { eq: $id } }) {
+    ...ShipmentFullFields
+  }
+}
+
+query GetShipmentByTrackingNumber($trackingNumber: String!) {
+  shipments(where: { trackingNumber: { eq: $trackingNumber } }) {
+    ...ShipmentFullFields
+  }
+}
+
+query GetShipmentsByStatus($status: ShipmentStatus!) {
+  shipments(where: { status: { eq: $status } }) {
+    ...ShipmentListFields
+  }
+}
+
+query GetShipmentsByOrderId($orderId: UUID!) {
+  shipments(where: { orderId: { eq: $orderId } }) {
+    ...ShipmentListFields
+  }
+}
+
+query GetShipmentsInTransit {
+  shipments(where: { status: { in: [SHIPPED, IN_TRANSIT, OUT_FOR_DELIVERY] } }) {
+    ...ShipmentListFields
+  }
+}
+
+query GetDelayedShipments {
+  shipments(where: { status: { eq: DELAYED } }) {
+    ...ShipmentListFields
+  }
+}
+
+# =============================================================================
+# Dashboard Aggregate Queries
+# =============================================================================
+
+# These queries fetch data for dashboard metrics and charts
+# Note: These may need to be computed client-side from entity queries
+# until the backend exposes dedicated aggregate endpoints
+
+query GetDashboardProductMetrics {
+  products {
+    id
+    isActive
+    isLowStock
+  }
+}
+
+query GetDashboardOrderMetrics {
+  orders {
+    id
+    status
+    totalAmount {
+      ...MoneyFields
+    }
+    createdAt
+  }
+}
+
+query GetDashboardShipmentMetrics {
+  shipments {
+    id
+    status
+    createdAt
+    estimatedDeliveryDate
+    actualDeliveryDate
+  }
+}
+
+# Monthly revenue data for charts (computed client-side)
+query GetOrdersForRevenueChart($startDate: DateTime, $endDate: DateTime) {
+  orders(
+    where: {
+      createdAt: { gte: $startDate, lte: $endDate }
+      status: { neq: CANCELLED }
+    }
+    order: [{ createdAt: ASC }]
+  ) {
+    id
+    totalAmount {
+      ...MoneyFields
+    }
+    createdAt
+  }
+}

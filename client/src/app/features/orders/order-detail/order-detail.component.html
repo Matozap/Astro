@@ -1,0 +1,175 @@
+<div class="order-detail-page">
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+    </div>
+  } @else if (order()) {
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-left">
+        <button mat-icon-button (click)="goBack()" class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div class="header-content">
+          <h1 class="page-title">{{ order()!.orderNumber }}</h1>
+          <p class="page-subtitle">Order placed on {{ order()!.createdAt | date:'MMM d, y, h:mm a' }}</p>
+        </div>
+      </div>
+      <app-status-badge
+        [label]="order()!.status"
+        [variant]="getStatusVariant(order()!.status)"
+        class="status-badge"
+      ></app-status-badge>
+    </div>
+
+    <div class="detail-grid">
+      <!-- Customer Information -->
+      <mat-card class="detail-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>person</mat-icon>
+          <mat-card-title>Customer Information</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-row">
+            <span class="info-label">Name</span>
+            <span class="info-value">{{ order()!.customerName }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Email</span>
+            <span class="info-value">{{ order()!.customerEmail }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Shipping Address -->
+      <mat-card class="detail-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>local_shipping</mat-icon>
+          <mat-card-title>Shipping Address</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="address-block">
+            <p>{{ order()!.shippingAddress.street }}</p>
+            <p>{{ order()!.shippingAddress.city }}, {{ order()!.shippingAddress.state }} {{ order()!.shippingAddress.postalCode }}</p>
+            <p>{{ order()!.shippingAddress.country }}</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Order Summary -->
+      <mat-card class="detail-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>receipt</mat-icon>
+          <mat-card-title>Order Summary</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-row">
+            <span class="info-label">Items</span>
+            <span class="info-value">{{ order()!.itemCount }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Total</span>
+            <span class="info-value price">{{ order()!.totalAmount.amount | currency:order()!.totalAmount.currency }}</span>
+          </div>
+          @if (order()!.notes) {
+            <div class="info-row notes">
+              <span class="info-label">Notes</span>
+              <span class="info-value">{{ order()!.notes }}</span>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Order Timeline -->
+      <mat-card class="detail-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>timeline</mat-icon>
+          <mat-card-title>Timeline</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-row">
+            <span class="info-label">Created</span>
+            <span class="info-value">{{ order()!.createdAt | date:'MMM d, y, h:mm a' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Last Updated</span>
+            <span class="info-value">{{ order()!.updatedAt | date:'MMM d, y, h:mm a' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Created By</span>
+            <span class="info-value">{{ order()!.createdBy }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Order Items -->
+    <mat-card class="items-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>inventory_2</mat-icon>
+        <mat-card-title>Order Items</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="order()!.details" class="items-table">
+          <ng-container matColumnDef="productName">
+            <th mat-header-cell *matHeaderCellDef>Product</th>
+            <td mat-cell *matCellDef="let item">{{ item.productName }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="quantity">
+            <th mat-header-cell *matHeaderCellDef>Quantity</th>
+            <td mat-cell *matCellDef="let item">{{ item.quantity }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="unitPrice">
+            <th mat-header-cell *matHeaderCellDef>Unit Price</th>
+            <td mat-cell *matCellDef="let item" class="price-cell">
+              {{ item.unitPrice.amount | currency:item.unitPrice.currency }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="lineTotal">
+            <th mat-header-cell *matHeaderCellDef>Line Total</th>
+            <td mat-cell *matCellDef="let item" class="price-cell">
+              {{ item.lineTotal.amount | currency:item.lineTotal.currency }}
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <div class="order-total">
+          <span class="total-label">Order Total</span>
+          <span class="total-value">{{ order()!.totalAmount.amount | currency:order()!.totalAmount.currency }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Actions -->
+    <div class="actions-row">
+      <button mat-stroked-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Orders
+      </button>
+      @if (canUpdateStatus()) {
+        <button mat-flat-button color="primary" [matMenuTriggerFor]="statusMenu">
+          <mat-icon>edit</mat-icon>
+          Update Status
+        </button>
+        <mat-menu #statusMenu="matMenu">
+          @for (status of getAvailableStatuses(); track status) {
+            <button mat-menu-item (click)="updateStatus(status)">{{ status }}</button>
+          }
+        </mat-menu>
+      }
+    </div>
+  } @else {
+    <div class="not-found">
+      <mat-icon>search_off</mat-icon>
+      <h2>Order Not Found</h2>
+      <p>The order you're looking for doesn't exist or has been removed.</p>
+      <button mat-flat-button color="primary" (click)="goBack()">Back to Orders</button>
+    </div>
+  }
+</div>
