@@ -12,10 +12,11 @@ var api = builder.AddProject<Projects.Astro_Api>("astro-api")
     .WaitForStart(database)
     .WithExternalHttpEndpoints();
 
-// Angular Frontend Client
-var client = builder.AddNpmApp("client", "../client", "start")
+// Angular Frontend Client (uses 4200 but needs a different port for aspire dashboard)
+var translatedPort = 4201;
+var client = builder.AddNpmApp("client", "../client")
     .WithReference(api)
-    .WithHttpEndpoint(port: 4201, env: "PORT")
+    .WithHttpEndpoint(port: translatedPort, env: "PORT")
     .WaitFor(api)
     .WithExternalHttpEndpoints();
 
