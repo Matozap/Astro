@@ -1,0 +1,35 @@
+<mat-card class="chart-card">
+  <mat-card-header>
+    <mat-card-title class="chart-title">
+      <mat-icon>donut_large</mat-icon>
+      Order Status
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    @if (loading()) {
+      <div class="chart-skeleton">
+        <div class="skeleton-circle"></div>
+      </div>
+    } @else {
+      <div class="chart-layout">
+        <div
+          echarts
+          [options]="chartOption()"
+          class="chart-container"
+        ></div>
+        <div class="legend-container">
+          @for (item of statusData(); track item.status) {
+            <div class="legend-item">
+              <span
+                class="legend-dot"
+                [style.background-color]="getStatusColor(item.status)"
+              ></span>
+              <span class="legend-label">{{ formatStatus(item.status) }}</span>
+              <span class="legend-value">{{ item.count }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

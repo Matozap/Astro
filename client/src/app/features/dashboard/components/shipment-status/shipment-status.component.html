@@ -1,0 +1,50 @@
+<mat-card class="widget-card">
+  <mat-card-header>
+    <mat-card-title class="widget-title">
+      <mat-icon>local_shipping</mat-icon>
+      Shipment Status
+    </mat-card-title>
+    <a mat-button color="primary" routerLink="/shipments" class="view-all">
+      View All
+      <mat-icon>arrow_forward</mat-icon>
+    </a>
+  </mat-card-header>
+  <mat-card-content>
+    @if (loading()) {
+      <div class="skeleton-list">
+        @for (i of [1, 2, 3, 4, 5]; track i) {
+          <div class="skeleton-item"></div>
+        }
+      </div>
+    } @else {
+      <div class="status-list">
+        @for (item of statusData(); track item.status) {
+          <div class="status-item">
+            <div class="status-info">
+              <div
+                class="status-icon-wrapper"
+                [style.background-color]="getStatusConfig(item.status).color + '20'"
+              >
+                <mat-icon [style.color]="getStatusConfig(item.status).color">
+                  {{ getStatusConfig(item.status).icon }}
+                </mat-icon>
+              </div>
+              <div class="status-details">
+                <span class="status-label">{{ getStatusConfig(item.status).label }}</span>
+                <span class="status-count">{{ item.count }} shipments</span>
+              </div>
+            </div>
+            <div class="status-progress">
+              <mat-progress-bar
+                mode="determinate"
+                [value]="getPercentage(item.count)"
+                [style.--mdc-linear-progress-active-indicator-color]="getStatusConfig(item.status).color"
+              ></mat-progress-bar>
+              <span class="progress-value">{{ getPercentage(item.count) | number:'1.0-0' }}%</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </mat-card-content>
+</mat-card>

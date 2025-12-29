@@ -118,3 +118,18 @@ docker-compose.override.yml
 # Other
 .claude/
 CLAUDE.md
+
+# Node.js / Angular (client/)
+client/node_modules/
+client/dist/
+client/.angular/
+client/.cache/
+client/coverage/
+client/*.tsbuildinfo
+client/.sass-cache/
+client/connect.lock
+client/libpeerconnection.log
+npm-debug.log
+testem.log
+typings/
+.angular/

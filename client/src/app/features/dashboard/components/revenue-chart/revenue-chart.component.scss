@@ -1,0 +1,113 @@
+.chart-card {
+  background-color: var(--surface-color) !important;
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--shadow-md) !important;
+  border: 1px solid var(--border-color);
+  height: 100%;
+
+  mat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 0;
+  }
+
+  mat-card-content {
+    padding: 16px 24px 24px !important;
+  }
+}
+
+.chart-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 !important;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--primary-color);
+  }
+}
+
+.chart-actions {
+  display: flex;
+  align-items: center;
+}
+
+.view-toggle {
+  background-color: var(--surface-variant);
+  border-radius: var(--radius-md);
+
+  ::ng-deep {
+    .mat-button-toggle {
+      background-color: transparent;
+      color: var(--text-secondary);
+      font-size: 12px;
+
+      &.mat-button-toggle-checked {
+        background-color: var(--primary-color);
+        color: var(--background-color);
+      }
+
+      .mat-button-toggle-button {
+        padding: 0 12px;
+        height: 32px;
+      }
+    }
+  }
+}
+
+.chart-container {
+  width: 100%;
+  height: 300px;
+}
+
+.chart-skeleton {
+  width: 100%;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.skeleton-line {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(
+    90deg,
+    var(--surface-variant) 25%,
+    var(--border-color) 50%,
+    var(--surface-variant) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .chart-card {
+    mat-card-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+  }
+
+  .chart-container {
+    height: 250px;
+  }
+}

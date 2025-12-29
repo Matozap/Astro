@@ -1,0 +1,96 @@
+.table-container {
+  background-color: var(--surface-color);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.loading-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+}
+
+.data-table {
+  width: 100%;
+  background: transparent !important;
+
+  th.mat-header-cell {
+    background-color: var(--surface-variant);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom-color: var(--border-color);
+    padding: 16px;
+
+    .mat-sort-header-arrow {
+      color: var(--text-secondary);
+    }
+  }
+
+  td.mat-cell {
+    color: var(--text-primary);
+    font-size: 14px;
+    border-bottom-color: var(--border-color);
+    padding: 16px;
+  }
+
+  .table-row {
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+
+    &:hover {
+      background-color: var(--surface-variant);
+    }
+  }
+}
+
+.no-data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+::ng-deep {
+  .mat-mdc-paginator {
+    background: transparent !important;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border-color);
+
+    .mat-mdc-paginator-container {
+      padding: 8px 16px;
+    }
+
+    .mat-mdc-select-value {
+      color: var(--text-primary);
+    }
+
+    .mat-mdc-paginator-range-label {
+      color: var(--text-secondary);
+    }
+
+    .mat-mdc-icon-button {
+      color: var(--text-secondary);
+
+      &:disabled {
+        color: var(--text-muted);
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .data-table {
+    th.mat-header-cell,
+    td.mat-cell {
+      padding: 12px;
+    }
+  }
+}

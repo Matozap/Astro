@@ -12,6 +12,13 @@ var api = builder.AddProject<Projects.Astro_Api>("astro-api")
     .WaitForStart(database)
     .WithExternalHttpEndpoints();
 
+// Angular Frontend Client
+var client = builder.AddNpmApp("client", "../client", "start")
+    .WithReference(api)
+    .WithHttpEndpoint(port: 4201, env: "PORT")
+    .WaitFor(api)
+    .WithExternalHttpEndpoints();
+
 try
 {
     builder.Build().Run();

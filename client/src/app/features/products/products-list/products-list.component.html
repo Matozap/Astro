@@ -1,0 +1,85 @@
+<div class="products-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Products</h1>
+      <p class="page-subtitle">Manage your product catalog</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearch($event)"
+            placeholder="Search by name or SKU..."
+          />
+          <mat-icon matPrefix>search</mat-icon>
+          @if (searchTerm) {
+            <button mat-icon-button matSuffix (click)="searchTerm = ''; onSearch('')">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="status-filter">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="activeFilter" (ngModelChange)="onActiveFilterChange()">
+            <mat-option [value]="null">All</mat-option>
+            <mat-option [value]="true">Active</mat-option>
+            <mat-option [value]="false">Inactive</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        @if (searchTerm || activeFilter !== null) {
+          <button mat-button color="primary" (click)="clearFilters()">
+            <mat-icon>filter_alt_off</mat-icon>
+            Clear Filters
+          </button>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Products Table -->
+  <app-data-table
+    [data]="products()"
+    [columns]="columns"
+    [totalCount]="totalCount()"
+    [pageSize]="pageSize"
+    [pageIndex]="pageIndex"
+    [loading]="loading()"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (rowClick)="onRowClick($event)"
+  ></app-data-table>
+
+  <!-- Column Templates -->
+  <ng-template #priceTemplate let-row let-value="value">
+    @if (value) {
+      <span class="price-cell">{{ value.amount | currency:value.currency }}</span>
+    }
+  </ng-template>
+
+  <ng-template #stockTemplate let-row let-value="value">
+    <div class="stock-cell">
+      <span class="stock-quantity">{{ value }}</span>
+      <app-status-badge
+        [label]="getStockStatus(value).label"
+        [variant]="getStockStatus(value).variant"
+      ></app-status-badge>
+    </div>
+  </ng-template>
+
+  <ng-template #statusTemplate let-row let-value="value">
+    <app-status-badge
+      [label]="value ? 'Active' : 'Inactive'"
+      [variant]="value ? 'success' : 'default'"
+    ></app-status-badge>
+  </ng-template>
+</div>

@@ -1,0 +1,156 @@
+@use './styles/theme';
+@use './styles/variables' as vars;
+
+// Import Manrope font
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Manrope', 'Roboto', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  @include vars.dark-scrollbar;
+}
+
+// Global link styles
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+
+  &:hover {
+    color: var(--primary-light);
+  }
+}
+
+// Global button styles for Material buttons
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-stroked-button,
+.mat-mdc-flat-button {
+  border-radius: var(--radius-md) !important;
+}
+
+// Card styling
+.mat-mdc-card {
+  background-color: var(--surface-color) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+// Table styling
+.mat-mdc-table {
+  background-color: transparent !important;
+}
+
+.mat-mdc-row {
+  &:hover {
+    background-color: var(--surface-hover) !important;
+  }
+}
+
+.mat-mdc-header-row {
+  background-color: var(--surface-variant) !important;
+}
+
+// Form field styling
+.mat-mdc-form-field {
+  .mdc-text-field--filled {
+    background-color: var(--surface-variant) !important;
+    border-radius: var(--radius-md) var(--radius-md) 0 0 !important;
+  }
+}
+
+// Snackbar/Toast styling
+.mat-mdc-snack-bar-container {
+  &.success-snackbar {
+    --mdc-snackbar-container-color: var(--success-color);
+  }
+
+  &.error-snackbar {
+    --mdc-snackbar-container-color: var(--error-color);
+  }
+
+  &.warning-snackbar {
+    --mdc-snackbar-container-color: var(--warning-color);
+  }
+
+  &.info-snackbar {
+    --mdc-snackbar-container-color: var(--info-color);
+  }
+}
+
+// Utility classes
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-success { color: var(--success-color); }
+.text-warning { color: var(--warning-color); }
+.text-error { color: var(--error-color); }
+.text-info { color: var(--info-color); }
+
+.bg-surface { background-color: var(--surface-color); }
+.bg-surface-variant { background-color: var(--surface-variant); }
+.bg-elevated { background-color: var(--background-elevated); }
+
+// Flexbox utilities
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.items-end { align-items: flex-end; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.justify-end { justify-content: flex-end; }
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.gap-6 { gap: 24px; }
+
+// Spacing utilities
+.p-0 { padding: 0; }
+.p-1 { padding: 4px; }
+.p-2 { padding: 8px; }
+.p-3 { padding: 12px; }
+.p-4 { padding: 16px; }
+.p-6 { padding: 24px; }
+
+.m-0 { margin: 0; }
+.m-1 { margin: 4px; }
+.m-2 { margin: 8px; }
+.m-3 { margin: 12px; }
+.m-4 { margin: 16px; }
+.m-6 { margin: 24px; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-2 { margin-bottom: 8px; }
+.mb-4 { margin-bottom: 16px; }
+.mb-6 { margin-bottom: 24px; }
+
+.mt-0 { margin-top: 0; }
+.mt-2 { margin-top: 8px; }
+.mt-4 { margin-top: 16px; }
+.mt-6 { margin-top: 24px; }
+
+// Width utilities
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+
+// Border radius
+.rounded { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.rounded-xl { border-radius: var(--radius-xl); }
+
+// Scrollable container
+.scrollable {
+  overflow-y: auto;
+  @include vars.dark-scrollbar;
+}

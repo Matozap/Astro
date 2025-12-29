@@ -1,0 +1,236 @@
+# GraphQL Fragments: Angular Frontend Application
+# These fragments define reusable field selections for GraphQL operations
+
+# =============================================================================
+# Common Value Object Fragments
+# =============================================================================
+
+fragment MoneyFields on Money {
+  amount
+  currency
+}
+
+fragment AddressFields on Address {
+  street
+  city
+  state
+  postalCode
+  country
+}
+
+fragment WeightFields on Weight {
+  value
+  unit
+}
+
+fragment DimensionsFields on Dimensions {
+  length
+  width
+  height
+  unit
+}
+
+# =============================================================================
+# Product Fragments
+# =============================================================================
+
+fragment ProductDetailFields on ProductDetail {
+  id
+  key
+  value
+}
+
+fragment ProductImageFields on ProductImage {
+  id
+  url
+  altText
+  isPrimary
+  storageMode
+}
+
+fragment ProductListFields on Product {
+  id
+  name
+  sku
+  price {
+    ...MoneyFields
+  }
+  stockQuantity
+  isActive
+  isLowStock
+  createdAt
+  updatedAt
+}
+
+fragment ProductFullFields on Product {
+  id
+  name
+  description
+  sku
+  price {
+    ...MoneyFields
+  }
+  stockQuantity
+  lowStockThreshold
+  isActive
+  isLowStock
+  details {
+    ...ProductDetailFields
+  }
+  images {
+    ...ProductImageFields
+  }
+  createdAt
+  updatedAt
+  createdBy
+  modifiedBy
+}
+
+# =============================================================================
+# Order Fragments
+# =============================================================================
+
+fragment OrderDetailFields on OrderDetail {
+  id
+  productId
+  productName
+  quantity
+  unitPrice {
+    ...MoneyFields
+  }
+  lineTotal {
+    ...MoneyFields
+  }
+}
+
+fragment OrderListFields on Order {
+  id
+  orderNumber
+  customerName
+  customerEmail
+  status
+  totalAmount {
+    ...MoneyFields
+  }
+  itemCount
+  createdAt
+  updatedAt
+}
+
+fragment OrderFullFields on Order {
+  id
+  orderNumber
+  customerName
+  customerEmail
+  shippingAddress {
+    ...AddressFields
+  }
+  status
+  totalAmount {
+    ...MoneyFields
+  }
+  notes
+  details {
+    ...OrderDetailFields
+  }
+  itemCount
+  createdAt
+  updatedAt
+  createdBy
+  modifiedBy
+}
+
+# =============================================================================
+# Payment Fragments
+# =============================================================================
+
+fragment PaymentListFields on Payment {
+  id
+  orderId
+  status
+  amount {
+    ...MoneyFields
+  }
+  paymentMethod
+  transactionId
+  createdAt
+  updatedAt
+}
+
+fragment PaymentWithOrderFields on Payment {
+  ...PaymentListFields
+  order {
+    ...OrderListFields
+  }
+}
+
+# =============================================================================
+# Shipment Fragments
+# =============================================================================
+
+fragment TrackingDetailFields on TrackingDetail {
+  id
+  timestamp
+  location
+  status
+  description
+}
+
+fragment ShipmentItemFields on ShipmentItem {
+  id
+  productId
+  productName
+  quantity
+}
+
+fragment ShipmentListFields on Shipment {
+  id
+  orderId
+  trackingNumber
+  carrier
+  status
+  shippingCost {
+    ...MoneyFields
+  }
+  estimatedDeliveryDate
+  actualDeliveryDate
+  itemCount
+  createdAt
+  updatedAt
+}
+
+fragment ShipmentFullFields on Shipment {
+  id
+  orderId
+  trackingNumber
+  carrier
+  status
+  originAddress {
+    ...AddressFields
+  }
+  destinationAddress {
+    ...AddressFields
+  }
+  weight {
+    ...WeightFields
+  }
+  dimensions {
+    ...DimensionsFields
+  }
+  shippingCost {
+    ...MoneyFields
+  }
+  estimatedDeliveryDate
+  actualDeliveryDate
+  trackingDetails {
+    ...TrackingDetailFields
+  }
+  items {
+    ...ShipmentItemFields
+  }
+  itemCount
+  createdAt
+  updatedAt
+  createdBy
+  modifiedBy
+}

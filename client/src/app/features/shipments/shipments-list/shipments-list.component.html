@@ -1,0 +1,114 @@
+<div class="shipments-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Shipments</h1>
+      <p class="page-subtitle">Track and manage package deliveries</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <mat-card class="filters-card">
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search</mat-label>
+          <input
+            matInput
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearch($event)"
+            placeholder="Search by tracking number..."
+          />
+          <mat-icon matPrefix>search</mat-icon>
+          @if (searchTerm) {
+            <button mat-icon-button matSuffix (click)="searchTerm = ''; onSearch('')">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="carrier-filter">
+          <mat-label>Carrier</mat-label>
+          <mat-select [(ngModel)]="carrierFilter" (ngModelChange)="onCarrierFilterChange()">
+            <mat-option [value]="null">All Carriers</mat-option>
+            @for (carrier of carriers; track carrier) {
+              <mat-option [value]="carrier">{{ carrier }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="status-filter">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange()">
+            <mat-option [value]="null">All Statuses</mat-option>
+            @for (status of shipmentStatuses; track status) {
+              <mat-option [value]="status">{{ getStatusLabel(status) }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        @if (searchTerm || statusFilter !== null || carrierFilter !== null) {
+          <button mat-button color="primary" (click)="clearFilters()">
+            <mat-icon>filter_alt_off</mat-icon>
+            Clear Filters
+          </button>
+        }
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Shipments Table -->
+  <app-data-table
+    [data]="shipments()"
+    [columns]="columns"
+    [totalCount]="totalCount()"
+    [pageSize]="pageSize"
+    [pageIndex]="pageIndex"
+    [loading]="loading()"
+    (pageChange)="onPageChange($event)"
+    (sortChange)="onSortChange($event)"
+    (rowClick)="onRowClick($event)"
+  ></app-data-table>
+
+  <!-- Column Templates -->
+  <ng-template #trackingTemplate let-row let-value="value">
+    <span class="tracking-number">{{ value }}</span>
+  </ng-template>
+
+  <ng-template #carrierTemplate let-row let-value="value">
+    <div class="carrier-cell">
+      <mat-icon class="carrier-icon">{{ getCarrierIcon(value) }}</mat-icon>
+      <span>{{ value }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template #destinationTemplate let-row>
+    <div class="destination-cell">
+      <span class="city">{{ row.destinationAddress.city }}, {{ row.destinationAddress.state }}</span>
+      <span class="country">{{ row.destinationAddress.country }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template #costTemplate let-row let-value="value">
+    @if (value) {
+      <span class="cost-cell">{{ value.amount | currency:value.currency }}</span>
+    }
+  </ng-template>
+
+  <ng-template #etaTemplate let-row let-value="value">
+    @if (value) {
+      <span class="eta-cell" [class.overdue]="isOverdue(value, row.status)">
+        {{ value | date:'MMM d, y' }}
+      </span>
+    } @else {
+      <span class="no-value">-</span>
+    }
+  </ng-template>
+
+  <ng-template #statusTemplate let-row let-value="value">
+    <app-status-badge
+      [label]="getStatusLabel(value)"
+      [variant]="getStatusVariant(value)"
+    ></app-status-badge>
+  </ng-template>
+</div>
