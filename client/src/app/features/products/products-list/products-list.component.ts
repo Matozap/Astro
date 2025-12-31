@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit, inject, signal, TemplateRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -39,6 +40,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 export class ProductsListComponent implements OnInit, AfterViewInit {
   private readonly productService = inject(ProductService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly router = inject(Router);
 
   @ViewChild('priceTemplate') priceTemplate!: TemplateRef<unknown>;
   @ViewChild('stockTemplate') stockTemplate!: TemplateRef<unknown>;
@@ -130,8 +132,7 @@ export class ProductsListComponent implements OnInit, AfterViewInit {
   }
 
   onRowClick(product: Product): void {
-    // Navigate to product detail or open dialog
-    console.log('Product clicked:', product);
+    this.router.navigate(['/products', product.id]);
   }
 
   getStockStatus(quantity: number): { label: string; variant: 'success' | 'warning' | 'error' } {

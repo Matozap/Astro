@@ -28,10 +28,22 @@ export const routes: Routes = [
       },
       {
         path: 'products',
-        loadComponent: () =>
-          import('./features/products/products-list/products-list.component').then(
-            (m) => m.ProductsListComponent
-          ),
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/products/products-list/products-list.component').then(
+                (m) => m.ProductsListComponent
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/products/product-detail/product-detail.component').then(
+                (m) => m.ProductDetailComponent
+              ),
+          },
+        ],
       },
       {
         path: 'orders',
@@ -54,10 +66,22 @@ export const routes: Routes = [
       },
       {
         path: 'payments',
-        loadComponent: () =>
-          import('./features/payments/payments-list/payments-list.component').then(
-            (m) => m.PaymentsListComponent
-          ),
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/payments/payments-list/payments-list.component').then(
+                (m) => m.PaymentsListComponent
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/payments/payment-detail/payment-detail.component').then(
+                (m) => m.PaymentDetailComponent
+              ),
+          },
+        ],
       },
       {
         path: 'shipments',
