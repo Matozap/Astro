@@ -36,7 +36,7 @@ public class AddProductImageCommandHandlerTests
 
         typeof(Entity).GetProperty("Id")!.SetValue(existingProduct, productId);
 
-        _repository.GetByIdWithDetailsAsync(productId, Arg.Any<CancellationToken>())
+        _repository.GetByIdAsync(productId, Arg.Any<CancellationToken>())
             .Returns(existingProduct);
 
         var command = new AddProductImageCommand(
@@ -55,7 +55,7 @@ public class AddProductImageCommandHandlerTests
         result.StorageMode.ShouldBe(StorageMode.Azure);
         result.IsPrimary.ShouldBeTrue();
 
-        _repository.Received(1).Update(Arg.Any<Product>());
+        await _repository.Received(1).AddImageAsync(Arg.Any<ProductImage>(), Arg.Any<CancellationToken>());
         await _unitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 
@@ -63,7 +63,7 @@ public class AddProductImageCommandHandlerTests
     public async Task Handle_WithNonExistentProduct_ShouldThrowProductNotFoundException()
     {
         var productId = Guid.NewGuid();
-        _repository.GetByIdWithDetailsAsync(productId, Arg.Any<CancellationToken>())
+        _repository.GetByIdAsync(productId, Arg.Any<CancellationToken>())
             .Returns((Product?)null);
 
         var command = new AddProductImageCommand(
@@ -79,16 +79,19 @@ public class AddProductImageCommandHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WithSecondPrimaryImage_ShouldRemovePrimaryFromFirst()
+    public async Task Handle_WithSecondPrimaryImage_ShouldAddImageDirectly()
     {
+        // With the direct insertion optimization, the handler no longer manages
+        // primary image logic. That responsibility is now at the application/UI layer.
+        // This test verifies that the handler simply inserts the image as requested.
+
         var productId = Guid.NewGuid();
         var existingProduct = Product.Create(
             "Test Product", "Description", 50m, "TEST001", 100, 10, true, "creator");
 
         typeof(Entity).GetProperty("Id")!.SetValue(existingProduct, productId);
-        existingProduct.AddImage("first-image.jpg", "https://example.com/first.jpg", StorageMode.Azure, true);
 
-        _repository.GetByIdWithDetailsAsync(productId, Arg.Any<CancellationToken>())
+        _repository.GetByIdAsync(productId, Arg.Any<CancellationToken>())
             .Returns(existingProduct);
 
         var command = new AddProductImageCommand(
@@ -102,7 +105,9 @@ public class AddProductImageCommandHandlerTests
         var result = await _handler.Handle(command, CancellationToken.None);
 
         result.IsPrimary.ShouldBeTrue();
-        existingProduct.Images.Count(i => i.IsPrimary).ShouldBe(1);
-        existingProduct.Images.Single(i => i.IsPrimary).FileName.ShouldBe("second-image.jpg");
+        result.FileName.ShouldBe("second-image.jpg");
+
+        await _repository.Received(1).AddImageAsync(Arg.Any<ProductImage>(), Arg.Any<CancellationToken>());
+        await _unitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
 }
