@@ -1,0 +1,152 @@
+<div class="payment-detail-page">
+  @if (loading()) {
+    <div class="loading-container">
+      <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+    </div>
+  } @else if (payment()) {
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-left">
+        <button mat-icon-button (click)="goBack()" class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div class="header-content">
+          <h1 class="page-title">{{ payment()!.transactionId || 'Pending Transaction' }}</h1>
+          <p class="page-subtitle">Payment for {{ payment()!.order?.orderNumber || 'Order #' + payment()!.orderId }}</p>
+        </div>
+      </div>
+      <app-status-badge
+        [label]="getStatusLabel(payment()!.status)"
+        [variant]="getStatusVariant(payment()!.status)"
+        class="status-badge"
+      ></app-status-badge>
+    </div>
+
+    <div class="detail-grid">
+      <!-- Payment Information -->
+      <mat-card class="detail-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>payment</mat-icon>
+          <mat-card-title>Payment Information</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-row">
+            <span class="info-label">Transaction ID</span>
+            <span class="info-value mono">{{ payment()!.transactionId || 'Not assigned' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Amount</span>
+            <span class="info-value price">{{ payment()!.amount.amount | currency:payment()!.amount.currency }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Payment Method</span>
+            <span class="info-value method">
+              <mat-icon>{{ getMethodIcon(payment()!.paymentMethod) }}</mat-icon>
+              {{ payment()!.paymentMethod || 'Not specified' }}
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Status</span>
+            <span class="info-value">
+              <app-status-badge
+                [label]="getStatusLabel(payment()!.status)"
+                [variant]="getStatusVariant(payment()!.status)"
+              ></app-status-badge>
+            </span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Timeline -->
+      <mat-card class="detail-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar>schedule</mat-icon>
+          <mat-card-title>Timeline</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="info-row">
+            <span class="info-label">Created</span>
+            <span class="info-value">{{ payment()!.createdAt | date:'MMM d, y, h:mm a' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Last Updated</span>
+            <span class="info-value">{{ payment()!.updatedAt | date:'MMM d, y, h:mm a' }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Order Information -->
+      @if (payment()!.order) {
+        <mat-card class="detail-card order-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>receipt</mat-icon>
+            <mat-card-title>Related Order</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="info-row">
+              <span class="info-label">Order Number</span>
+              <span class="info-value link" (click)="goToOrder(payment()!.order!.id)">
+                {{ payment()!.order!.orderNumber }}
+                <mat-icon>open_in_new</mat-icon>
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Customer</span>
+              <span class="info-value">{{ payment()!.order!.customerName }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Email</span>
+              <span class="info-value">{{ payment()!.order!.customerEmail }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Order Status</span>
+              <span class="info-value">{{ payment()!.order!.status }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Order Total</span>
+              <span class="info-value price">{{ payment()!.order!.totalAmount.amount | currency:payment()!.order!.totalAmount.currency }}</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+
+      <!-- Shipping Address -->
+      @if (payment()!.order?.shippingAddress) {
+        <mat-card class="detail-card">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>local_shipping</mat-icon>
+            <mat-card-title>Shipping Address</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="address-block">
+              <p>{{ payment()!.order!.shippingAddress.street }}</p>
+              <p>{{ payment()!.order!.shippingAddress.city }}, {{ payment()!.order!.shippingAddress.state }} {{ payment()!.order!.shippingAddress.postalCode }}</p>
+              <p>{{ payment()!.order!.shippingAddress.country }}</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+
+    <!-- Actions -->
+    <div class="actions-row">
+      <button mat-stroked-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Payments
+      </button>
+      @if (payment()!.order) {
+        <button mat-flat-button color="primary" (click)="goToOrder(payment()!.order!.id)">
+          <mat-icon>receipt</mat-icon>
+          View Order
+        </button>
+      }
+    </div>
+  } @else {
+    <div class="not-found">
+      <mat-icon>search_off</mat-icon>
+      <h2>Payment Not Found</h2>
+      <p>The payment you're looking for doesn't exist or has been removed.</p>
+      <button mat-flat-button color="primary" (click)="goBack()">Back to Payments</button>
+    </div>
+  }
+</div>

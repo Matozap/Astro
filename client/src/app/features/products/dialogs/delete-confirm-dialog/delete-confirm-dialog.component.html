@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>
+  <mat-icon color="warn">warning</mat-icon>
+  Delete Product
+</h2>
+
+<mat-dialog-content>
+  <p class="warning-text">
+    Are you sure you want to permanently delete this product?
+  </p>
+
+  <div class="product-info">
+    <p><strong>Name:</strong> {{ data.productName }}</p>
+    <p><strong>SKU:</strong> {{ data.productSku }}</p>
+  </div>
+
+  <p class="consequence-text">
+    <mat-icon>info</mat-icon>
+    This action cannot be undone. The product will be permanently removed from the system.
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="warn" (click)="onConfirm()">
+    <mat-icon>delete_forever</mat-icon>
+    Delete Permanently
+  </button>
+</mat-dialog-actions>

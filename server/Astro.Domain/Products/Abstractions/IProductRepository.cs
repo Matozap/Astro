@@ -42,4 +42,10 @@ public interface IProductRepository
     /// Removes a product from the repository.
     /// </summary>
     void Delete(Product product);
+
+    /// <summary>
+    /// Adds a product image directly to the database.
+    /// This bypasses the aggregate root for performance when you only need to verify product existence.
+    /// </summary>
+    Task AddImageAsync(ProductImage image, CancellationToken cancellationToken = default);
 }

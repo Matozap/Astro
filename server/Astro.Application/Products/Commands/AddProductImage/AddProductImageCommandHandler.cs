@@ -30,16 +30,22 @@ public sealed class AddProductImageCommandHandler : IRequestHandler<AddProductIm
     {
         _logger.LogInformation("Adding image to product {ProductId}", request.ProductId);
 
-        var product = await _repository.GetByIdWithDetailsAsync(request.ProductId, cancellationToken)
-            ?? throw new ProductNotFoundException(request.ProductId);
+        // Verify product exists (lightweight check - no need to load the aggregate)
+        var productExists = await _repository.GetByIdAsync(request.ProductId, cancellationToken);
+        if (productExists is null)
+        {
+            throw new ProductNotFoundException(request.ProductId);
+        }
 
-        var image = product.AddImage(
+        // Create and add image directly to the database
+        var image = ProductImage.CreateForProduct(
+            productId: request.ProductId,
             fileName: request.FileName,
             url: request.Url,
             storageMode: request.StorageMode,
             isPrimary: request.IsPrimary);
 
-        _repository.Update(product);
+        await _repository.AddImageAsync(image, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation("Image {ImageId} added to product {ProductId}", image.Id, request.ProductId);

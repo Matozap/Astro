@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="rocketGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4285f4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a73e8;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="flameGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6b00;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ffb300;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffd54f;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Flames -->
+  <ellipse cx="50" cy="85" rx="8" ry="15" fill="url(#flameGradient)" opacity="0.9"/>
+
+  <!-- Rocket body -->
+  <path d="M 40 70 L 35 50 Q 35 25 50 10 Q 65 25 65 50 L 60 70 Z" fill="url(#rocketGradient)" stroke="#1a73e8" stroke-width="2"/>
+
+  <!-- Window -->
+  <circle cx="50" cy="35" r="8" fill="#e3f2fd" stroke="#1a73e8" stroke-width="1.5"/>
+  <circle cx="50" cy="35" r="5" fill="#90caf9" opacity="0.6"/>
+
+  <!-- Wings -->
+  <path d="M 35 50 L 20 65 L 30 65 Z" fill="#1a73e8" stroke="#0d47a1" stroke-width="1.5"/>
+  <path d="M 65 50 L 80 65 L 70 65 Z" fill="#1a73e8" stroke="#0d47a1" stroke-width="1.5"/>
+
+  <!-- Details -->
+  <rect x="45" y="55" width="10" height="3" rx="1" fill="#e3f2fd" opacity="0.7"/>
+  <rect x="45" y="60" width="10" height="3" rx="1" fill="#e3f2fd" opacity="0.7"/>
+</svg>

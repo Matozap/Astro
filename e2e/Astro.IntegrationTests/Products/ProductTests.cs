@@ -18,7 +18,7 @@ public class ProductTests(IntegrationTestFixture fixture) : IntegrationTestBase(
         var response = await GraphClient.ExecuteAsync("GetProducts");
 
         var data = response.RootElement.GetProperty("data");
-        var products = data.GetProperty("products");
+        var products = data.GetProperty("products").GetProperty("nodes");
 
         products.GetArrayLength().ShouldBeGreaterThan(0);
 

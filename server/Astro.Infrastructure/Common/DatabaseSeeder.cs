@@ -100,8 +100,8 @@ public static class DatabaseSeeder
                     { "Connectivity", "Bluetooth 5.2" },
                     { "Weight", "250g" }
                 },
-                new[] { ("headphones-main.jpg", "https://images.example.com/products/headphones-main.jpg", true),
-                        ("headphones-side.jpg", "https://images.example.com/products/headphones-side.jpg", false) }),
+                new[] { ("headphones-main.jpg", "https://picsum.photos/seed/1/200/300.jpg", true),
+                        ("headphones-side.jpg", "https://picsum.photos/seed/2/200/300.jpg", false) }),
 
             CreateProduct(
                 "Mechanical Gaming Keyboard",
@@ -115,8 +115,8 @@ public static class DatabaseSeeder
                     { "Layout", "Full Size (104 keys)" },
                     { "Cable Length", "1.8m braided" }
                 },
-                new[] { ("keyboard-main.jpg", "https://images.example.com/products/keyboard-main.jpg", true),
-                        ("keyboard-rgb.jpg", "https://images.example.com/products/keyboard-rgb.jpg", false) }),
+                new[] { ("keyboard-main.jpg", "https://picsum.photos/seed/3/200/300.jpg", true),
+                        ("keyboard-rgb.jpg", "https://picsum.photos/seed/4/200/300.jpg", false) }),
 
             CreateProduct(
                 "4K Ultra HD Monitor",
@@ -131,9 +131,9 @@ public static class DatabaseSeeder
                     { "Panel Type", "IPS" },
                     { "Response Time", "1ms" }
                 },
-                new[] { ("monitor-front.jpg", "https://images.example.com/products/monitor-front.jpg", true),
-                        ("monitor-angle.jpg", "https://images.example.com/products/monitor-angle.jpg", false),
-                        ("monitor-back.jpg", "https://images.example.com/products/monitor-back.jpg", false) }),
+                new[] { ("monitor-front.jpg", "https://picsum.photos/seed/5/200/300.jpg", true),
+                        ("monitor-angle.jpg", "https://picsum.photos/seed/6/200/300.jpg", false),
+                        ("monitor-back.jpg", "https://picsum.photos/seed/7/200/300.jpg", false) }),
 
             CreateProduct(
                 "Ergonomic Office Chair",
@@ -147,8 +147,8 @@ public static class DatabaseSeeder
                     { "Adjustable Height", "16-20 inches" },
                     { "Warranty", "5 years" }
                 },
-                new[] { ("chair-main.jpg", "https://images.example.com/products/chair-main.jpg", true),
-                        ("chair-side.jpg", "https://images.example.com/products/chair-side.jpg", false) }),
+                new[] { ("chair-main.jpg", "https://picsum.photos/seed/8/200/300.jpg", true),
+                        ("chair-side.jpg", "https://picsum.photos/seed/9/200/300.jpg", false) }),
 
             CreateProduct(
                 "Portable SSD 1TB",
@@ -163,7 +163,7 @@ public static class DatabaseSeeder
                     { "Interface", "USB 3.2 Gen 2" },
                     { "Dimensions", "100x55x9mm" }
                 },
-                new[] { ("ssd-main.jpg", "https://images.example.com/products/ssd-main.jpg", true) }),
+                new[] { ("ssd-main.jpg", "https://picsum.photos/seed/10/200/300.jpg", true) }),
 
             CreateProduct(
                 "Smart Fitness Watch",
@@ -178,8 +178,8 @@ public static class DatabaseSeeder
                     { "Sensors", "Heart Rate, SpO2, GPS" },
                     { "Compatibility", "iOS & Android" }
                 },
-                new[] { ("watch-main.jpg", "https://images.example.com/products/watch-main.jpg", true),
-                        ("watch-band.jpg", "https://images.example.com/products/watch-band.jpg", false) }),
+                new[] { ("watch-main.jpg", "https://picsum.photos/seed/11/200/300.jpg", true),
+                        ("watch-band.jpg", "https://picsum.photos/seed/12/200/300.jpg", false) }),
 
             CreateProduct(
                 "USB-C Docking Station",
@@ -194,8 +194,8 @@ public static class DatabaseSeeder
                     { "Ethernet", "Gigabit" },
                     { "Card Slots", "SD/MicroSD" }
                 },
-                new[] { ("dock-main.jpg", "https://images.example.com/products/dock-main.jpg", true),
-                        ("dock-ports.jpg", "https://images.example.com/products/dock-ports.jpg", false) }),
+                new[] { ("dock-main.jpg", "https://picsum.photos/seed/13/200/300.jpg", true),
+                        ("dock-ports.jpg", "https://picsum.photos/seed/14/200/300.jpg", false) }),
 
             CreateProduct(
                 "Wireless Gaming Mouse",
@@ -210,8 +210,8 @@ public static class DatabaseSeeder
                     { "Buttons", "6 programmable" },
                     { "Connectivity", "2.4GHz Wireless & Bluetooth" }
                 },
-                new[] { ("mouse-main.jpg", "https://images.example.com/products/mouse-main.jpg", true),
-                        ("mouse-grip.jpg", "https://images.example.com/products/mouse-grip.jpg", false) }),
+                new[] { ("mouse-main.jpg", "https://picsum.photos/seed/15/200/300.jpg", true),
+                        ("mouse-grip.jpg", "https://picsum.photos/seed/16/200/300.jpg", false) }),
 
             CreateProduct(
                 "Webcam 4K Pro",
@@ -226,7 +226,7 @@ public static class DatabaseSeeder
                     { "Mount", "Universal clip" },
                     { "Features", "Auto-focus, HDR, Privacy shutter" }
                 },
-                new[] { ("webcam-main.jpg", "https://images.example.com/products/webcam-main.jpg", true) }),
+                new[] { ("webcam-main.jpg", "https://picsum.photos/seed/17/200/300.jpg", true) }),
 
             CreateProduct(
                 "Standing Desk Converter",
@@ -241,9 +241,9 @@ public static class DatabaseSeeder
                     { "Lift Mechanism", "Gas spring" },
                     { "Keyboard Tray", "Included" }
                 },
-                new[] { ("desk-main.jpg", "https://images.example.com/products/desk-main.jpg", true),
-                        ("desk-raised.jpg", "https://images.example.com/products/desk-raised.jpg", false),
-                        ("desk-lowered.jpg", "https://images.example.com/products/desk-lowered.jpg", false) })
+                new[] { ("desk-main.jpg", "https://picsum.photos/seed/18/200/300.jpg", true),
+                        ("desk-raised.jpg", "https://picsum.photos/seed/19/200/300.jpg", false),
+                        ("desk-lowered.jpg", "https://picsum.photos/seed/20/200/300.jpg", false) })
         };
 
         context.Products.AddRange(products);

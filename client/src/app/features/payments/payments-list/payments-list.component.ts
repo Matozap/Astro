@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit, inject, signal, TemplateRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -40,6 +41,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 export class PaymentsListComponent implements OnInit, AfterViewInit {
   private readonly paymentService = inject(PaymentService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly router = inject(Router);
 
   @ViewChild('transactionTemplate') transactionTemplate!: TemplateRef<unknown>;
   @ViewChild('orderTemplate') orderTemplate!: TemplateRef<unknown>;
@@ -145,8 +147,7 @@ export class PaymentsListComponent implements OnInit, AfterViewInit {
   }
 
   onRowClick(payment: Payment): void {
-    // Could navigate to payment detail or show dialog
-    console.log('Payment clicked:', payment);
+    this.router.navigate(['/payments', payment.id]);
   }
 
   getStatusVariant(status: PaymentStatus): 'success' | 'warning' | 'error' | 'info' | 'default' {

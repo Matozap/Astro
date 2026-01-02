@@ -1,41 +1,48 @@
 query GetOrders {
-  orders {
-    id
-    orderNumber
-    customerName
-    customerEmail
-    shippingAddress {
-      street
-      city
-      state
-      postalCode
-      country
-    }
-    status
-    totalAmount {
-      amount
-      currency
-    }
-    notes
-    itemCount
-    createdAt
-    updatedAt
-    createdBy
-    modifiedBy
-    details {
+  orders(order: { createdAt: DESC }, first: 5) {
+    nodes {
+      createdAt
+      createdBy
+      customerEmail
+      customerName
       id
-      productId
-      productName
-      productSku
-      quantity
-      unitPrice {
+      itemCount
+      modifiedBy
+      notes
+      orderNumber
+      status
+      updatedAt
+      totalAmount {
         amount
         currency
       }
-      lineTotal {
-        amount
-        currency
+      shippingAddress {
+        city
+        country
+        postalCode
+        state
+        street
       }
+      payments {
+        createdAt
+        id
+        orderId
+        status
+        updatedAt
+      }
+      details {
+        id
+        productId
+        productName
+        productSku
+        quantity
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+      hasPreviousPage
+      startCursor
     }
   }
 }

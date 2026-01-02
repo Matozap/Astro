@@ -18,6 +18,7 @@ export const GET_PRODUCTS = gql`
           currency
         }
         stockQuantity
+        lowStockThreshold
         isActive
         createdAt
         updatedAt
@@ -40,26 +41,28 @@ export const GET_PRODUCTS = gql`
 
 export const GET_PRODUCT_BY_ID = gql`
   query GetProductById($id: UUID!) {
-    productById(id: $id) {
-      id
-      sku
-      name
-      description
-      price {
-        amount
-        currency
-      }
-      stockQuantity
-      isActive
-      createdAt
-      updatedAt
-      createdBy
-      modifiedBy
-      images {
+    products(where: { id: { eq: $id } }) {
+      nodes {
         id
-        url
-        altText
-        isPrimary
+        sku
+        name
+        description
+        price {
+          amount
+          currency
+        }
+        stockQuantity
+        lowStockThreshold
+        isActive
+        createdAt
+        updatedAt
+        createdBy
+        modifiedBy
+        images {
+          id
+          url
+          isPrimary
+        }
       }
     }
   }

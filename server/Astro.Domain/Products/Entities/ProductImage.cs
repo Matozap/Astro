@@ -8,6 +8,7 @@ namespace Astro.Domain.Products.Entities;
 /// </summary>
 public class ProductImage : Entity
 {
+    public Guid ProductId { get; private set; }
     public string FileName { get; private set; } = null!;
     public string Url { get; private set; } = null!;
     public StorageMode StorageMode { get; private set; }
@@ -28,6 +29,36 @@ public class ProductImage : Entity
         Url = url;
         StorageMode = storageMode;
         IsPrimary = isPrimary;
+    }
+
+    /// <summary>
+    /// Creates a new product image for direct insertion.
+    /// Use this when adding images without loading the full product aggregate.
+    /// </summary>
+    public static ProductImage CreateForProduct(
+        Guid productId,
+        string fileName,
+        string url,
+        StorageMode storageMode,
+        bool isPrimary = false)
+    {
+        if (productId == Guid.Empty)
+            throw new ArgumentException("Product ID cannot be empty.", nameof(productId));
+
+        if (string.IsNullOrWhiteSpace(fileName))
+            throw new ArgumentException("File name cannot be empty.", nameof(fileName));
+
+        if (string.IsNullOrWhiteSpace(url))
+            throw new ArgumentException("URL cannot be empty.", nameof(url));
+
+        return new ProductImage
+        {
+            ProductId = productId,
+            FileName = fileName,
+            Url = url,
+            StorageMode = storageMode,
+            IsPrimary = isPrimary
+        };
     }
 
     internal void SetAsPrimary()

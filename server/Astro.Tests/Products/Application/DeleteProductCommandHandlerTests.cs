@@ -1,6 +1,7 @@
 using Astro.Application.Common;
 using Astro.Application.Products.Commands.DeleteProduct;
 using Astro.Application.Products.Exceptions;
+using Astro.Domain.Orders.Abstractions;
 using Astro.Domain.Products.Abstractions;
 using Astro.Domain.Products.Entities;
 using Astro.Domain.Shared;
@@ -16,15 +17,15 @@ public class DeleteProductCommandHandlerTests
 {
     private readonly IProductRepository _repository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger<DeleteProductCommandHandler> _logger;
     private readonly DeleteProductCommandHandler _handler;
 
     public DeleteProductCommandHandlerTests()
     {
         _repository = Substitute.For<IProductRepository>();
         _unitOfWork = Substitute.For<IUnitOfWork>();
-        _logger = Substitute.For<ILogger<DeleteProductCommandHandler>>();
-        _handler = new DeleteProductCommandHandler(_repository, _unitOfWork, _logger);
+        var logger = Substitute.For<ILogger<DeleteProductCommandHandler>>();
+        var orderRepository = Substitute.For<IOrderRepository>();
+        _handler = new DeleteProductCommandHandler(_repository, orderRepository, _unitOfWork, logger);
     }
 
     [Fact]

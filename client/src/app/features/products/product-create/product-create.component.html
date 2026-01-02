@@ -1,0 +1,23 @@
+<div class="product-create-container">
+  <div class="page-header">
+    <h1>Create New Product</h1>
+    <p class="subtitle">Add a new product to your catalog</p>
+  </div>
+
+  @if (isSubmitting()) {
+    <mat-card class="loading-card">
+      <mat-card-content>
+        <div class="loading-content">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Creating product...</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <app-product-form
+      submitLabel="Create Product"
+      (formSubmit)="onFormSubmit($event)"
+      (formCancel)="onFormCancel()">
+    </app-product-form>
+  }
+</div>

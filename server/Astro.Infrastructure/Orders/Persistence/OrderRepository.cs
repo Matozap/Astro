@@ -57,4 +57,10 @@ public sealed class OrderRepository : IOrderRepository
     {
         _context.Set<Order>().Remove(order);
     }
+
+    public async Task<bool> HasProductOrdersAsync(Guid productId, CancellationToken cancellationToken = default)
+    {
+        return await _context.Set<OrderDetail>()
+            .AnyAsync(od => od.ProductId == productId, cancellationToken);
+    }
 }

@@ -1,0 +1,35 @@
+query GetProductById($id: UUID!) {
+  productById(id: $id) {
+    id
+    sku
+    name
+    description
+    price {
+      amount
+      currency
+    }
+    stockQuantity
+    lowStockThreshold
+    isActive
+    isLowStock
+    createdAt
+    updatedAt
+    createdBy
+    modifiedBy
+    images {
+      id
+      fileName
+      url
+      altText
+      storageMode
+      isPrimary
+      createdAt
+      createdBy
+    }
+    details {
+      id
+      key
+      value
+    }
+  }
+}

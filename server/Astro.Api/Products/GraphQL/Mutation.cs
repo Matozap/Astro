@@ -55,6 +55,7 @@ public class ProductMutation
     /// Deletes a product.
     /// </summary>
     [Error<ProductNotFoundException>]
+    [Error<ProductInUseException>]
     public async Task<DeleteResponse> DeleteProduct(
         DeleteProductCommand command,
         [Service] IMediator mediator,

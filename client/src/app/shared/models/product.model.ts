@@ -26,10 +26,14 @@ export interface ProductDetail {
 
 export interface ProductImage {
   id: string;
+  productId: string;
+  fileName: string;
   url: string;
   altText: string | null;
+  storageMode: 'FILE_SYSTEM' | 'AZURE' | 'AWS';
   isPrimary: boolean;
-  storageMode: 'Url' | 'Base64';
+  createdAt: string;
+  createdBy: string;
 }
 
 // GraphQL input types

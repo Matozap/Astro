@@ -42,4 +42,12 @@ public interface IOrderRepository
     /// Removes an order from the repository.
     /// </summary>
     void Delete(Order order);
+
+    /// <summary>
+    /// Checks if a product has been used in any orders.
+    /// </summary>
+    /// <param name="productId">The product identifier to check.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if the product appears in one or more orders; otherwise false.</returns>
+    Task<bool> HasProductOrdersAsync(Guid productId, CancellationToken cancellationToken = default);
 }

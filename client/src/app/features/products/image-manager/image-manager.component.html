@@ -1,0 +1,103 @@
+<div class="image-manager">
+  <!-- Add Image Form - Always Visible -->
+  <div class="add-image-form">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field-grow">
+        <mat-label>Image URL</mat-label>
+        <input matInput
+               [ngModel]="newImageUrl()"
+               (ngModelChange)="newImageUrl.set($event)"
+               placeholder="https://example.com/image.jpg">
+        <mat-icon matPrefix>link</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field-medium">
+        <mat-label>File Name</mat-label>
+        <input matInput
+               [ngModel]="newImageFileName()"
+               (ngModelChange)="newImageFileName.set($event)"
+               placeholder="product-image.jpg">
+        <mat-icon matPrefix>description</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field-small">
+        <mat-label>Storage</mat-label>
+        <mat-select [ngModel]="newImageStorageMode()"
+                    (ngModelChange)="newImageStorageMode.set($event)">
+          <mat-option value="FILE_SYSTEM">File System</mat-option>
+          <mat-option value="AWS">AWS S3</mat-option>
+          <mat-option value="AZURE">Azure Blob</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-icon-button
+              type="button"
+              color="primary"
+              (click)="addImage()"
+              [disabled]="!newImageUrl().trim() || !newImageFileName().trim()"
+              matTooltip="Add image to list">
+        <mat-icon>add_circle</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Image Gallery -->
+  @if (hasImages()) {
+    <div class="image-gallery">
+      @for (image of images$(); track image.url; let i = $index) {
+        <mat-card class="image-card" [class.primary]="image.isPrimary">
+          <mat-card-header>
+            @if (image.isPrimary) {
+              <mat-chip-set>
+                <mat-chip highlighted>
+                  <mat-icon>star</mat-icon>
+                  Primary
+                </mat-chip>
+              </mat-chip-set>
+            }
+          </mat-card-header>
+
+          <img mat-card-image [src]="image.url" [alt]="image.altText || image.fileName">
+
+          <mat-card-content>
+            <div class="image-details">
+              <p class="file-name">{{ image.fileName }}</p>
+              <mat-chip-set>
+                <mat-chip>{{ image.storageMode }}</mat-chip>
+              </mat-chip-set>
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions>
+            @if (!image.isPrimary) {
+              <button mat-button (click)="setPrimary(i)">
+                <mat-icon>star_border</mat-icon>
+                Set as Primary
+              </button>
+            }
+            <button mat-button
+                    color="warn"
+                    (click)="removeImage(i)"
+                    [disabled]="images$().length === 1">
+              <mat-icon>delete</mat-icon>
+              Remove
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  } @else {
+    <div class="empty-state">
+      <mat-icon>image_not_supported</mat-icon>
+      <p>No images added yet</p>
+      <p class="hint">Enter image details above and click the add button</p>
+    </div>
+  }
+
+  @if (!hasPrimaryImage() && hasImages()) {
+    <div class="warning-message">
+      <mat-icon>warning</mat-icon>
+      <span>Please select a primary image</span>
+    </div>
+  }
+</div>
