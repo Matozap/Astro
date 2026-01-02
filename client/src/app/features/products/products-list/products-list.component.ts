@@ -8,6 +8,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog } from '@angular/material/dialog';
 import { Sort } from '@angular/material/sort';
 import { PageEvent } from '@angular/material/paginator';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/data-table/data-table.component';
@@ -16,6 +18,10 @@ import { ProductService } from '../services/product.service';
 import { Product, ProductFilterInput, ProductSortInput } from '../../../shared/models/product.model';
 import { DEFAULT_PAGE_SIZE } from '../../../shared/models/table.model';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { DeleteConfirmDialogComponent, DeleteConfirmDialogData } from '../dialogs/delete-confirm-dialog/delete-confirm-dialog.component';
+import { DeactivateConfirmDialogComponent, DeactivateConfirmDialogData } from '../dialogs/deactivate-confirm-dialog/deactivate-confirm-dialog.component';
+import { NotificationService } from '../../../core/services/notification.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-products-list',
@@ -29,6 +35,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
     MatSelectModule,
     MatIconModule,
     MatButtonModule,
+    MatTooltipModule,
     DataTableComponent,
     StatusBadgeComponent,
     CurrencyPipe,
@@ -41,10 +48,14 @@ export class ProductsListComponent implements OnInit, AfterViewInit {
   private readonly productService = inject(ProductService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
+  private readonly notificationService = inject(NotificationService);
+  private readonly authService = inject(AuthService);
 
   @ViewChild('priceTemplate') priceTemplate!: TemplateRef<unknown>;
   @ViewChild('stockTemplate') stockTemplate!: TemplateRef<unknown>;
   @ViewChild('statusTemplate') statusTemplate!: TemplateRef<unknown>;
+  @ViewChild('actionsTemplate') actionsTemplate!: TemplateRef<unknown>;
 
   products = signal<Product[]>([]);
   totalCount = signal(0);
@@ -82,6 +93,7 @@ export class ProductsListComponent implements OnInit, AfterViewInit {
       { field: 'price', header: 'Price', sortable: true, template: this.priceTemplate },
       { field: 'stockQuantity', header: 'Stock', sortable: true, template: this.stockTemplate },
       { field: 'isActive', header: 'Status', sortable: true, template: this.statusTemplate },
+      { field: 'actions', header: 'Actions', sortable: false, template: this.actionsTemplate },
     ];
   }
 
@@ -135,6 +147,10 @@ export class ProductsListComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/products', product.id]);
   }
 
+  onCreateProduct(): void {
+    this.router.navigate(['/products/create']);
+  }
+
   getStockStatus(quantity: number): { label: string; variant: 'success' | 'warning' | 'error' } {
     if (quantity === 0) {
       return { label: 'Out of Stock', variant: 'error' };
@@ -142,5 +158,125 @@ export class ProductsListComponent implements OnInit, AfterViewInit {
       return { label: 'Low Stock', variant: 'warning' };
     }
     return { label: 'In Stock', variant: 'success' };
+  }
+
+  onDeleteProduct(event: Event, product: Product): void {
+    event.stopPropagation(); // Prevent row click
+
+    const dialogData: DeleteConfirmDialogData = {
+      productName: product.name,
+      productSku: product.sku,
+    };
+
+    const dialogRef = this.dialog.open(DeleteConfirmDialogComponent, {
+      width: '500px',
+      data: dialogData,
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.productService.deleteProduct(product.id).subscribe({
+          next: () => {
+            this.notificationService.success('Product deleted successfully');
+            this.loadProducts();
+          },
+          error: (error) => {
+            console.error('Error deleting product:', error);
+
+            // Check if it's a ProductInUseException by examining the error structure
+            const isProductInUse = this.isProductInUseError(error);
+
+            if (isProductInUse) {
+              // Product is in use, show deactivate dialog instead
+              this.showDeactivateDialog(product);
+              return;
+            }
+
+            // Other error - show error message
+            const errorMessage = this.extractErrorMessage(error);
+            this.notificationService.error(errorMessage);
+          },
+        });
+      }
+    });
+  }
+
+  private showDeactivateDialog(product: Product): void {
+    const dialogData: DeactivateConfirmDialogData = {
+      productName: product.name,
+      productSku: product.sku,
+    };
+
+    const dialogRef = this.dialog.open(DeactivateConfirmDialogComponent, {
+      width: '550px',
+      data: dialogData,
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.deactivateProduct(product);
+      }
+    });
+  }
+
+  private deactivateProduct(product: Product): void {
+    const currentUser = this.authService.currentUser();
+    const modifiedBy = currentUser?.email || 'system';
+
+    const updateCommand = {
+      id: product.id,
+      sku: product.sku,
+      name: product.name,
+      description: product.description || undefined,
+      price: product.price.amount,
+      stockQuantity: 0, // Set stock to 0
+      lowStockThreshold: product.lowStockThreshold,
+      isActive: false, // Deactivate
+      modifiedBy,
+    };
+
+    this.productService.updateProduct(updateCommand).subscribe({
+      next: () => {
+        this.notificationService.success('Product deactivated successfully');
+        this.loadProducts();
+      },
+      error: (error) => {
+        console.error('Error deactivating product:', error);
+        const errorMessage = this.extractErrorMessage(error);
+        this.notificationService.error(errorMessage);
+      },
+    });
+  }
+
+  /**
+   * Checks if the error is a ProductInUseException
+   */
+  private isProductInUseError(error: any): boolean {
+    if (!error.graphQLErrors || error.graphQLErrors.length === 0) {
+      return false;
+    }
+
+    const graphQLError = error.graphQLErrors[0];
+
+    // Check various ways the error might be identified
+    return (
+      graphQLError.extensions?.['code'] === 'PRODUCT_IN_USE' ||
+      graphQLError.extensions?.['exception']?.['type'] === 'ProductInUseException' ||
+      graphQLError.message?.includes('ProductInUseException') ||
+      graphQLError.message?.includes('been used in one or more orders') ||
+      graphQLError.message?.includes('cannot be deleted')
+    );
+  }
+
+  /**
+   * Extracts a user-friendly error message from GraphQL error
+   */
+  private extractErrorMessage(error: any, defaultMessage: string = 'An error occurred'): string {
+    if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+      return error.graphQLErrors[0].message;
+    } else if (error.message) {
+      return error.message;
+    }
+    return defaultMessage;
   }
 }

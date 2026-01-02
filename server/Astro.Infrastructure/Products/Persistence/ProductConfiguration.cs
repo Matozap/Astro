@@ -83,7 +83,7 @@ public sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.HasMany(p => p.Images)
             .WithOne()
-            .HasForeignKey("ProductId")
+            .HasForeignKey(i => i.ProductId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Ignore domain events collection

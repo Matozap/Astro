@@ -1,0 +1,19 @@
+mutation CreateProduct($command: CreateProductCommand!) {
+  createProduct(command: $command) {
+    id
+    sku
+    name
+    description
+    price {
+      amount
+      currency
+    }
+    stockQuantity
+    lowStockThreshold
+    isActive
+    isLowStock
+    createdAt
+    updatedAt
+    createdBy
+  }
+}

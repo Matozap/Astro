@@ -5,6 +5,12 @@
       <h1 class="page-title">Products</h1>
       <p class="page-subtitle">Manage your product catalog</p>
     </div>
+    <div class="header-actions">
+      <button mat-raised-button color="primary" (click)="onCreateProduct()">
+        <mat-icon>add</mat-icon>
+        Create Product
+      </button>
+    </div>
   </div>
 
   <!-- Filters -->
@@ -81,5 +87,14 @@
       [label]="value ? 'Active' : 'Inactive'"
       [variant]="value ? 'success' : 'default'"
     ></app-status-badge>
+  </ng-template>
+
+  <ng-template #actionsTemplate let-row>
+    <button mat-icon-button
+            color="warn"
+            (click)="onDeleteProduct($event, row)"
+            matTooltip="Delete product">
+      <mat-icon>delete</mat-icon>
+    </button>
   </ng-template>
 </div>

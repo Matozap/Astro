@@ -21,7 +21,7 @@ public class OrderTests(IntegrationTestFixture fixture) : IntegrationTestBase(fi
         var response = await GraphClient.ExecuteAsync("GetOrders");
 
         var data = response.RootElement.GetProperty("data");
-        var orders = data.GetProperty("orders");
+        var orders = data.GetProperty("orders").GetProperty("nodes");
 
         orders.GetArrayLength().ShouldBeGreaterThan(0);
 

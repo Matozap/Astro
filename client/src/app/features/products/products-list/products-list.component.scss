@@ -25,6 +25,14 @@
   }
 }
 
+.header-actions {
+  button {
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
 .filters-card {
   background-color: var(--surface-color) !important;
   border-radius: var(--radius-xl) !important;

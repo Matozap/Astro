@@ -1,0 +1,8 @@
+mutation RemoveProductImage($command: RemoveProductImageCommand!) {
+  removeProductImage(command: $command) {
+    id
+  }
+}
+
+# Note: Frontend should prevent removal of the last or only primary image
+# without replacement. Backend does not enforce this constraint.

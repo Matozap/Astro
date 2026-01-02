@@ -14,6 +14,7 @@ public class OrderQuery
     /// <summary>
     /// Gets all orders with projection, filtering, and sorting support.
     /// </summary>
+    [UsePaging(DefaultPageSize = 10, IncludeTotalCount =  true)]
     [UseFiltering]
     [UseSorting]
     public async Task<IQueryable<Order>> GetOrders([Service] IMediator mediator)

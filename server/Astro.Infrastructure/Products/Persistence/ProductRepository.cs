@@ -60,4 +60,9 @@ public sealed class ProductRepository : IProductRepository
     {
         _context.Set<Product>().Remove(product);
     }
+
+    public async Task AddImageAsync(ProductImage image, CancellationToken cancellationToken = default)
+    {
+        await _context.Set<ProductImage>().AddAsync(image, cancellationToken);
+    }
 }

@@ -14,6 +14,7 @@ public class ShipmentQuery
     /// <summary>
     /// Gets all shipments with projection, filtering, and sorting support.
     /// </summary>
+    [UsePaging(DefaultPageSize = 10, IncludeTotalCount =  true)]
     [UseFiltering]
     [UseSorting]
     public async Task<IQueryable<Shipment>> GetShipments([Service] IMediator mediator)

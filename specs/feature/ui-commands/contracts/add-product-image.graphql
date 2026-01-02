@@ -1,0 +1,16 @@
+mutation AddProductImage($command: AddProductImageCommand!) {
+  addProductImage(command: $command) {
+    id
+    productId
+    fileName
+    url
+    altText
+    storageMode
+    isPrimary
+    createdAt
+    createdBy
+  }
+}
+
+# Note: If isPrimary = true, backend automatically removes primary flag
+# from any existing primary image. Only one image can be primary.

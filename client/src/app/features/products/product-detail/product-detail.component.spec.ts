@@ -23,7 +23,7 @@ describe('ProductDetailComponent', () => {
     isActive: true,
     isLowStock: false,
     details: [{ id: '1', key: 'Brand', value: 'AudioPro' }],
-    images: [{ id: '1', url: '/assets/products/headphones.jpg', altText: 'Headphones', isPrimary: true, storageMode: 'Url' }],
+    images: [{ id: '1', productId: '1', fileName: 'headphones.jpg', url: '/assets/products/headphones.jpg', altText: 'Headphones', isPrimary: true, storageMode: 'FILE_SYSTEM' as const, createdAt: '2024-01-15T10:00:00Z', createdBy: 'admin' }],
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-01-15T10:00:00Z',
     createdBy: 'admin',
@@ -164,7 +164,7 @@ describe('ProductDetailComponent', () => {
     beforeEach(fakeAsync(() => {
       const noPrimaryProduct = {
         ...mockProduct,
-        images: [{ id: '1', url: '/assets/first.jpg', altText: 'First', isPrimary: false, storageMode: 'Url' as const }],
+        images: [{ id: '1', productId: '1', fileName: 'first.jpg', url: '/assets/first.jpg', altText: 'First', isPrimary: false, storageMode: 'FILE_SYSTEM' as const, createdAt: '2024-01-15T10:00:00Z', createdBy: 'admin' }],
       };
       mockProductService.getProductById.and.returnValue(of(noPrimaryProduct));
       fixture = TestBed.createComponent(ProductDetailComponent);

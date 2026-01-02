@@ -29,6 +29,7 @@ builder.Services.AddInfrastructure();
 // Add GraphQL with HotChocolate
 builder.Services
     .AddGraphQLServer()
+    .ModifyCostOptions(options => options.EnforceCostLimits = !builder.Environment.IsDevelopment())
     // Register root types with utility operations
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
@@ -54,8 +55,17 @@ builder.Services
     .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = builder.Environment.IsDevelopment())
     .InitializeOnStartup();
 
-// Add WebSockets for GraphQL subscriptions
-builder.Services.AddCors();
+// Add CORS for Angular frontend
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:4200", "https://localhost:4200", "http://localhost:5000", "https://localhost:5001","http://localhost:5003")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 var app = builder.Build();
 
@@ -64,6 +74,7 @@ await app.SeedDatabaseAsync();
 
 // Configure middleware
 app.MapDefaultEndpoints();
+app.UseCors();
 app.UseWebSockets();
 app.MapGraphQL();
 

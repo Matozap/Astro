@@ -1,0 +1,42 @@
+.product-create-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+
+  .page-header {
+    margin-bottom: 32px;
+
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--mat-grey-900, #212121);
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 16px;
+      color: var(--mat-grey-600, #757575);
+    }
+  }
+
+  .loading-card {
+    max-width: 400px;
+    margin: 0 auto;
+
+    .loading-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      gap: 16px;
+
+      p {
+        margin: 0;
+        font-size: 16px;
+        color: var(--mat-grey-700, #616161);
+      }
+    }
+  }
+}

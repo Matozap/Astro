@@ -1,148 +1,24 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, of, delay, map } from 'rxjs';
+import { Observable, map, catchError } from 'rxjs';
 import { Apollo } from 'apollo-angular';
-import { Product, ProductFilterInput, ProductSortInput } from '../../../shared/models/product.model';
+import { Product, ProductFilterInput, ProductSortInput, ProductImage } from '../../../shared/models/product.model';
 import { PaginatedResult, PaginationParams } from '../../../shared/models/table.model';
+import { CREATE_PRODUCT, ADD_PRODUCT_IMAGE, UPDATE_PRODUCT, DELETE_PRODUCT, REMOVE_PRODUCT_IMAGE } from '../graphql/product.mutations';
+import { GET_PRODUCTS, GET_PRODUCT_BY_ID } from '../graphql/product.queries';
 
-// Mock data for development
-const MOCK_PRODUCTS: Product[] = [
-  {
-    id: '1',
-    sku: 'PRD-001',
-    name: 'Wireless Bluetooth Headphones',
-    description: 'High-quality wireless headphones with noise cancellation',
-    price: { amount: 149.99, currency: 'USD' },
-    stockQuantity: 150,
-    lowStockThreshold: 20,
-    isActive: true,
-    isLowStock: false,
-    details: [{ id: '1', key: 'Brand', value: 'AudioPro' }],
-    createdAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-15T10:00:00Z',
-    createdBy: 'admin',
-    modifiedBy: 'admin',
-    images: [{ id: '1', url: '/assets/products/headphones.jpg', altText: 'Headphones', isPrimary: true, storageMode: 'Url' }],
-  },
-  {
-    id: '2',
-    sku: 'PRD-002',
-    name: 'Smart Watch Pro',
-    description: 'Feature-rich smartwatch with health tracking',
-    price: { amount: 299.99, currency: 'USD' },
-    stockQuantity: 75,
-    lowStockThreshold: 20,
-    isActive: true,
-    isLowStock: false,
-    details: [{ id: '2', key: 'Brand', value: 'TechTime' }],
-    createdAt: '2024-01-14T10:00:00Z',
-    updatedAt: '2024-01-14T10:00:00Z',
-    createdBy: 'admin',
-    modifiedBy: 'admin',
-    images: [],
-  },
-  {
-    id: '3',
-    sku: 'PRD-003',
-    name: 'USB-C Charging Cable 2m',
-    description: 'Durable braided USB-C cable for fast charging',
-    price: { amount: 19.99, currency: 'USD' },
-    stockQuantity: 500,
-    lowStockThreshold: 50,
-    isActive: true,
-    isLowStock: false,
-    details: [{ id: '3', key: 'Length', value: '2 meters' }],
-    createdAt: '2024-01-13T10:00:00Z',
-    updatedAt: '2024-01-13T10:00:00Z',
-    createdBy: 'admin',
-    modifiedBy: 'admin',
-    images: [],
-  },
-  {
-    id: '4',
-    sku: 'PRD-004',
-    name: 'Laptop Stand Adjustable',
-    description: 'Ergonomic aluminum laptop stand with adjustable height',
-    price: { amount: 79.99, currency: 'USD' },
-    stockQuantity: 0,
-    lowStockThreshold: 10,
-    isActive: false,
-    isLowStock: true,
-    details: [{ id: '4', key: 'Material', value: 'Aluminum' }],
-    createdAt: '2024-01-12T10:00:00Z',
-    updatedAt: '2024-01-12T10:00:00Z',
-    createdBy: 'admin',
-    modifiedBy: 'admin',
-    images: [],
-  },
-  {
-    id: '5',
-    sku: 'PRD-005',
-    name: 'Mechanical Keyboard RGB',
-    description: 'Gaming mechanical keyboard with RGB backlighting',
-    price: { amount: 129.99, currency: 'USD' },
-    stockQuantity: 25,
-    lowStockThreshold: 30,
-    isActive: true,
-    isLowStock: true,
-    details: [{ id: '5', key: 'Switch Type', value: 'Cherry MX Blue' }],
-    createdAt: '2024-01-11T10:00:00Z',
-    updatedAt: '2024-01-11T10:00:00Z',
-    createdBy: 'admin',
-    modifiedBy: 'admin',
-    images: [],
-  },
-  {
-    id: '6',
-    sku: 'PRD-006',
-    name: 'Wireless Mouse Ergonomic',
-    description: 'Comfortable ergonomic wireless mouse',
-    price: { amount: 49.99, currency: 'USD' },
-    stockQuantity: 200,
-    lowStockThreshold: 25,
-    isActive: true,
-    isLowStock: false,
-    details: [{ id: '6', key: 'DPI', value: '4000' }],
-    createdAt: '2024-01-10T10:00:00Z',
-    updatedAt: '2024-01-10T10:00:00Z',
-    createdBy: 'admin',
-    modifiedBy: 'admin',
-    images: [],
-  },
-  {
-    id: '7',
-    sku: 'PRD-007',
-    name: 'Monitor 27" 4K',
-    description: '27-inch 4K UHD monitor with HDR support',
-    price: { amount: 449.99, currency: 'USD' },
-    stockQuantity: 30,
-    lowStockThreshold: 10,
-    isActive: true,
-    isLowStock: false,
-    details: [{ id: '7', key: 'Resolution', value: '3840x2160' }],
-    createdAt: '2024-01-09T10:00:00Z',
-    updatedAt: '2024-01-09T10:00:00Z',
-    createdBy: 'admin',
-    modifiedBy: 'admin',
-    images: [],
-  },
-  {
-    id: '8',
-    sku: 'PRD-008',
-    name: 'Webcam HD 1080p',
-    description: 'Full HD webcam with built-in microphone',
-    price: { amount: 89.99, currency: 'USD' },
-    stockQuantity: 85,
-    lowStockThreshold: 15,
-    isActive: true,
-    isLowStock: false,
-    details: [{ id: '8', key: 'Resolution', value: '1080p' }],
-    createdAt: '2024-01-08T10:00:00Z',
-    updatedAt: '2024-01-08T10:00:00Z',
-    createdBy: 'admin',
-    modifiedBy: 'admin',
-    images: [],
-  },
-];
+/**
+ * GraphQL connection type for HotChocolate cursor-based pagination
+ */
+interface ProductConnection {
+  nodes: Product[];
+  pageInfo: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    startCursor: string | null;
+    endCursor: string | null;
+  };
+  totalCount: number;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -153,6 +29,16 @@ export class ProductService {
   private readonly _loading = signal(false);
   readonly loading = this._loading.asReadonly();
 
+  // Store cursors for pagination navigation
+  private cursors: Map<number, string> = new Map();
+
+  /**
+   * Retrieves paginated products from the GraphQL API
+   * Uses HotChocolate cursor-based pagination
+   * @param pagination - Pagination parameters (page, pageSize)
+   * @param filters - Optional filter criteria
+   * @param sort - Optional sort configuration
+   */
   getProducts(
     pagination: PaginationParams,
     filters?: ProductFilterInput,
@@ -160,75 +46,282 @@ export class ProductService {
   ): Observable<PaginatedResult<Product>> {
     this._loading.set(true);
 
-    // Mock implementation - TODO: Replace with GraphQL query
-    return of(MOCK_PRODUCTS).pipe(
-      delay(500),
-      map((products) => {
-        let filtered = [...products];
+    // Get cursor for the requested page (null for first page)
+    const afterCursor = pagination.page > 0 ? this.cursors.get(pagination.page - 1) : null;
 
-        // Apply search filter
-        if (filters?.name?.contains) {
-          const searchTerm = filters.name.contains.toLowerCase();
-          filtered = filtered.filter(
-            (p) =>
-              p.name.toLowerCase().includes(searchTerm) ||
-              p.sku.toLowerCase().includes(searchTerm)
-          );
-        }
-
-        // Apply active filter
-        if (filters?.isActive?.eq !== undefined) {
-          filtered = filtered.filter((p) => p.isActive === filters.isActive?.eq);
-        }
-
-        // Apply sorting
-        if (sort) {
-          const sortKey = Object.keys(sort)[0] as keyof Product;
-          const sortDir = Object.values(sort)[0] as 'ASC' | 'DESC';
-          filtered.sort((a, b) => {
-            const aVal = a[sortKey];
-            const bVal = b[sortKey];
-            if (aVal === undefined || bVal === undefined) return 0;
-            if (typeof aVal === 'string' && typeof bVal === 'string') {
-              return sortDir === 'ASC'
-                ? aVal.localeCompare(bVal)
-                : bVal.localeCompare(aVal);
-            }
-            if (typeof aVal === 'number' && typeof bVal === 'number') {
-              return sortDir === 'ASC' ? aVal - bVal : bVal - aVal;
-            }
-            return 0;
-          });
-        }
-
-        const totalCount = filtered.length;
-        const startIndex = pagination.page * pagination.pageSize;
-        const paginated = filtered.slice(startIndex, startIndex + pagination.pageSize);
-
-        this._loading.set(false);
-
-        return {
-          items: paginated,
-          totalCount,
-          page: pagination.page,
-          pageSize: pagination.pageSize,
-          totalPages: Math.ceil(totalCount / pagination.pageSize),
-          hasNextPage: startIndex + pagination.pageSize < totalCount,
-          hasPreviousPage: pagination.page > 0,
-        };
+    return this.apollo
+      .query<{ products: ProductConnection }>({
+        query: GET_PRODUCTS,
+        variables: {
+          first: pagination.pageSize,
+          after: afterCursor || null,
+          where: filters || null,
+          order: sort ? [sort] : null,
+        },
+        fetchPolicy: 'network-only',
       })
-    );
+      .pipe(
+        map((result) => {
+          this._loading.set(false);
+          if (!result.data) {
+            throw new Error('No data returned from products query');
+          }
+          const { nodes, pageInfo, totalCount } = result.data.products;
+
+          // Store the end cursor for next page navigation
+          if (pageInfo.endCursor) {
+            this.cursors.set(pagination.page, pageInfo.endCursor);
+          }
+
+          return {
+            items: nodes,
+            totalCount,
+            page: pagination.page,
+            pageSize: pagination.pageSize,
+            totalPages: Math.ceil(totalCount / pagination.pageSize),
+            hasNextPage: pageInfo.hasNextPage,
+            hasPreviousPage: pageInfo.hasPreviousPage,
+          };
+        }),
+        catchError((error) => {
+          this._loading.set(false);
+          throw error;
+        })
+      );
   }
 
+  /**
+   * Retrieves a single product by ID from the GraphQL API
+   * @param id - The product UUID
+   * @returns Observable with the product or null if not found
+   */
   getProductById(id: string): Observable<Product | null> {
     this._loading.set(true);
 
-    return of(MOCK_PRODUCTS.find((p) => p.id === id) || null).pipe(
-      delay(300),
-      map((product) => {
-        this._loading.set(false);
-        return product;
+    return this.apollo
+      .query<{ products: ProductConnection }>({
+        query: GET_PRODUCT_BY_ID,
+        variables: { id },
+        fetchPolicy: 'network-only',
       })
-    );
+      .pipe(
+        map((result) => {
+          this._loading.set(false);
+          if (!result.data) {
+            throw new Error('No data returned from products query');
+          }
+          // Return the first node or null if not found
+          return result.data.products.nodes[0] || null;
+        }),
+        catchError((error) => {
+          this._loading.set(false);
+          throw error;
+        })
+      );
   }
+
+  /**
+   * Creates a new product
+   */
+  createProduct(input: CreateProductInput): Observable<Product> {
+    this._loading.set(true);
+
+    return this.apollo
+      .mutate<{ createProduct: { product: Product } }>({
+        mutation: CREATE_PRODUCT,
+        variables: { command: input },
+        refetchQueries: [{ query: GET_PRODUCTS }],
+      })
+      .pipe(
+        map((result) => {
+          this._loading.set(false);
+          if (!result.data?.createProduct?.product) {
+            throw new Error('No data returned from createProduct mutation');
+          }
+          return result.data.createProduct.product;
+        }),
+        catchError((error) => {
+          this._loading.set(false);
+          throw error;
+        })
+      );
+  }
+
+  /**
+   * Updates an existing product
+   */
+  updateProduct(input: UpdateProductInput): Observable<Product> {
+    this._loading.set(true);
+
+    return this.apollo
+      .mutate<{ updateProduct: { product: Product } }>({
+        mutation: UPDATE_PRODUCT,
+        variables: { command: input },
+        refetchQueries: [{ query: GET_PRODUCTS }],
+      })
+      .pipe(
+        map((result) => {
+          this._loading.set(false);
+          if (!result.data?.updateProduct?.product) {
+            throw new Error('No data returned from updateProduct mutation');
+          }
+          return result.data.updateProduct.product;
+        }),
+        catchError((error) => {
+          this._loading.set(false);
+          throw error;
+        })
+      );
+  }
+
+  /**
+   * Deletes a product
+   * Note: Will throw ProductInUseException if product is referenced in orders
+   */
+  deleteProduct(id: string): Observable<void> {
+    this._loading.set(true);
+
+    interface DeleteProductError {
+      message: string;
+      productId: string;
+    }
+
+    interface DeleteProductResponse {
+      errors?: DeleteProductError[];
+      deleteResponse?: { objectDeleted: string; executedAt: string } | null;
+    }
+
+    return this.apollo
+      .mutate<{ deleteProduct: DeleteProductResponse }>({
+        mutation: DELETE_PRODUCT,
+        variables: { command: { id } },
+      })
+      .pipe(
+        map((result) => {
+          this._loading.set(false);
+
+          // Check for errors in the response payload
+          if (result.data?.deleteProduct?.errors && result.data.deleteProduct.errors.length > 0) {
+            const error = result.data.deleteProduct.errors[0];
+            // Create an error object that matches the expected GraphQL error structure
+            throw {
+              message: error.message,
+              graphQLErrors: [{
+                message: error.message,
+                extensions: { productId: error.productId }
+              }]
+            };
+          }
+        }),
+        catchError((error) => {
+          this._loading.set(false);
+          throw error;
+        })
+      );
+  }
+
+  /**
+   * Adds an image to a product
+   */
+  addProductImage(input: AddProductImageInput): Observable<ProductImage> {
+    this._loading.set(true);
+
+    return this.apollo
+      .mutate<{ addProductImage: { productImage: ProductImage } }>({
+        mutation: ADD_PRODUCT_IMAGE,
+        variables: { command: input },
+      })
+      .pipe(
+        map((result) => {
+          this._loading.set(false);
+          if (!result.data?.addProductImage?.productImage) {
+            throw new Error('No data returned from addProductImage mutation');
+          }
+          return result.data.addProductImage.productImage;
+        }),
+        catchError((error) => {
+          this._loading.set(false);
+          throw error;
+        })
+      );
+  }
+
+  /**
+   * Removes an image from a product
+   */
+  removeProductImage(productId: string, imageId: string): Observable<void> {
+    this._loading.set(true);
+
+    interface RemoveImageError {
+      message: string;
+      productId: string;
+    }
+
+    interface RemoveImageResponse {
+      errors?: RemoveImageError[];
+      deleteResponse?: { objectDeleted: string; executedAt: string } | null;
+    }
+
+    return this.apollo
+      .mutate<{ removeProductImage: RemoveImageResponse }>({
+        mutation: REMOVE_PRODUCT_IMAGE,
+        variables: { command: { productId, imageId } },
+      })
+      .pipe(
+        map((result) => {
+          this._loading.set(false);
+
+          // Check for errors in the response payload
+          if (result.data?.removeProductImage?.errors && result.data.removeProductImage.errors.length > 0) {
+            const error = result.data.removeProductImage.errors[0];
+            throw {
+              message: error.message,
+              graphQLErrors: [{
+                message: error.message,
+                extensions: { productId: error.productId }
+              }]
+            };
+          }
+        }),
+        catchError((error) => {
+          this._loading.set(false);
+          throw error;
+        })
+      );
+  }
+}
+
+// Type definitions for mutation inputs
+export interface CreateProductInput {
+  name: string;
+  description?: string;
+  price: number;
+  sku: string;
+  stockQuantity: number;
+  lowStockThreshold: number;
+  isActive: boolean;
+  createdBy: string;
+  details?: Array<{ key: string; value: string }>;
+}
+
+export interface UpdateProductInput {
+  id: string;
+  name: string;
+  description?: string;
+  price: number;
+  sku: string;
+  stockQuantity: number;
+  lowStockThreshold: number;
+  isActive: boolean;
+  modifiedBy: string;
+  details?: Array<{ id?: string; key: string; value: string }>;
+}
+
+export interface AddProductImageInput {
+  productId: string;
+  fileName: string;
+  url: string;
+  storageMode: 'FILE_SYSTEM' | 'AZURE' | 'AWS';
+  isPrimary: boolean;
+  createdBy: string;
 }

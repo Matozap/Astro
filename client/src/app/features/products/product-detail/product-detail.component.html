@@ -4,28 +4,69 @@
       <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
     </div>
   } @else if (product()) {
-    <!-- Page Header -->
-    <div class="page-header">
-      <div class="header-left">
-        <button mat-icon-button (click)="goBack()" class="back-button">
-          <mat-icon>arrow_back</mat-icon>
-        </button>
-        <div class="header-content">
-          <h1 class="page-title">{{ product()!.name }}</h1>
-          <p class="page-subtitle">SKU: {{ product()!.sku }}</p>
+    @if (editMode()) {
+      <!-- Edit Mode -->
+      <div class="edit-mode-container">
+        <div class="page-header">
+          <div class="header-left">
+            <button mat-icon-button (click)="goBack()" class="back-button">
+              <mat-icon>arrow_back</mat-icon>
+            </button>
+            <div class="header-content">
+              <h1 class="page-title">Edit Product</h1>
+              <p class="page-subtitle">SKU: {{ product()!.sku }}</p>
+            </div>
+          </div>
+        </div>
+
+        @if (saving()) {
+          <mat-card class="loading-card">
+            <mat-card-content>
+              <div class="loading-content">
+                <mat-spinner diameter="40"></mat-spinner>
+                <p>Saving changes...</p>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        } @else {
+          <app-product-form
+            [product]="product()!"
+            submitLabel="Save Changes"
+            (formSubmit)="onFormSubmit($event)"
+            (formCancel)="onFormCancel()">
+          </app-product-form>
+        }
+      </div>
+    } @else {
+      <!-- View Mode -->
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="header-left">
+          <button mat-icon-button (click)="goBack()" class="back-button">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+          <div class="header-content">
+            <h1 class="page-title">{{ product()!.name }}</h1>
+            <p class="page-subtitle">SKU: {{ product()!.sku }}</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <button mat-raised-button color="primary" (click)="toggleEditMode()">
+            <mat-icon>edit</mat-icon>
+            Edit Product
+          </button>
+          <div class="header-badges">
+            <app-status-badge
+              [label]="getActiveStatus().label"
+              [variant]="getActiveStatus().variant"
+            ></app-status-badge>
+            <app-status-badge
+              [label]="getStockStatus().label"
+              [variant]="getStockStatus().variant"
+            ></app-status-badge>
+          </div>
         </div>
       </div>
-      <div class="header-badges">
-        <app-status-badge
-          [label]="getActiveStatus().label"
-          [variant]="getActiveStatus().variant"
-        ></app-status-badge>
-        <app-status-badge
-          [label]="getStockStatus().label"
-          [variant]="getStockStatus().variant"
-        ></app-status-badge>
-      </div>
-    </div>
 
     <div class="detail-grid">
       <!-- Product Image -->
@@ -179,13 +220,14 @@
       </mat-card>
     }
 
-    <!-- Actions -->
-    <div class="actions-row">
-      <button mat-stroked-button (click)="goBack()">
-        <mat-icon>arrow_back</mat-icon>
-        Back to Products
-      </button>
-    </div>
+      <!-- Actions -->
+      <div class="actions-row">
+        <button mat-stroked-button (click)="goBack()">
+          <mat-icon>arrow_back</mat-icon>
+          Back to Products
+        </button>
+      </div>
+    }
   } @else {
     <div class="not-found">
       <mat-icon>search_off</mat-icon>

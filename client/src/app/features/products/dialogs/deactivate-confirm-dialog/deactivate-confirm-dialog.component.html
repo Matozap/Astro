@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>
+  <mat-icon color="primary">block</mat-icon>
+  Deactivate Product
+</h2>
+
+<mat-dialog-content>
+  <p class="info-text">
+    This product cannot be deleted because it has been used in one or more orders.
+  </p>
+
+  <div class="product-info">
+    <p><strong>Name:</strong> {{ data.productName }}</p>
+    <p><strong>SKU:</strong> {{ data.productSku }}</p>
+  </div>
+
+  <p class="action-text">
+    Instead of deleting, you can deactivate this product. This will:
+  </p>
+
+  <ul class="consequences-list">
+    <li>Set stock quantity to 0</li>
+    <li>Mark the product as inactive</li>
+    <li>Hide it from the active catalog</li>
+    <li>Preserve order history and data integrity</li>
+  </ul>
+
+  <p class="consequence-text">
+    <mat-icon>info</mat-icon>
+    You can reactivate this product later by editing it and setting stock quantity and active status.
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onConfirm()">
+    <mat-icon>block</mat-icon>
+    Deactivate Product
+  </button>
+</mat-dialog-actions>

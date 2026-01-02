@@ -9,7 +9,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { ProductService } from '../services/product.service';
-import { Product } from '../../../shared/models/product.model';
+import { Product, ProductImage } from '../../../shared/models/product.model';
+import { ProductFormComponent, ProductFormValue } from '../product-form/product-form.component';
+import { ImageManagerImage } from '../image-manager/image-manager.component';
+import { NotificationService } from '../../../core/services/notification.service';
+import { AuthService } from '../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-product-detail',
@@ -23,6 +27,7 @@ import { Product } from '../../../shared/models/product.model';
     MatProgressSpinnerModule,
     MatChipsModule,
     StatusBadgeComponent,
+    ProductFormComponent,
     CurrencyPipe,
     DatePipe,
   ],
@@ -34,9 +39,13 @@ export class ProductDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly productService = inject(ProductService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly authService = inject(AuthService);
 
   product = signal<Product | null>(null);
   loading = signal(true);
+  editMode = signal(false);
+  saving = signal(false);
 
   displayedColumns = ['key', 'value'];
 
@@ -88,5 +97,98 @@ export class ProductDetailComponent implements OnInit {
 
     const primary = p.images.find((img) => img.isPrimary);
     return primary?.url || p.images[0]?.url || null;
+  }
+
+  toggleEditMode(): void {
+    this.editMode.update(mode => !mode);
+  }
+
+  onFormSubmit(formValue: ProductFormValue): void {
+    const product = this.product();
+    if (!product) return;
+
+    this.saving.set(true);
+
+    const currentUser = this.authService.currentUser();
+    const modifiedBy = currentUser?.email || 'system';
+
+    const updateCommand = {
+      id: product.id,
+      sku: formValue.sku,
+      name: formValue.name,
+      description: formValue.description,
+      price: formValue.price,
+      stockQuantity: formValue.stockQuantity,
+      lowStockThreshold: formValue.lowStockThreshold,
+      isActive: formValue.isActive,
+      modifiedBy,
+    };
+
+    this.productService.updateProduct(updateCommand).subscribe({
+      next: (updatedProduct) => {
+        this.syncImages(product.id, product.images || [], formValue.images, modifiedBy)
+          .then(() => {
+            this.loadProduct(product.id);
+            this.editMode.set(false);
+            this.saving.set(false);
+            this.notificationService.success('Product updated successfully');
+          })
+          .catch((error) => {
+            this.saving.set(false);
+            console.error('Error syncing images:', error);
+            this.notificationService.error('Product updated but some image changes failed');
+            this.loadProduct(product.id);
+            this.editMode.set(false);
+          });
+      },
+      error: (error) => {
+        this.saving.set(false);
+        console.error('Error updating product:', error);
+
+        let errorMessage = 'Failed to update product';
+        if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+          errorMessage = error.graphQLErrors[0].message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        this.notificationService.error(errorMessage);
+      },
+    });
+  }
+
+  onFormCancel(): void {
+    this.editMode.set(false);
+  }
+
+  private async syncImages(
+    productId: string,
+    existingImages: ProductImage[],
+    newImages: ImageManagerImage[],
+    createdBy: string
+  ): Promise<void> {
+    const existingIds = new Set(existingImages.map(img => img.id));
+    const newIds = new Set(newImages.filter(img => img.id).map(img => img.id!));
+
+    // Remove images that are no longer in the list
+    const imagesToRemove = existingImages.filter(img => !newIds.has(img.id));
+    const removePromises = imagesToRemove.map(img =>
+      this.productService.removeProductImage(productId, img.id).toPromise()
+    );
+
+    // Add new images (those without an id)
+    const imagesToAdd = newImages.filter(img => !img.id);
+    const addPromises = imagesToAdd.map(img =>
+      this.productService.addProductImage({
+        productId,
+        fileName: img.fileName,
+        url: img.url,
+        storageMode: img.storageMode,
+        isPrimary: img.isPrimary,
+        createdBy,
+      }).toPromise()
+    );
+
+    await Promise.all([...removePromises, ...addPromises]);
   }
 }

@@ -1,0 +1,47 @@
+query GetProducts(
+  $first: Int
+  $after: String
+  $where: ProductFilterInput
+  $order: [ProductSortInput!]
+) {
+  products(first: $first, after: $after, where: $where, order: $order) {
+    nodes {
+      id
+      sku
+      name
+      description
+      price {
+        amount
+        currency
+      }
+      stockQuantity
+      lowStockThreshold
+      isActive
+      isLowStock
+      createdAt
+      updatedAt
+      images {
+        id
+        url
+        isPrimary
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
+  }
+}
+
+# Example filters:
+# where: {
+#   name: { contains: "laptop" }
+#   isActive: { eq: true }
+#   stockQuantity: { gte: 0 }
+# }
+#
+# Example sorting:
+# order: [{ name: ASC }, { createdAt: DESC }]

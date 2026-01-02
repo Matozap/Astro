@@ -1,32 +1,40 @@
 query GetProducts {
-  products {
-    id
-    name
-    description
-    price {
-      amount
-      currency
-    }
-    sku
-    stockQuantity
-    lowStockThreshold
-    isActive
-    isLowStock
-    createdAt
-    updatedAt
-    createdBy
-    modifiedBy
-    details {
+  products(first: 5) {
+    nodes {
+      createdAt
+      createdBy
+      description
       id
-      key
-      value
+      isActive
+      isLowStock
+      lowStockThreshold
+      modifiedBy
+      name
+      sku
+      stockQuantity
+      updatedAt
+      price {
+        amount
+        currency
+      }
+      details {
+        id
+        key
+        value
+      }
+      images {
+        fileName
+        id
+        isPrimary
+        storageMode
+        url
+      }
     }
-    images {
-      id
-      fileName
-      url
-      storageMode
-      isPrimary
+    pageInfo {
+      endCursor
+      hasNextPage
+      hasPreviousPage
+      startCursor
     }
   }
 }

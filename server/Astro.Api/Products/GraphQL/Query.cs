@@ -14,6 +14,7 @@ public class ProductQuery
     /// <summary>
     /// Gets all products with filtering and sorting support.
     /// </summary>
+    [UsePaging(DefaultPageSize = 10, IncludeTotalCount =  true)]
     [UseFiltering]
     [UseSorting]
     public async Task<IQueryable<Product>> GetProducts([Service] IMediator mediator)

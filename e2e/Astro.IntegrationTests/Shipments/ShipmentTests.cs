@@ -21,7 +21,7 @@ public class ShipmentTests(IntegrationTestFixture fixture) : IntegrationTestBase
         var response = await GraphClient.ExecuteAsync("GetShipments");
 
         var data = response.RootElement.GetProperty("data");
-        var shipments = data.GetProperty("shipments");
+        var shipments = data.GetProperty("shipments").GetProperty("nodes");
 
         shipments.GetArrayLength().ShouldBeGreaterThan(0);
 

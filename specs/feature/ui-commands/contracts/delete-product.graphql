@@ -1,0 +1,18 @@
+mutation DeleteProduct($command: DeleteProductCommand!) {
+  deleteProduct(command: $command) {
+    id
+  }
+}
+
+# Expected Errors:
+# - ProductNotFoundException: Product with given ID not found
+# - ProductInUseException: Product is referenced in orders and cannot be deleted
+#
+# Frontend handling example:
+# try {
+#   await deleteProduct({ id: productId });
+# } catch (error) {
+#   if (error.graphQLErrors?.some(e => e.extensions?.code === 'PRODUCT_IN_USE')) {
+#     // Show deactivate dialog instead
+#   }
+# }

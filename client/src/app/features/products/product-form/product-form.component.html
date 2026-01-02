@@ -1,0 +1,152 @@
+<form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="product-form">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Product Information</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- SKU and Name Row -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field-half">
+          <mat-label>SKU</mat-label>
+          <input matInput formControlName="sku" placeholder="Enter product SKU" maxlength="50">
+          <mat-icon matPrefix>inventory_2</mat-icon>
+          @if (productForm.get('sku')?.invalid && productForm.get('sku')?.touched) {
+            <mat-error>{{ getErrorMessage('sku') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field-half">
+          <mat-label>Product Name</mat-label>
+          <input matInput formControlName="name" placeholder="Enter product name" maxlength="200">
+          <mat-icon matPrefix>label</mat-icon>
+          @if (productForm.get('name')?.invalid && productForm.get('name')?.touched) {
+            <mat-error>{{ getErrorMessage('name') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Description -->
+      <mat-form-field appearance="outline" class="form-field-full">
+        <mat-label>Description</mat-label>
+        <textarea matInput
+                  formControlName="description"
+                  placeholder="Enter product description"
+                  rows="4"
+                  maxlength="2000"></textarea>
+        <mat-icon matPrefix>description</mat-icon>
+        @if (productForm.get('description')?.invalid && productForm.get('description')?.touched) {
+          <mat-error>{{ getErrorMessage('description') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Price and Currency Row -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field-two-thirds">
+          <mat-label>Price</mat-label>
+          <input matInput
+                 type="number"
+                 formControlName="price"
+                 placeholder="0.00"
+                 step="0.01"
+                 min="0">
+          <mat-icon matPrefix>attach_money</mat-icon>
+          @if (productForm.get('price')?.invalid && productForm.get('price')?.touched) {
+            <mat-error>{{ getErrorMessage('price') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field-third">
+          <mat-label>Currency</mat-label>
+          <mat-select formControlName="currency">
+            <mat-option value="USD">USD</mat-option>
+            <mat-option value="EUR">EUR</mat-option>
+            <mat-option value="GBP">GBP</mat-option>
+            <mat-option value="JPY">JPY</mat-option>
+          </mat-select>
+          @if (productForm.get('currency')?.invalid && productForm.get('currency')?.touched) {
+            <mat-error>{{ getErrorMessage('currency') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Stock Quantity and Low Stock Threshold Row -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field-half">
+          <mat-label>Stock Quantity</mat-label>
+          <input matInput
+                 type="number"
+                 formControlName="stockQuantity"
+                 placeholder="0"
+                 min="0">
+          <mat-icon matPrefix>inventory</mat-icon>
+          @if (productForm.get('stockQuantity')?.invalid && productForm.get('stockQuantity')?.touched) {
+            <mat-error>{{ getErrorMessage('stockQuantity') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field-half">
+          <mat-label>Low Stock Threshold</mat-label>
+          <input matInput
+                 type="number"
+                 formControlName="lowStockThreshold"
+                 placeholder="10"
+                 min="0">
+          <mat-icon matPrefix>warning</mat-icon>
+          @if (productForm.get('lowStockThreshold')?.invalid && productForm.get('lowStockThreshold')?.touched) {
+            <mat-error>{{ getErrorMessage('lowStockThreshold') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <!-- Active Status Toggle -->
+      <div class="form-row">
+        <mat-slide-toggle formControlName="isActive" color="primary">
+          Product is Active
+        </mat-slide-toggle>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Image Manager Section -->
+  <mat-card class="images-section">
+    <mat-card-header>
+      <mat-card-title>Product Images</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <app-image-manager
+        [images]="images"
+        (imagesChange)="onImagesChange($event)">
+      </app-image-manager>
+
+      @if (!hasImages) {
+        <div class="validation-error">
+          <mat-icon>error</mat-icon>
+          <span>At least one product image is required</span>
+        </div>
+      }
+
+      @if (hasImages && !hasPrimaryImage) {
+        <div class="validation-error">
+          <mat-icon>error</mat-icon>
+          <span>Please select a primary image</span>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Form Actions -->
+  <div class="form-actions">
+    <button mat-button type="button" (click)="onCancel()">
+      <mat-icon>cancel</mat-icon>
+      Cancel
+    </button>
+    <button mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="productForm.invalid || !hasImages || !hasPrimaryImage">
+      <mat-icon>save</mat-icon>
+      {{ submitLabel }}
+    </button>
+  </div>
+</form>

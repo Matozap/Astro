@@ -37,6 +37,13 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'create',
+            loadComponent: () =>
+              import('./features/products/product-create/product-create.component').then(
+                (m) => m.ProductCreateComponent
+              ),
+          },
+          {
             path: ':id',
             loadComponent: () =>
               import('./features/products/product-detail/product-detail.component').then(

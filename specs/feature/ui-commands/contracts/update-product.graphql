@@ -1,32 +1,25 @@
-query GetProductById($id: UUID!) {
-  products(where: { id: { eq: $id } }) {
+mutation UpdateProduct($command: UpdateProductCommand!) {
+  updateProduct(command: $command) {
     id
+    sku
     name
     description
     price {
       amount
       currency
     }
-    sku
     stockQuantity
     lowStockThreshold
     isActive
     isLowStock
-    createdAt
     updatedAt
-    createdBy
     modifiedBy
-    details {
-      id
-      key
-      value
-    }
     images {
       id
-      fileName
       url
-      storageMode
+      fileName
       isPrimary
+      storageMode
     }
   }
 }
