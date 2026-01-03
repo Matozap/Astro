@@ -13,6 +13,48 @@ public class PaymentTests(IntegrationTestFixture fixture) : IntegrationTestBase(
         Path.Combine(AppContext.BaseDirectory, "Payments", "Payloads");
 
     [Fact]
+    public async Task GetPayments_ReturnsPayments()
+    {
+        // First create a payment to ensure we have data
+        await CreateTestPayment();
+
+        var response = await GraphClient.ExecuteAsync("GetPayments");
+
+        var data = response.RootElement.GetProperty("data");
+        var payments = data.GetProperty("payments").GetProperty("nodes");
+
+        payments.GetArrayLength().ShouldBeGreaterThan(0);
+
+        var firstPayment = payments[0];
+
+        // Core properties
+        firstPayment.GetProperty("id").GetString().ShouldNotBeNullOrEmpty();
+        firstPayment.GetProperty("orderId").GetString().ShouldNotBeNullOrEmpty();
+        firstPayment.GetProperty("status").GetString().ShouldNotBeNullOrEmpty();
+
+        // Amount
+        var amount = firstPayment.GetProperty("amount");
+        amount.GetProperty("amount").GetDecimal().ShouldBeGreaterThanOrEqualTo(0);
+        amount.GetProperty("currency").GetString().ShouldBe("USD");
+
+        // Optional fields
+        firstPayment.TryGetProperty("paymentMethod", out _).ShouldBeTrue();
+        firstPayment.TryGetProperty("transactionId", out _).ShouldBeTrue();
+
+        // Audit fields
+        firstPayment.GetProperty("createdAt").GetString().ShouldNotBeNullOrEmpty();
+        firstPayment.GetProperty("updatedAt").GetString().ShouldNotBeNullOrEmpty();
+
+        // Order navigation
+        var order = firstPayment.GetProperty("order");
+        order.GetProperty("id").GetString().ShouldNotBeNullOrEmpty();
+        order.GetProperty("orderNumber").GetString().ShouldNotBeNullOrEmpty();
+        order.GetProperty("customerName").GetString().ShouldNotBeNullOrEmpty();
+        order.GetProperty("customerEmail").GetString().ShouldNotBeNullOrEmpty();
+        order.GetProperty("totalAmount").GetProperty("amount").GetDecimal().ShouldBeGreaterThan(0);
+    }
+
+    [Fact]
     public async Task CreatePayment_WithValidOrderId_ReturnsCreatedPayment()
     {
         // First create an order
@@ -24,7 +66,10 @@ public class PaymentTests(IntegrationTestFixture fixture) : IntegrationTestBase(
             {
                 command = new
                 {
-                    orderId
+                    orderId,
+                    amount = 99.99m,
+                    currency = "USD",
+                    paymentMethod = "Credit Card"
                 }
             }
         };
@@ -55,7 +100,9 @@ public class PaymentTests(IntegrationTestFixture fixture) : IntegrationTestBase(
             {
                 command = new
                 {
-                    orderId = nonExistentOrderId
+                    orderId = nonExistentOrderId,
+                    amount = 99.99m,
+                    currency = "USD"
                 }
             }
         };
@@ -301,7 +348,10 @@ public class PaymentTests(IntegrationTestFixture fixture) : IntegrationTestBase(
             {
                 command = new
                 {
-                    orderId
+                    orderId,
+                    amount = 99.99m,
+                    currency = "USD",
+                    paymentMethod = "Test Payment"
                 }
             }
         };

@@ -31,6 +31,7 @@ export interface OrderDetail {
   id: string;
   productId: string;
   productName: string;
+  productSku: string;
   quantity: number;
   unitPrice: Money;
   lineTotal: Money;

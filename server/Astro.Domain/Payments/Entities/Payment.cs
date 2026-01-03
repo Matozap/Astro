@@ -2,6 +2,7 @@ using Astro.Domain.Orders.Entities;
 using Astro.Domain.Payments.Enums;
 using Astro.Domain.Payments.Events;
 using Astro.Domain.Shared;
+using Astro.Domain.Shared.ValueObjects;
 
 namespace Astro.Domain.Payments.Entities;
 
@@ -14,6 +15,9 @@ public class Payment : Entity, IAggregateRoot
 
     public Guid OrderId { get; private set; }
     public PaymentStatus Status { get; private set; }
+    public Money Amount { get; private set; } = null!;
+    public string? PaymentMethod { get; private set; }
+    public string? TransactionId { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset UpdatedAt { get; private set; }
 
@@ -23,14 +27,20 @@ public class Payment : Entity, IAggregateRoot
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     // EF Core constructor
-    private Payment() { }
+    private Payment()
+    {
+        // Initialize with default values for EF Core
+        Amount = Money.Zero();
+    }
 
-    private Payment(Guid orderId)
+    private Payment(Guid orderId, Money amount, string? paymentMethod = null)
     {
         if (orderId == Guid.Empty)
             throw new ArgumentException("Order ID cannot be empty", nameof(orderId));
 
         OrderId = orderId;
+        Amount = amount ?? throw new ArgumentNullException(nameof(amount));
+        PaymentMethod = paymentMethod;
         Status = PaymentStatus.Pending;
         CreatedAt = DateTimeOffset.UtcNow;
         UpdatedAt = DateTimeOffset.UtcNow;
@@ -46,10 +56,25 @@ public class Payment : Entity, IAggregateRoot
     /// Creates a new Payment aggregate with Pending status
     /// </summary>
     /// <param name="orderId">The ID of the order this payment is for</param>
+    /// <param name="amount">The payment amount</param>
+    /// <param name="paymentMethod">The payment method (optional)</param>
     /// <returns>A new Payment instance</returns>
-    public static Payment Create(Guid orderId)
+    public static Payment Create(Guid orderId, Money amount, string? paymentMethod = null)
     {
-        return new Payment(orderId);
+        return new Payment(orderId, amount, paymentMethod);
+    }
+
+    /// <summary>
+    /// Sets the transaction ID when payment is processed
+    /// </summary>
+    /// <param name="transactionId">The transaction ID from the payment processor</param>
+    public void SetTransactionId(string transactionId)
+    {
+        if (string.IsNullOrWhiteSpace(transactionId))
+            throw new ArgumentException("Transaction ID cannot be empty", nameof(transactionId));
+
+        TransactionId = transactionId;
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 
     /// <summary>

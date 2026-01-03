@@ -8,7 +8,8 @@ public static class Configuration
     {
         public IRequestExecutorBuilder AddPaymentTypeExtensions()
         {
-            builder.AddTypeExtension<PaymentMutation>()
+            builder.AddTypeExtension<PaymentQuery>()
+                .AddTypeExtension<PaymentMutation>()
                 .AddTypeExtension<PaymentSubscription>();
 
             return builder;
