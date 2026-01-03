@@ -1,141 +1,109 @@
-# Tasks: Connect Orders UI to Backend
+# Tasks: Connect Payments and Shipments UI to Backend
 
-**Input**: Design documents from `/specs/feature/orders-connect/`
-**Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/
+**Input**: Based on orders-connect pattern - remove mock data from Payments and Shipments features
+**Prerequisites**: Backend GraphQL APIs for Payments and Shipments are implemented
 
-**Tests**: Not explicitly requested in the feature specification. No test tasks included.
+**Tests**: Tests are NOT requested for this feature - focus on implementation only.
 
-**Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
+**Organization**: Tasks are organized into two parallel user stories (Payments and Shipments) that can be implemented independently.
 
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: Which user story this task belongs to (e.g., US1, US2, US3)
+- **[Story]**: Which user story this task belongs to (e.g., US1, US2)
 - Include exact file paths in descriptions
 
 ## Path Conventions
 
-- **Web app**: `client/src/` for Angular frontend, `server/` for .NET backend
-- Backend changes: NOT REQUIRED (already implemented)
+- **Client**: `client/src/app/features/`
+- **Shared Models**: `client/src/app/shared/models/`
 
 ---
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-**Purpose**: Model updates and GraphQL query preparation shared across all user stories
+**Purpose**: No setup needed - using existing Angular infrastructure
 
-- [X] T001 [P] Add productSku field to OrderDetail interface in client/src/app/shared/models/order.model.ts
-- [X] T002 [P] Update GET_ORDERS query to use cursor-based pagination (first/after) in client/src/app/features/orders/graphql/order.queries.ts
-- [X] T003 [P] Update GET_ORDER_BY_ID query to use filter pattern in client/src/app/features/orders/graphql/order.queries.ts
-- [X] T004 [P] Update UPDATE_ORDER_STATUS mutation to match backend command pattern in client/src/app/features/orders/graphql/order.queries.ts
+*No tasks required - infrastructure already exists*
 
 ---
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-**Purpose**: Core service infrastructure that MUST be complete before ANY user story can work
+**Purpose**: Verify backend APIs and update shared types if needed
 
-**⚠️ CRITICAL**: No user story work can begin until this phase is complete
+**⚠️ CRITICAL**: Verify backend GraphQL APIs exist before proceeding
 
-- [X] T005 Add OrderConnection interface to OrderService in client/src/app/features/orders/services/order.service.ts
-- [X] T006 Remove MOCK_ORDERS array from OrderService in client/src/app/features/orders/services/order.service.ts
-- [X] T007 Add cursor storage Map for pagination in OrderService in client/src/app/features/orders/services/order.service.ts
+- [X] T001 [P] Verify Payments GraphQL API is available at backend and document schema
+- [X] T002 [P] Verify Shipments GraphQL API is available at backend and document schema
 
-**Checkpoint**: Foundation ready - user story implementation can now begin
+**Checkpoint**: Backend APIs confirmed - UI integration can now begin in parallel
 
 ---
 
-## Phase 3: User Story 1 - View Orders List (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - Connect Payments to Backend (Priority: P1) 🎯 MVP
 
-**Goal**: Display a paginated list of real orders from the backend
+**Goal**: Replace mock payment data with real GraphQL API calls following the orders pattern
 
-**Independent Test**: Navigate to Orders page and verify orders match database data, test pagination by clicking next/previous
+**Independent Test**: Navigate to Payments page and verify payments displayed match backend database. Click on a payment to view details.
 
 ### Implementation for User Story 1
 
-- [X] T008 [US1] Implement getOrders() method using Apollo query with cursor pagination in client/src/app/features/orders/services/order.service.ts
-- [X] T009 [US1] Add response mapping from OrderConnection to PaginatedResult in client/src/app/features/orders/services/order.service.ts
-- [X] T010 [US1] Add cursor storage logic to store endCursor for next page navigation in client/src/app/features/orders/services/order.service.ts
-- [X] T011 [US1] Add loading state management with catchError in getOrders() in client/src/app/features/orders/services/order.service.ts
-- [X] T012 [US1] Verify orders-list component displays orders from backend in client/src/app/features/orders/orders-list/orders-list.component.ts
+- [X] T003 [US1] Update GET_PAYMENTS query to use cursor-based pagination (first/after instead of skip/take) in client/src/app/features/payments/graphql/payment.queries.ts
+- [X] T004 [US1] Update GET_PAYMENT_BY_ID query to use filter-based approach (where: {id: {eq: $id}}) in client/src/app/features/payments/graphql/payment.queries.ts
+- [X] T005 [US1] Add PaymentConnection interface for cursor-based pagination in client/src/app/features/payments/services/payment.service.ts
+- [X] T006 [US1] Remove MOCK_PAYMENTS array and all mock data logic from client/src/app/features/payments/services/payment.service.ts
+- [X] T007 [US1] Add cursor storage Map<number, string> for pagination state in client/src/app/features/payments/services/payment.service.ts
+- [X] T008 [US1] Replace getPayments() mock Observable with Apollo query call using GET_PAYMENTS in client/src/app/features/payments/services/payment.service.ts
+- [X] T009 [US1] Replace getPaymentById() mock Observable with Apollo query call using GET_PAYMENT_BY_ID in client/src/app/features/payments/services/payment.service.ts
+- [X] T010 [US1] Add error handling with catchError and loading signal management in client/src/app/features/payments/services/payment.service.ts
+- [X] T011 [US1] Map GraphQL PaymentConnection response to PaginatedResult in client/src/app/features/payments/services/payment.service.ts
+- [X] T012 [US1] Verify payments-list component displays real data without code changes in client/src/app/features/payments/payments-list/payments-list.component.ts
+- [X] T013 [US1] Verify payment-detail component displays real data without code changes in client/src/app/features/payments/payment-detail/payment-detail.component.ts
 
-**Checkpoint**: Orders list displays real data from backend with pagination working
+**Checkpoint**: At this point, Payments feature should be fully functional with real backend data
 
 ---
 
-## Phase 4: User Story 2 - View Order Details (Priority: P1)
+## Phase 4: User Story 2 - Connect Shipments to Backend (Priority: P1)
 
-**Goal**: Display complete order details including shipping address and line items
+**Goal**: Replace mock shipment data with real GraphQL API calls following the orders pattern
 
-**Independent Test**: Click on an order in the list and verify all details (customer info, address, line items) match backend data
+**Independent Test**: Navigate to Shipments page and verify shipments displayed match backend database. Click on a shipment to view details including tracking information.
 
 ### Implementation for User Story 2
 
-- [X] T013 [US2] Implement getOrderById() method using Apollo query with filter pattern in client/src/app/features/orders/services/order.service.ts
-- [X] T014 [US2] Add response mapping to extract single order from nodes array in client/src/app/features/orders/services/order.service.ts
-- [X] T015 [US2] Add error handling for order not found scenario in client/src/app/features/orders/services/order.service.ts
-- [X] T016 [US2] Verify order-detail component displays complete order from backend in client/src/app/features/orders/order-detail/order-detail.component.ts
+- [X] T014 [US2] Update GET_SHIPMENTS query to use cursor-based pagination (first/after instead of skip/take) in client/src/app/features/shipments/graphql/shipment.queries.ts
+- [X] T015 [US2] Update GET_SHIPMENT_BY_ID query to use filter-based approach (where: {id: {eq: $id}}) in client/src/app/features/shipments/graphql/shipment.queries.ts
+- [X] T016 [US2] Add ShipmentConnection interface for cursor-based pagination in client/src/app/features/shipments/services/shipment.service.ts
+- [X] T017 [US2] Remove MOCK_SHIPMENTS array and all mock data logic from client/src/app/features/shipments/services/shipment.service.ts
+- [X] T018 [US2] Add cursor storage Map<number, string> for pagination state in client/src/app/features/shipments/services/shipment.service.ts
+- [X] T019 [US2] Replace getShipments() mock Observable with Apollo query call using GET_SHIPMENTS in client/src/app/features/shipments/services/shipment.service.ts
+- [X] T020 [US2] Replace getShipmentById() mock Observable with Apollo query call using GET_SHIPMENT_BY_ID in client/src/app/features/shipments/services/shipment.service.ts
+- [X] T021 [US2] Add error handling with catchError and loading signal management in client/src/app/features/shipments/services/shipment.service.ts
+- [X] T022 [US2] Map GraphQL ShipmentConnection response to PaginatedResult in client/src/app/features/shipments/services/shipment.service.ts
+- [X] T023 [US2] Verify shipments-list component displays real data without code changes in client/src/app/features/shipments/shipments-list/shipments-list.component.ts
+- [X] T024 [US2] Verify shipment-detail component displays real data including tracking details without code changes in client/src/app/features/shipments/shipment-detail/shipment-detail.component.ts
 
-**Checkpoint**: Order details view shows real data including line items and shipping address
-
----
-
-## Phase 5: User Story 3 - Filter and Search Orders (Priority: P2)
-
-**Goal**: Allow filtering orders by search text and status
-
-**Independent Test**: Enter search terms and select status filters, verify displayed orders match filter criteria
-
-### Implementation for User Story 3
-
-- [X] T017 [US3] Verify filter parameter mapping in getOrders() passes filters to GraphQL query in client/src/app/features/orders/services/order.service.ts
-- [X] T018 [US3] Verify orders-list component search input triggers backend filter in client/src/app/features/orders/orders-list/orders-list.component.ts
-- [X] T019 [US3] Verify orders-list component status filter triggers backend filter in client/src/app/features/orders/orders-list/orders-list.component.ts
-
-**Checkpoint**: Search and status filter work against backend data
+**Checkpoint**: At this point, Shipments feature should be fully functional with real backend data
 
 ---
 
-## Phase 6: User Story 4 - Sort Orders (Priority: P2)
+## Phase 5: Polish & Cross-Cutting Concerns
 
-**Goal**: Allow sorting orders by different columns
+**Purpose**: Validation and cleanup across both features
 
-**Independent Test**: Click column headers and verify order list is re-sorted correctly
-
-### Implementation for User Story 4
-
-- [X] T020 [US4] Verify sort parameter mapping in getOrders() passes sort config to GraphQL query in client/src/app/features/orders/services/order.service.ts
-- [X] T021 [US4] Verify orders-list component column sort triggers backend sorting in client/src/app/features/orders/orders-list/orders-list.component.ts
-
-**Checkpoint**: Column sorting works against backend data
-
----
-
-## Phase 7: User Story 5 - Update Order Status (Priority: P2)
-
-**Goal**: Allow updating an order's status via backend mutation
-
-**Independent Test**: Change an order's status and verify the change persists in the backend
-
-### Implementation for User Story 5
-
-- [X] T022 [US5] Implement updateOrderStatus() method using Apollo mutation in client/src/app/features/orders/services/order.service.ts
-- [X] T023 [US5] Add error handling for invalid status transitions in updateOrderStatus() in client/src/app/features/orders/services/order.service.ts
-- [X] T024 [US5] Add success response mapping and UI refresh after status update in client/src/app/features/orders/services/order.service.ts
-- [X] T025 [US5] Verify order-detail component status update triggers mutation in client/src/app/features/orders/order-detail/order-detail.component.ts
-
-**Checkpoint**: Status updates persist to backend and reflect in UI
-
----
-
-## Phase 8: Polish & Cross-Cutting Concerns
-
-**Purpose**: Improvements that affect multiple user stories
-
-- [X] T026 Verify all error scenarios display user-friendly messages in orders-list and order-detail components
-- [X] T027 Verify loading states display correctly during API calls in orders-list and order-detail components
-- [X] T028 Verify empty state displays when no orders exist in client/src/app/features/orders/orders-list/orders-list.component.ts
-- [ ] T029 Manual validation of quickstart.md testing checklist against running application
+- [X] T025 [P] Test pagination on Payments list (next/previous pages work correctly)
+- [X] T026 [P] Test pagination on Shipments list (next/previous pages work correctly)
+- [X] T027 [P] Test filter/search functionality on Payments list
+- [X] T028 [P] Test filter/search functionality on Shipments list
+- [X] T029 [P] Test sorting on Payments list (click column headers)
+- [X] T030 [P] Test sorting on Shipments list (click column headers)
+- [X] T031 [P] Verify error states display correctly for Payments (backend down, network error)
+- [X] T032 [P] Verify error states display correctly for Shipments (backend down, network error)
+- [X] T033 [P] Verify empty states display correctly for Payments (no data in database)
+- [X] T034 [P] Verify empty states display correctly for Shipments (no data in database)
+- [X] T035 Remove any console.log debugging statements from both features
 
 ---
 
@@ -143,98 +111,111 @@
 
 ### Phase Dependencies
 
-- **Setup (Phase 1)**: No dependencies - can start immediately
-- **Foundational (Phase 2)**: Depends on Setup completion - BLOCKS all user stories
-- **User Story 1 (Phase 3)**: Depends on Foundational - MVP target
-- **User Story 2 (Phase 4)**: Depends on Foundational - Can run in parallel with US1
-- **User Story 3 (Phase 5)**: Depends on US1 (uses getOrders with filters)
-- **User Story 4 (Phase 6)**: Depends on US1 (uses getOrders with sort)
-- **User Story 5 (Phase 7)**: Depends on US2 (needs order detail view)
-- **Polish (Phase 8)**: Depends on all user stories being complete
+- **Setup (Phase 1)**: No tasks - infrastructure exists
+- **Foundational (Phase 2)**: Must verify backend APIs exist - BLOCKS all user stories
+- **User Stories (Phase 3 & 4)**: Both depend on Foundational phase completion
+  - User Story 1 (Payments) and User Story 2 (Shipments) can proceed in parallel
+  - No dependencies between Payments and Shipments features
+- **Polish (Phase 5)**: Depends on both user stories being complete
 
 ### User Story Dependencies
 
-```
-Setup (T001-T004) → Foundational (T005-T007)
-                           ↓
-              ┌────────────┼────────────┐
-              ↓            ↓            ↓
-           US1 (P1)    US2 (P1)    (after US1)
-           T008-T012   T013-T016      ↓
-              ↓            ↓      ┌───┴───┐
-              └────────────┼──────┤       │
-                           ↓      ↓       ↓
-                        US3 (P2) US4    US5
-                        T017-T019 T020-T021 T022-T025
-                                      ↓
-                                   Polish
-                                   T026-T029
-```
+- **User Story 1 (Payments)**: Can start after Foundational (Phase 2) - No dependencies on Shipments
+- **User Story 2 (Shipments)**: Can start after Foundational (Phase 2) - No dependencies on Payments
+
+### Within Each User Story
+
+- GraphQL queries must be updated before service implementation
+- Service interfaces (Connection types) before query implementation
+- Remove mock data as queries are implemented
+- Component verification happens after service is complete
 
 ### Parallel Opportunities
 
-**Phase 1 (all parallel)**:
-- T001, T002, T003, T004 can all run in parallel (different files or sections)
-
-**Phase 3 & 4 (stories parallel)**:
-- US1 (T008-T012) and US2 (T013-T016) can run in parallel after Foundational
-
-**Phase 5 & 6 (dependent on US1, parallel with each other)**:
-- US3 (T017-T019) and US4 (T020-T021) can run in parallel with each other
+- **Phase 2**: T001 and T002 can run in parallel (verify different APIs)
+- **Phases 3 & 4**: Entire Payments (US1) and Shipments (US2) features can be developed in parallel
+  - Developer A can work on Payments while Developer B works on Shipments
+  - No shared files between the two features
+- **Phase 5**: All validation tasks marked [P] can run in parallel
 
 ---
 
-## Parallel Example: Phase 1 Setup
+## Parallel Example: Payments and Shipments
 
 ```bash
-# Launch all setup tasks together:
-Task: "Add productSku field to OrderDetail in client/src/app/shared/models/order.model.ts"
-Task: "Update GET_ORDERS query in client/src/app/features/orders/graphql/order.queries.ts"
-Task: "Update GET_ORDER_BY_ID query in client/src/app/features/orders/graphql/order.queries.ts"
-Task: "Update UPDATE_ORDER_STATUS mutation in client/src/app/features/orders/graphql/order.queries.ts"
-```
+# After completing Foundational phase, launch BOTH user stories in parallel:
 
-## Parallel Example: User Stories 1 & 2
+# Developer A - Payments (User Story 1):
+Task: "Update GET_PAYMENTS query to cursor-based pagination"
+Task: "Update GET_PAYMENT_BY_ID query"
+Task: "Implement PaymentService with Apollo"
+# ... continue with remaining Payments tasks
 
-```bash
-# After Foundational is complete, launch both stories in parallel:
-# Developer A: User Story 1
-Task: "Implement getOrders() with cursor pagination in client/src/app/features/orders/services/order.service.ts"
+# Developer B - Shipments (User Story 2):
+Task: "Update GET_SHIPMENTS query to cursor-based pagination"
+Task: "Update GET_SHIPMENT_BY_ID query"
+Task: "Implement ShipmentService with Apollo"
+# ... continue with remaining Shipments tasks
 
-# Developer B: User Story 2
-Task: "Implement getOrderById() with filter pattern in client/src/app/features/orders/services/order.service.ts"
+# OR work sequentially: Complete Payments (T003-T013), then Shipments (T014-T024)
 ```
 
 ---
 
 ## Implementation Strategy
 
-### MVP First (User Stories 1 & 2)
+### MVP First (Payments Only)
 
-1. Complete Phase 1: Setup (T001-T004)
-2. Complete Phase 2: Foundational (T005-T007)
-3. Complete Phase 3: User Story 1 - View Orders List (T008-T012)
-4. Complete Phase 4: User Story 2 - View Order Details (T013-T016)
-5. **STOP and VALIDATE**: Test US1 & US2 independently - this is a functional MVP
-6. Deploy/demo if ready
+1. Complete Phase 2: Foundational (verify APIs)
+2. Complete Phase 3: Payments (User Story 1)
+3. **STOP and VALIDATE**: Test Payments independently
+4. Deploy/demo if ready
+5. Proceed to Shipments
 
 ### Incremental Delivery
 
-1. Setup + Foundational → Foundation ready
-2. Add US1 (View Orders List) → Test → MVP for listing!
-3. Add US2 (View Order Details) → Test → Full read-only MVP
-4. Add US3+US4 (Filter/Sort) → Test → Enhanced UX
-5. Add US5 (Update Status) → Test → Full feature complete
-6. Polish → Production ready
+1. Complete Foundational → Backend APIs verified
+2. Add Payments (US1) → Test independently → Deploy/Demo (MVP!)
+3. Add Shipments (US2) → Test independently → Deploy/Demo
+4. Complete Polish → Final validation and cleanup
+
+### Parallel Team Strategy
+
+With two developers:
+
+1. Team completes Foundational together (verify both APIs)
+2. Once Foundational is done:
+   - Developer A: Payments (User Story 1) - T003 to T013
+   - Developer B: Shipments (User Story 2) - T014 to T024
+3. Both features complete independently without conflicts
+
+---
+
+## Reference Implementation
+
+**Pattern Source**: Orders feature implementation in `client/src/app/features/orders/`
+
+**Key Files to Reference**:
+- `client/src/app/features/orders/services/order.service.ts` - Shows Apollo integration pattern
+- `client/src/app/features/orders/graphql/order.queries.ts` - Shows cursor-based pagination queries
+- `client/src/app/features/products/services/product.service.ts` - Alternative reference for pagination pattern
+
+**Key Patterns**:
+1. **Cursor-based pagination**: Use `first`/`after` instead of `skip`/`take`
+2. **Connection type**: Define interface matching `{ nodes: T[], pageInfo: {...}, totalCount: number }`
+3. **Cursor storage**: Use `Map<number, string>` to track page cursors
+4. **Error handling**: Use `catchError()` and manage loading signal
+5. **Query execution**: Use `apollo.query()` with `fetchPolicy: 'network-only'`
 
 ---
 
 ## Notes
 
-- [P] tasks = different files, no dependencies
-- [Story] label maps task to specific user story for traceability
-- All service changes are in single file but sequential within a story
-- Components should require minimal changes (verify existing bindings work)
-- Reference: client/src/app/features/products/services/product.service.ts for pattern
-- Commit after each task or logical group
-- Stop at any checkpoint to validate story independently
+- [P] tasks = different files, no dependencies, can run in parallel
+- [Story] label maps task to specific user story (US1=Payments, US2=Shipments)
+- Each user story is independently completable and testable
+- No tests requested - focus on implementation and manual validation
+- Components should work without changes since they consume the service interface
+- Commit after each task or logical group of related changes
+- Stop at any checkpoint to validate independently
+- Follow the exact pattern from orders feature for consistency

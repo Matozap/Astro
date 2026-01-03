@@ -1,0 +1,34 @@
+query GetPayments {
+  payments(order: { createdAt: DESC }, first: 5) {
+    nodes {
+      id
+      orderId
+      status
+      amount {
+        amount
+        currency
+      }
+      paymentMethod
+      transactionId
+      createdAt
+      updatedAt
+      order {
+        id
+        orderNumber
+        customerName
+        customerEmail
+        totalAmount {
+          amount
+          currency
+        }
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+      hasPreviousPage
+      startCursor
+    }
+    totalCount
+  }
+}

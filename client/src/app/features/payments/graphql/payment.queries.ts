@@ -2,12 +2,12 @@ import { gql } from 'apollo-angular';
 
 export const GET_PAYMENTS = gql`
   query GetPayments(
-    $skip: Int
-    $take: Int
+    $first: Int
+    $after: String
     $where: PaymentFilterInput
     $order: [PaymentSortInput!]
   ) {
-    payments(skip: $skip, take: $take, where: $where, order: $order) {
+    payments(first: $first, after: $after, where: $where, order: $order) {
       nodes {
         id
         orderId
@@ -23,11 +23,17 @@ export const GET_PAYMENTS = gql`
         order {
           orderNumber
           customerName
+          totalAmount {
+            amount
+            currency
+          }
         }
       }
       pageInfo {
         hasNextPage
         hasPreviousPage
+        startCursor
+        endCursor
       }
       totalCount
     }
@@ -36,28 +42,30 @@ export const GET_PAYMENTS = gql`
 
 export const GET_PAYMENT_BY_ID = gql`
   query GetPaymentById($id: UUID!) {
-    payment(id: $id) {
-      id
-      orderId
-      status
-      amount {
-        amount
-        currency
-      }
-      paymentMethod
-      transactionId
-      createdAt
-      updatedAt
-      order {
+    payments(where: { id: { eq: $id } }) {
+      nodes {
         id
-        orderNumber
-        customerName
-        customerEmail
-        totalAmount {
+        orderId
+        status
+        amount {
           amount
           currency
         }
-        status
+        paymentMethod
+        transactionId
+        createdAt
+        updatedAt
+        order {
+          id
+          orderNumber
+          customerName
+          customerEmail
+          totalAmount {
+            amount
+            currency
+          }
+          status
+        }
       }
     }
   }

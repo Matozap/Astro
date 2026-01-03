@@ -3,6 +3,7 @@ using Astro.Application.Orders.Exceptions;
 using Astro.Domain.Orders.Abstractions;
 using Astro.Domain.Payments.Abstractions;
 using Astro.Domain.Payments.Entities;
+using Astro.Domain.Shared.ValueObjects;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -41,13 +42,15 @@ public sealed class CreatePaymentCommandHandler : IRequestHandler<CreatePaymentC
             throw new OrderNotFoundException(request.OrderId);
         }
 
-        // Create the payment
-        var payment = Payment.Create(request.OrderId);
+        // Create the payment with Money value object
+        var amount = Money.FromDecimal(request.Amount, request.Currency);
+        var payment = Payment.Create(request.OrderId, amount, request.PaymentMethod);
 
         await _paymentRepository.AddAsync(payment, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        _logger.LogInformation("Payment {PaymentId} created for order {OrderId}", payment.Id, request.OrderId);
+        _logger.LogInformation("Payment {PaymentId} created for order {OrderId} with amount {Amount}",
+            payment.Id, request.OrderId, request.Amount);
 
         return payment;
     }

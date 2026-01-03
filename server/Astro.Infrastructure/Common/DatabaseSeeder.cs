@@ -474,12 +474,24 @@ public static class DatabaseSeeder
 
         foreach (var (orderId, status) in paymentScenarios)
         {
-            var payment = Payment.Create(orderId);
+            // Find the corresponding order to get the total amount
+            var order = orders.First(o => o.Id == orderId);
+            var paymentMethod = status == PaymentStatus.Successful ? "Credit Card" :
+                               status == PaymentStatus.Failed ? "Bank Transfer" :
+                               "PayPal";
+
+            var payment = Payment.Create(orderId, order.TotalAmount, paymentMethod);
 
             // Update status if not Pending
             if (status != PaymentStatus.Pending)
             {
                 payment.UpdateStatus(status);
+            }
+
+            // Set transaction ID for successful payments
+            if (status == PaymentStatus.Successful)
+            {
+                payment.SetTransactionId($"TXN-{Guid.NewGuid():N}");
             }
 
             payment.ClearDomainEvents();

@@ -1,6 +1,7 @@
 using Astro.Domain.Payments.Entities;
 using Astro.Domain.Payments.Enums;
 using Astro.Domain.Payments.Events;
+using Astro.Domain.Shared.ValueObjects;
 using Shouldly;
 using Xunit;
 
@@ -17,7 +18,7 @@ public class PaymentTests
     public void Create_WithValidOrderId_ShouldCreatePaymentWithPendingStatus()
     {
         // Arrange & Act
-        var payment = Payment.Create(ValidOrderId);
+        var payment = Payment.Create(ValidOrderId, Money.FromDecimal(100, "USD"));
 
         // Assert
         payment.ShouldNotBeNull();
@@ -31,7 +32,7 @@ public class PaymentTests
     public void Create_ShouldPublishPaymentCreatedEvent()
     {
         // Arrange & Act
-        var payment = Payment.Create(ValidOrderId);
+        var payment = Payment.Create(ValidOrderId, Money.FromDecimal(100, "USD"));
 
         // Assert
         payment.DomainEvents.ShouldContain(e => e is PaymentCreatedEvent);
@@ -48,7 +49,7 @@ public class PaymentTests
         var emptyOrderId = Guid.Empty;
 
         // Act & Assert
-        var exception = Should.Throw<ArgumentException>(() => Payment.Create(emptyOrderId));
+        var exception = Should.Throw<ArgumentException>(() => Payment.Create(emptyOrderId, Money.FromDecimal(100, "USD")));
         exception.Message.ShouldContain("Order ID cannot be empty");
         exception.ParamName.ShouldBe("orderId");
     }
@@ -57,7 +58,7 @@ public class PaymentTests
     public void UpdateStatus_FromPendingToSuccessful_ShouldUpdateStatus()
     {
         // Arrange
-        var payment = Payment.Create(ValidOrderId);
+        var payment = Payment.Create(ValidOrderId, Money.FromDecimal(100, "USD"));
         payment.ClearDomainEvents();
 
         // Act
@@ -71,7 +72,7 @@ public class PaymentTests
     public void UpdateStatus_FromPendingToFailed_ShouldUpdateStatus()
     {
         // Arrange
-        var payment = Payment.Create(ValidOrderId);
+        var payment = Payment.Create(ValidOrderId, Money.FromDecimal(100, "USD"));
         payment.ClearDomainEvents();
 
         // Act
@@ -91,7 +92,7 @@ public class PaymentTests
         PaymentStatus toStatus)
     {
         // Arrange
-        var payment = Payment.Create(ValidOrderId);
+        var payment = Payment.Create(ValidOrderId, Money.FromDecimal(100, "USD"));
         if (fromStatus == PaymentStatus.Successful)
         {
             payment.UpdateStatus(PaymentStatus.Successful);
@@ -110,7 +111,7 @@ public class PaymentTests
     public void UpdateStatus_ShouldPublishPaymentStatusChangedEvent()
     {
         // Arrange
-        var payment = Payment.Create(ValidOrderId);
+        var payment = Payment.Create(ValidOrderId, Money.FromDecimal(100, "USD"));
         payment.ClearDomainEvents();
 
         // Act
@@ -129,7 +130,7 @@ public class PaymentTests
     public void UpdateStatus_ShouldUpdateUpdatedAt()
     {
         // Arrange
-        var payment = Payment.Create(ValidOrderId);
+        var payment = Payment.Create(ValidOrderId, Money.FromDecimal(100, "USD"));
         var originalUpdatedAt = payment.UpdatedAt;
 
         // Wait a small amount to ensure time difference
@@ -148,7 +149,7 @@ public class PaymentTests
     public void UpdateStatus_FromTerminalState_ShouldNotAllowTransition(PaymentStatus terminalStatus)
     {
         // Arrange
-        var payment = Payment.Create(ValidOrderId);
+        var payment = Payment.Create(ValidOrderId, Money.FromDecimal(100, "USD"));
         payment.UpdateStatus(terminalStatus);
 
         // Act & Assert - Try to transition to any other status
@@ -160,7 +161,7 @@ public class PaymentTests
     public void UpdateStatus_ToSameStatus_ShouldThrowInvalidOperationException()
     {
         // Arrange
-        var payment = Payment.Create(ValidOrderId);
+        var payment = Payment.Create(ValidOrderId, Money.FromDecimal(100, "USD"));
 
         // Act & Assert
         var exception = Should.Throw<InvalidOperationException>(() =>
@@ -172,7 +173,7 @@ public class PaymentTests
     public void ClearDomainEvents_ShouldRemoveAllEvents()
     {
         // Arrange
-        var payment = Payment.Create(ValidOrderId);
+        var payment = Payment.Create(ValidOrderId, Money.FromDecimal(100, "USD"));
         payment.UpdateStatus(PaymentStatus.Successful);
         payment.DomainEvents.Count.ShouldBeGreaterThan(0);
 
@@ -187,7 +188,7 @@ public class PaymentTests
     public void Payment_ShouldHaveId()
     {
         // Arrange & Act
-        var payment = Payment.Create(ValidOrderId);
+        var payment = Payment.Create(ValidOrderId, Money.FromDecimal(100, "USD"));
 
         // Assert
         payment.Id.ShouldNotBe(Guid.Empty);
@@ -200,7 +201,7 @@ public class PaymentTests
         var beforeCreation = DateTimeOffset.UtcNow;
 
         // Act
-        var payment = Payment.Create(ValidOrderId);
+        var payment = Payment.Create(ValidOrderId, Money.FromDecimal(100, "USD"));
 
         // Assert
         var afterCreation = DateTimeOffset.UtcNow;
@@ -214,7 +215,7 @@ public class PaymentTests
         var beforeCreation = DateTimeOffset.UtcNow;
 
         // Act
-        var payment = Payment.Create(ValidOrderId);
+        var payment = Payment.Create(ValidOrderId, Money.FromDecimal(100, "USD"));
 
         // Assert
         var afterCreation = DateTimeOffset.UtcNow;

@@ -22,6 +22,26 @@ public sealed class PaymentConfiguration : IEntityTypeConfiguration<Payment>
             .IsRequired()
             .HasConversion<int>();
 
+        // Configure Amount value object (Money) as complex property
+        builder.ComplexProperty(p => p.Amount, amount =>
+        {
+            amount.Property(m => m.Amount)
+                .HasColumnName("Amount")
+                .HasPrecision(18, 2)
+                .IsRequired();
+
+            amount.Property(m => m.Currency)
+                .HasColumnName("Currency")
+                .HasMaxLength(3)
+                .IsRequired();
+        });
+
+        builder.Property(p => p.PaymentMethod)
+            .HasMaxLength(100);
+
+        builder.Property(p => p.TransactionId)
+            .HasMaxLength(200);
+
         builder.Property(p => p.CreatedAt)
             .IsRequired();
 

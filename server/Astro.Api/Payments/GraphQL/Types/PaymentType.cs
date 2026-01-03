@@ -24,6 +24,18 @@ public class PaymentType : ObjectType<Payment>
             .Description("The current status of the payment.");
 
         descriptor
+            .Field(p => p.Amount)
+            .Description("The payment amount.");
+
+        descriptor
+            .Field(p => p.PaymentMethod)
+            .Description("The payment method used (e.g., Credit Card, PayPal, Bank Transfer).");
+
+        descriptor
+            .Field(p => p.TransactionId)
+            .Description("The transaction ID from the payment processor.");
+
+        descriptor
             .Field(p => p.CreatedAt)
             .Description("When the payment was created.");
 

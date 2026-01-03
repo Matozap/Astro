@@ -7,6 +7,7 @@ using Astro.Domain.Payments.Abstractions;
 using Astro.Domain.Payments.Entities;
 using Astro.Domain.Payments.Enums;
 using Astro.Domain.Shared;
+using Astro.Domain.Shared.ValueObjects;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
@@ -45,7 +46,7 @@ public class CreatePaymentCommandHandlerTests
         _orderRepository.GetByIdAsync(orderId, Arg.Any<CancellationToken>())
             .Returns(order);
 
-        var command = new CreatePaymentCommand(orderId);
+        var command = new CreatePaymentCommand(orderId, 100m, "USD");
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -67,7 +68,7 @@ public class CreatePaymentCommandHandlerTests
         _orderRepository.GetByIdAsync(orderId, Arg.Any<CancellationToken>())
             .Returns((Order?)null);
 
-        var command = new CreatePaymentCommand(orderId);
+        var command = new CreatePaymentCommand(orderId, 100m, "USD");
 
         // Act & Assert
         var exception = await Should.ThrowAsync<OrderNotFoundException>(
@@ -89,7 +90,7 @@ public class CreatePaymentCommandHandlerTests
         _orderRepository.GetByIdAsync(orderId, Arg.Any<CancellationToken>())
             .Returns(order);
 
-        var command = new CreatePaymentCommand(orderId);
+        var command = new CreatePaymentCommand(orderId, 100m, "USD");
 
         // Act
         await _handler.Handle(command, CancellationToken.None);

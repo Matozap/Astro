@@ -5,6 +5,7 @@ using Astro.Domain.Payments.Abstractions;
 using Astro.Domain.Payments.Entities;
 using Astro.Domain.Payments.Enums;
 using Astro.Domain.Shared;
+using Astro.Domain.Shared.ValueObjects;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
@@ -133,7 +134,7 @@ public class UpdatePaymentStatusCommandHandlerTests
     private static Payment CreateTestPayment(Guid id)
     {
         var orderId = Guid.NewGuid();
-        var payment = Payment.Create(orderId);
+        var payment = Payment.Create(orderId, Money.FromDecimal(100, "USD"));
         typeof(Entity).GetProperty("Id")!.SetValue(payment, id);
         return payment;
     }

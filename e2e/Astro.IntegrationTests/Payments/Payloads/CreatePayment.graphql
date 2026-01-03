@@ -4,6 +4,12 @@ mutation CreatePayment($input: CreatePaymentInput!) {
       id
       orderId
       status
+      amount {
+        amount
+        currency
+      }
+      paymentMethod
+      transactionId
       createdAt
       updatedAt
       order {
