@@ -2,12 +2,12 @@ import { gql } from 'apollo-angular';
 
 export const GET_ORDERS = gql`
   query GetOrders(
-    $skip: Int
-    $take: Int
+    $first: Int
+    $after: String
     $where: OrderFilterInput
     $order: [OrderSortInput!]
   ) {
-    orders(skip: $skip, take: $take, where: $where, order: $order) {
+    orders(first: $first, after: $after, where: $where, order: $order) {
       nodes {
         id
         orderNumber
@@ -25,6 +25,8 @@ export const GET_ORDERS = gql`
       pageInfo {
         hasNextPage
         hasPreviousPage
+        startCursor
+        endCursor
       }
       totalCount
     }
@@ -33,60 +35,58 @@ export const GET_ORDERS = gql`
 
 export const GET_ORDER_BY_ID = gql`
   query GetOrderById($id: UUID!) {
-    order(id: $id) {
-      id
-      orderNumber
-      customerName
-      customerEmail
-      shippingAddress {
-        street
-        city
-        state
-        postalCode
-        country
-      }
-      status
-      totalAmount {
-        amount
-        currency
-      }
-      notes
-      details {
+    orders(where: { id: { eq: $id } }) {
+      nodes {
         id
-        productId
-        productName
-        quantity
-        unitPrice {
+        orderNumber
+        customerName
+        customerEmail
+        shippingAddress {
+          street
+          city
+          state
+          postalCode
+          country
+        }
+        status
+        totalAmount {
           amount
           currency
         }
-        lineTotal {
-          amount
-          currency
+        notes
+        details {
+          id
+          productId
+          productName
+          productSku
+          quantity
+          unitPrice {
+            amount
+            currency
+          }
+          lineTotal {
+            amount
+            currency
+          }
         }
+        itemCount
+        createdAt
+        updatedAt
+        createdBy
+        modifiedBy
       }
-      itemCount
-      createdAt
-      updatedAt
-      createdBy
-      modifiedBy
     }
   }
 `;
 
 export const UPDATE_ORDER_STATUS = gql`
-  mutation UpdateOrderStatus($input: UpdateOrderStatusInput!) {
-    updateOrderStatus(input: $input) {
-      order {
-        id
-        status
-        updatedAt
-      }
-      errors {
-        ... on Error {
-          message
-        }
-      }
+  mutation UpdateOrderStatus($command: UpdateOrderStatusCommandInput!) {
+    updateOrderStatus(command: $command) {
+      id
+      orderNumber
+      status
+      updatedAt
+      modifiedBy
     }
   }
 `;

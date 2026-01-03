@@ -1,0 +1,193 @@
+# Orders GraphQL Contract
+# Feature: Connect Orders UI to Backend
+# Date: 2026-01-03
+
+# ============================================================================
+# QUERIES
+# ============================================================================
+
+# Get paginated list of orders with cursor-based pagination
+query GetOrders(
+  $first: Int
+  $after: String
+  $where: OrderFilterInput
+  $order: [OrderSortInput!]
+) {
+  orders(first: $first, after: $after, where: $where, order: $order) {
+    nodes {
+      id
+      orderNumber
+      customerName
+      customerEmail
+      status
+      totalAmount {
+        amount
+        currency
+      }
+      itemCount
+      createdAt
+      updatedAt
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
+  }
+}
+
+# Get a single order by ID with full details
+query GetOrderById($id: UUID!) {
+  orders(where: { id: { eq: $id } }) {
+    nodes {
+      id
+      orderNumber
+      customerName
+      customerEmail
+      shippingAddress {
+        street
+        city
+        state
+        postalCode
+        country
+      }
+      status
+      totalAmount {
+        amount
+        currency
+      }
+      notes
+      details {
+        id
+        productId
+        productName
+        productSku
+        quantity
+        unitPrice {
+          amount
+          currency
+        }
+        lineTotal {
+          amount
+          currency
+        }
+      }
+      itemCount
+      createdAt
+      updatedAt
+      createdBy
+      modifiedBy
+    }
+  }
+}
+
+# ============================================================================
+# MUTATIONS
+# ============================================================================
+
+# Update order status
+mutation UpdateOrderStatus($command: UpdateOrderStatusCommandInput!) {
+  updateOrderStatus(command: $command) {
+    id
+    orderNumber
+    status
+    updatedAt
+    modifiedBy
+  }
+}
+
+# ============================================================================
+# INPUT TYPES
+# ============================================================================
+
+# Filter input for orders query
+input OrderFilterInput {
+  # Filter by order number (contains)
+  orderNumber: StringFilterInput
+  # Filter by customer name (contains)
+  customerName: StringFilterInput
+  # Filter by customer email (contains)
+  customerEmail: StringFilterInput
+  # Filter by status
+  status: OrderStatusFilterInput
+  # Filter by creation date
+  createdAt: DateTimeFilterInput
+  # Combine filters with AND
+  and: [OrderFilterInput!]
+  # Combine filters with OR
+  or: [OrderFilterInput!]
+}
+
+input OrderStatusFilterInput {
+  # Exact match
+  eq: OrderStatus
+  # Match any of these values
+  in: [OrderStatus!]
+}
+
+input StringFilterInput {
+  # Contains substring (case-insensitive)
+  contains: String
+  # Starts with prefix
+  startsWith: String
+  # Ends with suffix
+  endsWith: String
+  # Exact match
+  eq: String
+}
+
+input DateTimeFilterInput {
+  # Greater than
+  gt: DateTime
+  # Greater than or equal
+  gte: DateTime
+  # Less than
+  lt: DateTime
+  # Less than or equal
+  lte: DateTime
+}
+
+# Sort input for orders query
+input OrderSortInput {
+  orderNumber: SortEnumType
+  customerName: SortEnumType
+  status: SortEnumType
+  totalAmount: SortEnumType
+  createdAt: SortEnumType
+  updatedAt: SortEnumType
+}
+
+# Update order status command input
+input UpdateOrderStatusCommandInput {
+  orderId: UUID!
+  newStatus: OrderStatus!
+  modifiedBy: String!
+}
+
+# ============================================================================
+# ENUMS
+# ============================================================================
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum SortEnumType {
+  ASC
+  DESC
+}
+
+# ============================================================================
+# SCALARS
+# ============================================================================
+
+scalar UUID
+scalar DateTime

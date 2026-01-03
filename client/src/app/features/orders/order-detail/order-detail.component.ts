@@ -107,7 +107,10 @@ export class OrderDetailComponent implements OnInit {
     const order = this.order();
     if (!order) return;
 
-    this.orderService.updateOrderStatus(order.id, newStatus).subscribe((updatedOrder) => {
+    // TODO: Get actual user from auth service
+    const modifiedBy = 'admin';
+
+    this.orderService.updateOrderStatus(order.id, newStatus, modifiedBy).subscribe((updatedOrder) => {
       if (updatedOrder) {
         this.order.set(updatedOrder);
       }
