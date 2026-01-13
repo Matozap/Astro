@@ -1,0 +1,433 @@
+# GraphQL Mutations for Order Management Commands
+# Feature: Order Management Commands
+# Date: 2026-01-07
+
+"""
+Create a new order with customer information and line items
+"""
+type Mutation {
+  createOrder(input: CreateOrderCommandInput!): Order!
+}
+
+"""
+Update existing order customer information and shipping address
+"""
+type Mutation {
+  updateOrder(input: UpdateOrderCommandInput!): Order!
+}
+
+"""
+Cancel an order with a reason
+"""
+type Mutation {
+  cancelOrder(input: CancelOrderCommandInput!): Order!
+}
+
+"""
+Update order status (existing mutation - included for completeness)
+"""
+type Mutation {
+  updateOrderStatus(input: UpdateOrderStatusCommandInput!): Order!
+}
+
+# Input Types
+
+"""
+Input for creating a new order
+"""
+input CreateOrderCommandInput {
+  """
+  Customer's full name (required, max 200 characters)
+  """
+  customerName: String!
+
+  """
+  Customer's email address (required, valid email format)
+  """
+  customerEmail: String!
+
+  """
+  Shipping address (required)
+  """
+  shippingAddress: AddressInput!
+
+  """
+  Additional notes for the order (optional, max 1000 characters)
+  """
+  notes: String
+
+  """
+  Order line items (required, at least one item)
+  """
+  details: [OrderDetailInput!]!
+
+  """
+  User creating the order (required, typically current user ID)
+  """
+  createdBy: String!
+}
+
+"""
+Input for updating an existing order
+"""
+input UpdateOrderCommandInput {
+  """
+  ID of the order to update (required)
+  """
+  orderId: ID!
+
+  """
+  Updated customer name (optional, max 200 characters)
+  """
+  customerName: String
+
+  """
+  Updated customer email (optional, valid email format)
+  """
+  customerEmail: String
+
+  """
+  Updated shipping address (optional)
+  """
+  shippingAddress: AddressInput
+
+  """
+  Updated notes (optional, max 1000 characters)
+  """
+  notes: String
+
+  """
+  User modifying the order (required, typically current user ID)
+  """
+  modifiedBy: String!
+}
+
+"""
+Input for cancelling an order
+"""
+input CancelOrderCommandInput {
+  """
+  ID of the order to cancel (required)
+  """
+  orderId: ID!
+
+  """
+  Reason for cancellation (required, max 500 characters)
+  """
+  reason: String!
+
+  """
+  User cancelling the order (required, typically current user ID)
+  """
+  cancelledBy: String!
+}
+
+"""
+Input for updating order status (existing - included for completeness)
+"""
+input UpdateOrderStatusCommandInput {
+  """
+  ID of the order to update (required)
+  """
+  orderId: ID!
+
+  """
+  New order status (required)
+  """
+  newStatus: OrderStatus!
+
+  """
+  User modifying the status (required)
+  """
+  modifiedBy: String!
+}
+
+"""
+Input for a single order line item
+"""
+input OrderDetailInput {
+  """
+  ID of the product (required)
+  """
+  productId: ID!
+
+  """
+  Quantity to order (required, must be > 0)
+  """
+  quantity: Int!
+}
+
+"""
+Input for shipping address
+"""
+input AddressInput {
+  """
+  Street address (required, max 200 characters)
+  """
+  street: String!
+
+  """
+  City (required, max 100 characters)
+  """
+  city: String!
+
+  """
+  State or province (required, max 100 characters)
+  """
+  state: String!
+
+  """
+  Postal code (required, max 20 characters)
+  """
+  postalCode: String!
+
+  """
+  Country (required, max 100 characters)
+  """
+  country: String!
+}
+
+# Output Types
+
+"""
+Order entity
+"""
+type Order {
+  """
+  Unique identifier
+  """
+  id: ID!
+
+  """
+  Human-readable order number (e.g., ORD-20260107-143052)
+  """
+  orderNumber: String!
+
+  """
+  Customer's full name
+  """
+  customerName: String!
+
+  """
+  Customer's email address
+  """
+  customerEmail: String!
+
+  """
+  Shipping address
+  """
+  shippingAddress: Address!
+
+  """
+  Current order status
+  """
+  status: OrderStatus!
+
+  """
+  Total order amount (calculated from line items)
+  """
+  totalAmount: Decimal!
+
+  """
+  Additional order notes
+  """
+  notes: String
+
+  """
+  Order line items
+  """
+  details: [OrderDetail!]!
+
+  """
+  Number of line items
+  """
+  itemCount: Int!
+
+  """
+  Order creation timestamp
+  """
+  createdAt: DateTime!
+
+  """
+  Last modification timestamp
+  """
+  updatedAt: DateTime!
+
+  """
+  User who created the order
+  """
+  createdBy: String!
+
+  """
+  User who last modified the order
+  """
+  modifiedBy: String
+}
+
+"""
+Order line item
+"""
+type OrderDetail {
+  """
+  Unique identifier
+  """
+  id: ID!
+
+  """
+  Product ID
+  """
+  productId: ID!
+
+  """
+  Product name (snapshot at order time)
+  """
+  productName: String!
+
+  """
+  Product SKU (snapshot at order time)
+  """
+  productSku: String!
+
+  """
+  Quantity ordered
+  """
+  quantity: Int!
+
+  """
+  Unit price (snapshot at order time)
+  """
+  unitPrice: Decimal!
+
+  """
+  Line total (quantity × unitPrice)
+  """
+  lineTotal: Decimal!
+}
+
+"""
+Shipping address
+"""
+type Address {
+  street: String!
+  city: String!
+  state: String!
+  postalCode: String!
+  country: String!
+}
+
+"""
+Order status enumeration
+"""
+enum OrderStatus {
+  """
+  Initial state - order created but not confirmed
+  """
+  PENDING
+
+  """
+  Order confirmed by customer or administrator
+  """
+  CONFIRMED
+
+  """
+  Order is being prepared for shipment
+  """
+  PROCESSING
+
+  """
+  Order has been shipped
+  """
+  SHIPPED
+
+  """
+  Order delivered to customer (terminal state)
+  """
+  DELIVERED
+
+  """
+  Order cancelled (terminal state)
+  """
+  CANCELLED
+
+  """
+  Order refunded (terminal state)
+  """
+  REFUNDED
+}
+
+# Error Types
+
+"""
+Error returned when validation fails
+"""
+type ValidationError {
+  """
+  Field that failed validation
+  """
+  field: String!
+
+  """
+  Validation error message
+  """
+  message: String!
+}
+
+"""
+Error returned when an order is not found
+"""
+type OrderNotFoundError {
+  """
+  ID of the order that was not found
+  """
+  orderId: ID!
+
+  """
+  Error message
+  """
+  message: String!
+}
+
+"""
+Error returned when a business rule is violated
+"""
+type BusinessRuleViolationError {
+  """
+  Rule that was violated
+  """
+  rule: String!
+
+  """
+  Error message
+  """
+  message: String!
+}
+
+# Subscription Types (existing - included for completeness)
+
+"""
+Subscribe to order created events
+"""
+type Subscription {
+  onOrderCreated: Order!
+}
+
+"""
+Subscribe to order updated events
+"""
+type Subscription {
+  onOrderUpdated(orderId: ID): Order!
+}
+
+"""
+Subscribe to order status changed events
+"""
+type Subscription {
+  onOrderStatusChanged(orderId: ID): Order!
+}
+
+"""
+Subscribe to order cancelled events
+"""
+type Subscription {
+  onOrderCancelled: Order!
+}

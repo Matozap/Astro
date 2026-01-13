@@ -5,6 +5,12 @@
       <h1 class="page-title">Orders</h1>
       <p class="page-subtitle">Manage customer orders and track fulfillment</p>
     </div>
+    <div class="header-actions">
+      <button mat-raised-button color="primary" routerLink="/orders/create">
+        <mat-icon>add</mat-icon>
+        Create Order
+      </button>
+    </div>
   </div>
 
   <!-- Filters -->
@@ -32,7 +38,7 @@
           <mat-select [(ngModel)]="statusFilter" (ngModelChange)="onStatusFilterChange()">
             <mat-option [value]="null">All Statuses</mat-option>
             @for (status of orderStatuses; track status) {
-              <mat-option [value]="status">{{ status }}</mat-option>
+              <mat-option [value]="status">{{ getStatusLabel(status) }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
@@ -84,7 +90,7 @@
 
   <ng-template #statusTemplate let-row let-value="value">
     <app-status-badge
-      [label]="value"
+      [label]="getStatusLabel(value)"
       [variant]="getStatusVariant(value)"
     ></app-status-badge>
   </ng-template>

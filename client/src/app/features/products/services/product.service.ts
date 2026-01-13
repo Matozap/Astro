@@ -63,24 +63,33 @@ export class ProductService {
       .pipe(
         map((result) => {
           this._loading.set(false);
-          if (!result.data) {
-            throw new Error('No data returned from products query');
+          if (!result.data || !result.data.products) {
+            // Return empty result when no data
+            return {
+              items: [],
+              totalCount: 0,
+              page: pagination.page,
+              pageSize: pagination.pageSize,
+              totalPages: 0,
+              hasNextPage: false,
+              hasPreviousPage: false,
+            };
           }
           const { nodes, pageInfo, totalCount } = result.data.products;
 
           // Store the end cursor for next page navigation
-          if (pageInfo.endCursor) {
+          if (pageInfo?.endCursor) {
             this.cursors.set(pagination.page, pageInfo.endCursor);
           }
 
           return {
-            items: nodes,
-            totalCount,
+            items: nodes || [],
+            totalCount: totalCount || 0,
             page: pagination.page,
             pageSize: pagination.pageSize,
-            totalPages: Math.ceil(totalCount / pagination.pageSize),
-            hasNextPage: pageInfo.hasNextPage,
-            hasPreviousPage: pageInfo.hasPreviousPage,
+            totalPages: Math.ceil((totalCount || 0) / pagination.pageSize),
+            hasNextPage: pageInfo?.hasNextPage || false,
+            hasPreviousPage: pageInfo?.hasPreviousPage || false,
           };
         }),
         catchError((error) => {
@@ -107,11 +116,11 @@ export class ProductService {
       .pipe(
         map((result) => {
           this._loading.set(false);
-          if (!result.data) {
-            throw new Error('No data returned from products query');
+          if (!result.data || !result.data.products) {
+            return null;
           }
           // Return the first node or null if not found
-          return result.data.products.nodes[0] || null;
+          return result.data.products.nodes?.[0] || null;
         }),
         catchError((error) => {
           this._loading.set(false);

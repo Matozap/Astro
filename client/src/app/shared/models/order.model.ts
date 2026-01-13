@@ -1,13 +1,13 @@
 import { Money, Address, StringFilterInput, DateTimeFilterInput } from './common.model';
 
 export type OrderStatus =
-  | 'Pending'
-  | 'Confirmed'
-  | 'Processing'
-  | 'Shipped'
-  | 'Delivered'
-  | 'Cancelled'
-  | 'Refunded';
+  | 'PENDING'
+  | 'CONFIRMED'
+  | 'PROCESSING'
+  | 'SHIPPED'
+  | 'DELIVERED'
+  | 'CANCELLED'
+  | 'REFUNDED';
 
 export interface Order {
   id: string;
@@ -70,21 +70,21 @@ export interface UpdateOrderStatusInput {
 
 // Order status display helpers
 export const ORDER_STATUS_COLORS: Record<OrderStatus, string> = {
-  Pending: 'warning',
-  Confirmed: 'info',
-  Processing: 'primary',
-  Shipped: 'primary',
-  Delivered: 'success',
-  Cancelled: 'error',
-  Refunded: 'secondary',
+  PENDING: 'warning',
+  CONFIRMED: 'info',
+  PROCESSING: 'primary',
+  SHIPPED: 'primary',
+  DELIVERED: 'success',
+  CANCELLED: 'error',
+  REFUNDED: 'secondary',
 };
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
-  Pending: 'Pending',
-  Confirmed: 'Confirmed',
-  Processing: 'Processing',
-  Shipped: 'Shipped',
-  Delivered: 'Delivered',
-  Cancelled: 'Cancelled',
-  Refunded: 'Refunded',
+  PENDING: 'Pending',
+  CONFIRMED: 'Confirmed',
+  PROCESSING: 'Processing',
+  SHIPPED: 'Shipped',
+  DELIVERED: 'Delivered',
+  CANCELLED: 'Cancelled',
+  REFUNDED: 'Refunded',
 };
