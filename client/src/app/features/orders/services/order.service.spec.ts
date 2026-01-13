@@ -20,7 +20,7 @@ describe('OrderService', () => {
       postalCode: '62701',
       country: 'USA',
     },
-    status: 'Pending' as OrderStatus,
+    status: 'PENDING' as OrderStatus,
     totalAmount: {
       amount: 299.99,
       currency: 'USD',
@@ -132,6 +132,18 @@ describe('OrderService', () => {
 
       op.flush({
         data: { createOrder: mockOrder },
+      });
+
+      // Handle refetch query
+      const refetchOp = controller.expectOne(GET_ORDERS);
+      refetchOp.flush({
+        data: {
+          orders: {
+            nodes: [mockOrder],
+            pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null },
+            totalCount: 1,
+          },
+        },
       });
     });
 
@@ -281,6 +293,18 @@ describe('OrderService', () => {
       op.flush({
         data: { updateOrder: updatedOrder },
       });
+
+      // Handle refetch query
+      const refetchOp = controller.expectOne(GET_ORDER_BY_ID);
+      refetchOp.flush({
+        data: {
+          orders: {
+            nodes: [updatedOrder],
+            pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null },
+            totalCount: 1,
+          },
+        },
+      });
     });
 
     it('should refetch order by ID after updating', (done) => {
@@ -374,7 +398,7 @@ describe('OrderService', () => {
 
     const cancelledOrder: Order = {
       ...mockOrder,
-      status: 'Cancelled' as OrderStatus,
+      status: 'CANCELLED' as OrderStatus,
       notes: `${mockOrder.notes}\nCancellation reason: ${reason}`,
       updatedAt: '2024-01-15T12:00:00Z',
       modifiedBy: cancelledBy,
@@ -409,7 +433,7 @@ describe('OrderService', () => {
       service.cancelOrder(orderId, reason, cancelledBy).subscribe({
         next: (order) => {
           expect(order).toEqual(cancelledOrder);
-          expect(order.status).toBe('Cancelled');
+          expect(order.status).toBe('CANCELLED');
           expect(service.loading()).toBeFalse();
           done();
         },
@@ -428,6 +452,18 @@ describe('OrderService', () => {
 
       op.flush({
         data: { cancelOrder: cancelledOrder },
+      });
+
+      // Handle refetch query
+      const refetchOp = controller.expectOne(GET_ORDER_BY_ID);
+      refetchOp.flush({
+        data: {
+          orders: {
+            nodes: [cancelledOrder],
+            pageInfo: { hasNextPage: false, hasPreviousPage: false, startCursor: null, endCursor: null },
+            totalCount: 1,
+          },
+        },
       });
     });
 

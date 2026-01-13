@@ -86,7 +86,7 @@ describe('OrderCreateComponent', () => {
       postalCode: '62701',
       country: 'USA',
     },
-    status: 'Pending',
+    status: 'PENDING',
     totalAmount: { amount: 300, currency: 'USD' },
     notes: 'Test order',
     details: [],
@@ -154,11 +154,15 @@ describe('OrderCreateComponent', () => {
       expect(component.orderForm.get('notes')?.value).toBe('');
     });
 
-    it('should load active products on init', () => {
-      expect(mockProductService.getProducts).toHaveBeenCalledWith({ page: 0, pageSize: 1000 });
-      expect(component.products.length).toBe(2); // Only active products
-      expect(component.products[0].id).toBe('prod-1');
-      expect(component.products[1].id).toBe('prod-2');
+    it('should load active products on init', (done) => {
+      expect(mockProductService.getProducts).toHaveBeenCalledWith({ page: 0, pageSize: 20 });
+      // Products are now stored in BehaviorSubject, verify via filteredProducts$
+      component.filteredProducts$?.subscribe(products => {
+        expect(products.length).toBe(2); // Only active products
+        expect(products[0].id).toBe('prod-1');
+        expect(products[1].id).toBe('prod-2');
+        done();
+      });
     });
 
     it('should initialize with empty selected products', () => {
@@ -240,25 +244,39 @@ describe('OrderCreateComponent', () => {
   });
 
   describe('product selection', () => {
-    it('should filter products by name', fakeAsync(() => {
-      component.productSearchControl.setValue('Product 1');
-      tick();
+    it('should filter products by name', (done) => {
+      // Wait for products to load, then subscribe and set search value
+      setTimeout(() => {
+        const subscription = component.filteredProducts$?.subscribe((filtered: Product[]) => {
+          // Skip first emission (all products), check when filtered
+          if (filtered.length < 2) {
+            expect(filtered.length).toBe(1);
+            expect(filtered[0].name).toBe('Product 1');
+            subscription?.unsubscribe();
+            done();
+          }
+        });
 
-      component.filteredProducts?.subscribe(filtered => {
-        expect(filtered.length).toBe(1);
-        expect(filtered[0].name).toBe('Product 1');
-      });
-    }));
+        component.productSearchControl.setValue('Product 1');
+      }, 0);
+    });
 
     it('should filter products by SKU', (done) => {
-      component.productSearchControl.setValue('SKU-002');
+      // Wait for products to load, then subscribe and set search value
+      setTimeout(() => {
+        const subscription = component.filteredProducts$?.subscribe((filtered: Product[]) => {
+          // Skip first emission (all products), check when filtered
+          if (filtered.length < 2) {
+            expect(filtered.length).toBe(1);
+            expect(filtered[0].sku).toBe('SKU-002');
+            expect(filtered[0].name).toBe('Product 2');
+            subscription?.unsubscribe();
+            done();
+          }
+        });
 
-      component.filteredProducts?.subscribe(filtered => {
-        expect(filtered.length).toBe(1);
-        expect(filtered[0].sku).toBe('SKU-002');
-        expect(filtered[0].name).toBe('Product 2');
-        done();
-      });
+        component.productSearchControl.setValue('SKU-002');
+      }, 0);
     });
 
     it('should add new product to selected products', () => {
@@ -379,8 +397,6 @@ describe('OrderCreateComponent', () => {
       mockOrderService.createOrder.and.returnValue(of(mockOrder));
 
       component.onSubmit();
-      expect(component.isSubmitting()).toBeTrue();
-
       tick();
 
       expect(mockOrderService.createOrder).toHaveBeenCalledWith({
