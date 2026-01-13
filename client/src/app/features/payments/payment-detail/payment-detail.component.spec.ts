@@ -25,7 +25,7 @@ describe('PaymentDetailComponent', () => {
       customerName: 'John Smith',
       customerEmail: 'john.smith@example.com',
       shippingAddress: { street: '123 Main St', city: 'New York', state: 'NY', postalCode: '10001', country: 'USA' },
-      status: 'Delivered',
+      status: 'DELIVERED',
       totalAmount: { amount: 299.99, currency: 'USD' },
       notes: null,
       details: [],

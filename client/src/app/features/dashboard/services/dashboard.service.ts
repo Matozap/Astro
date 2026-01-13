@@ -53,46 +53,46 @@ const MOCK_REVENUE_DATA: RevenueDataPoint[] = [
 ];
 
 const MOCK_ORDER_STATUS: OrderStatusDistribution[] = [
-  { status: 'Pending', count: 45, percentage: 15 },
-  { status: 'Confirmed', count: 78, percentage: 26 },
-  { status: 'Processing', count: 52, percentage: 17.3 },
-  { status: 'Shipped', count: 89, percentage: 29.7 },
-  { status: 'Delivered', count: 36, percentage: 12 },
+  { status: 'PENDING', count: 45, percentage: 15 },
+  { status: 'CONFIRMED', count: 78, percentage: 26 },
+  { status: 'PROCESSING', count: 52, percentage: 17.3 },
+  { status: 'SHIPPED', count: 89, percentage: 29.7 },
+  { status: 'DELIVERED', count: 36, percentage: 12 },
 ];
 
 const MOCK_RECENT_ORDERS: Partial<Order>[] = [
   {
     id: 'ORD-001',
     customerName: 'John Smith',
-    status: 'Pending',
+    status: 'PENDING',
     total: { amount: 299.99, currency: 'USD' },
     createdAt: new Date(Date.now() - 3600000).toISOString(),
   },
   {
     id: 'ORD-002',
     customerName: 'Sarah Johnson',
-    status: 'Processing',
+    status: 'PROCESSING',
     total: { amount: 549.5, currency: 'USD' },
     createdAt: new Date(Date.now() - 7200000).toISOString(),
   },
   {
     id: 'ORD-003',
     customerName: 'Mike Wilson',
-    status: 'Shipped',
+    status: 'SHIPPED',
     total: { amount: 129.0, currency: 'USD' },
     createdAt: new Date(Date.now() - 14400000).toISOString(),
   },
   {
     id: 'ORD-004',
     customerName: 'Emily Brown',
-    status: 'Confirmed',
+    status: 'CONFIRMED',
     total: { amount: 899.99, currency: 'USD' },
     createdAt: new Date(Date.now() - 21600000).toISOString(),
   },
   {
     id: 'ORD-005',
     customerName: 'David Lee',
-    status: 'Delivered',
+    status: 'DELIVERED',
     total: { amount: 199.0, currency: 'USD' },
     createdAt: new Date(Date.now() - 28800000).toISOString(),
   },

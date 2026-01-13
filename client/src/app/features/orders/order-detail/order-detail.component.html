@@ -16,7 +16,7 @@
         </div>
       </div>
       <app-status-badge
-        [label]="order()!.status"
+        [label]="getStatusLabel(order()!.status)"
         [variant]="getStatusVariant(order()!.status)"
         class="status-badge"
       ></app-status-badge>
@@ -153,13 +153,17 @@
         Back to Orders
       </button>
       @if (canUpdateStatus()) {
-        <button mat-flat-button color="primary" [matMenuTriggerFor]="statusMenu">
-          <mat-icon>edit</mat-icon>
+        <button mat-flat-button color="primary" [matMenuTriggerFor]="statusMenu" [disabled]="updatingStatus()">
+          @if (updatingStatus()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            <mat-icon>edit</mat-icon>
+          }
           Update Status
         </button>
         <mat-menu #statusMenu="matMenu">
           @for (status of getAvailableStatuses(); track status) {
-            <button mat-menu-item (click)="updateStatus(status)">{{ status }}</button>
+            <button mat-menu-item (click)="updateStatus(status)">{{ getStatusLabel(status) }}</button>
           }
         </mat-menu>
       }

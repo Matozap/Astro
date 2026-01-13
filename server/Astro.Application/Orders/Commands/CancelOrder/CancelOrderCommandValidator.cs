@@ -13,8 +13,8 @@ public sealed class CancelOrderCommandValidator : AbstractValidator<CancelOrderC
             .NotEmpty().WithMessage("Order ID is required");
 
         RuleFor(x => x.Reason)
-            .MaximumLength(500).WithMessage("Reason must not exceed 500 characters")
-            .When(x => x.Reason is not null);
+            .NotEmpty().WithMessage("Cancellation reason is required")
+            .MaximumLength(500).WithMessage("Reason must not exceed 500 characters");
 
         RuleFor(x => x.CancelledBy)
             .NotEmpty().WithMessage("CancelledBy is required");

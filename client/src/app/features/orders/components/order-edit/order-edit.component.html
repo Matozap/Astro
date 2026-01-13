@@ -1,0 +1,144 @@
+<div class="edit-order-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Edit Order</mat-card-title>
+      <mat-card-subtitle *ngIf="order()">Order #{{ order()!.orderNumber }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Loading State -->
+      <div class="loading-container" *ngIf="isLoading()">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Loading order...</p>
+      </div>
+
+      <!-- Form -->
+      <form *ngIf="!isLoading()" [formGroup]="orderForm" (ngSubmit)="onSubmit()">
+        <!-- Customer Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">Customer Information</h3>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Customer Name</mat-label>
+              <input matInput formControlName="customerName" placeholder="Enter customer name" />
+              <mat-error *ngIf="orderForm.get('customerName')?.invalid">
+                {{ getErrorMessage('customerName') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Customer Email</mat-label>
+              <input
+                matInput
+                type="email"
+                formControlName="customerEmail"
+                placeholder="customer@example.com"
+              />
+              <mat-error *ngIf="orderForm.get('customerEmail')?.invalid">
+                {{ getErrorMessage('customerEmail') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Shipping Address Section -->
+        <div class="form-section">
+          <h3 class="section-title">Shipping Address</h3>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Street Address</mat-label>
+              <input matInput formControlName="street" placeholder="123 Main St" />
+              <mat-error *ngIf="orderForm.get('street')?.invalid">
+                {{ getErrorMessage('street') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>City</mat-label>
+              <input matInput formControlName="city" placeholder="City" />
+              <mat-error *ngIf="orderForm.get('city')?.invalid">
+                {{ getErrorMessage('city') }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>State/Province</mat-label>
+              <input matInput formControlName="state" placeholder="State" />
+              <mat-error *ngIf="orderForm.get('state')?.invalid">
+                {{ getErrorMessage('state') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Postal Code</mat-label>
+              <input matInput formControlName="postalCode" placeholder="12345" />
+              <mat-error *ngIf="orderForm.get('postalCode')?.invalid">
+                {{ getErrorMessage('postalCode') }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Country</mat-label>
+              <input matInput formControlName="country" placeholder="Country" />
+              <mat-error *ngIf="orderForm.get('country')?.invalid">
+                {{ getErrorMessage('country') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="form-section">
+          <h3 class="section-title">Additional Notes (Optional)</h3>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Order Notes</mat-label>
+              <textarea
+                matInput
+                formControlName="notes"
+                rows="3"
+                placeholder="Add any special instructions or notes..."
+              ></textarea>
+              <mat-hint align="end"
+                >{{ orderForm.get('notes')?.value?.length || 0 }} / 1000</mat-hint
+              >
+              <mat-error *ngIf="orderForm.get('notes')?.invalid">
+                {{ getErrorMessage('notes') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            type="button"
+            mat-stroked-button
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            mat-raised-button
+            color="primary"
+            [disabled]="isSubmitting() || orderForm.invalid"
+          >
+            <mat-spinner *ngIf="isSubmitting()" diameter="20"></mat-spinner>
+            <span *ngIf="!isSubmitting()">Save Changes</span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -9,7 +9,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { OrderService } from '../services/order.service';
-import { Order, OrderStatus } from '../../../shared/models/order.model';
+import { NotificationService } from '../../../core/services/notification.service';
+import { AuthService } from '../../../core/auth/auth.service';
+import { Order, OrderStatus, ORDER_STATUS_LABELS } from '../../../shared/models/order.model';
 
 @Component({
   selector: 'app-order-detail',
@@ -34,9 +36,13 @@ export class OrderDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly orderService = inject(OrderService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly authService = inject(AuthService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   order = signal<Order | null>(null);
   loading = signal(true);
+  updatingStatus = signal(false);
 
   displayedColumns = ['productName', 'quantity', 'unitPrice', 'lineTotal'];
 
@@ -51,9 +57,20 @@ export class OrderDetailComponent implements OnInit {
 
   private loadOrder(id: string): void {
     this.loading.set(true);
-    this.orderService.getOrderById(id).subscribe((order) => {
-      this.order.set(order);
-      this.loading.set(false);
+    this.orderService.getOrderById(id).subscribe({
+      next: (order) => {
+        console.log('Loaded order:', order);
+        console.log('Order status:', order?.status);
+        this.order.set(order);
+        this.loading.set(false);
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error loading order:', error);
+        this.loading.set(false);
+        this.notificationService.error('Failed to load order');
+        this.cdr.markForCheck();
+      },
     });
   }
 
@@ -63,17 +80,17 @@ export class OrderDetailComponent implements OnInit {
 
   getStatusVariant(status: OrderStatus): 'success' | 'warning' | 'error' | 'info' | 'default' {
     switch (status) {
-      case 'Delivered':
+      case 'DELIVERED':
         return 'success';
-      case 'Pending':
+      case 'PENDING':
         return 'warning';
-      case 'Cancelled':
-      case 'Refunded':
+      case 'CANCELLED':
+      case 'REFUNDED':
         return 'error';
-      case 'Confirmed':
-      case 'Shipped':
+      case 'CONFIRMED':
+      case 'SHIPPED':
         return 'info';
-      case 'Processing':
+      case 'PROCESSING':
       default:
         return 'default';
     }
@@ -82,7 +99,7 @@ export class OrderDetailComponent implements OnInit {
   canUpdateStatus(): boolean {
     const order = this.order();
     if (!order) return false;
-    return !['Delivered', 'Cancelled', 'Refunded'].includes(order.status);
+    return !['DELIVERED', 'CANCELLED', 'REFUNDED'].includes(order.status);
   }
 
   getAvailableStatuses(): OrderStatus[] {
@@ -91,29 +108,63 @@ export class OrderDetailComponent implements OnInit {
 
     // Define valid status transitions
     const statusTransitions: Record<OrderStatus, OrderStatus[]> = {
-      'Pending': ['Confirmed', 'Cancelled'],
-      'Confirmed': ['Processing', 'Cancelled'],
-      'Processing': ['Shipped', 'Cancelled'],
-      'Shipped': ['Delivered'],
-      'Delivered': [],
-      'Cancelled': [],
-      'Refunded': [],
+      'PENDING': ['CONFIRMED', 'CANCELLED'],
+      'CONFIRMED': ['PROCESSING', 'CANCELLED'],
+      'PROCESSING': ['SHIPPED', 'CANCELLED'],
+      'SHIPPED': ['DELIVERED'],
+      'DELIVERED': [],
+      'CANCELLED': [],
+      'REFUNDED': [],
     };
 
-    return statusTransitions[order.status] || [];
+    const availableStatuses = statusTransitions[order.status] || [];
+    console.log('Current status:', order.status, 'Available statuses:', availableStatuses);
+    return availableStatuses;
+  }
+
+  getStatusLabel(status: OrderStatus): string {
+    return ORDER_STATUS_LABELS[status] || status;
   }
 
   updateStatus(newStatus: OrderStatus): void {
+    console.log('updateStatus called with:', newStatus);
     const order = this.order();
-    if (!order) return;
+    if (!order) {
+      console.log('No order found');
+      return;
+    }
 
-    // TODO: Get actual user from auth service
-    const modifiedBy = 'admin';
+    const currentUser = this.authService.currentUser();
+    const modifiedBy = currentUser?.email || 'admin';
 
-    this.orderService.updateOrderStatus(order.id, newStatus, modifiedBy).subscribe((updatedOrder) => {
-      if (updatedOrder) {
-        this.order.set(updatedOrder);
-      }
+    console.log('Calling orderService.updateOrderStatus with:', order.id, newStatus, modifiedBy);
+    this.updatingStatus.set(true);
+
+    this.orderService.updateOrderStatus(order.id, newStatus, modifiedBy).subscribe({
+      next: (updatedOrder) => {
+        this.updatingStatus.set(false);
+        if (updatedOrder) {
+          // Merge updated fields into existing order to preserve all data
+          this.order.set({ ...order, ...updatedOrder });
+          this.notificationService.success(`Order status updated to ${this.getStatusLabel(newStatus)}`);
+          this.cdr.markForCheck();
+        }
+      },
+      error: (error) => {
+        this.updatingStatus.set(false);
+        console.error('Error updating order status:', error);
+
+        let errorMessage = 'Failed to update order status';
+        if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+          const gqlError = error.graphQLErrors[0];
+          errorMessage = gqlError.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        this.notificationService.error(errorMessage);
+        this.cdr.markForCheck();
+      },
     });
   }
 }

@@ -32,13 +32,13 @@ export class RecentOrdersComponent implements OnInit {
   displayedColumns = ['id', 'customer', 'status', 'total', 'date'];
 
   private readonly statusConfig: Record<OrderStatus, { color: string; icon: string }> = {
-    'Pending': { color: '#ffb74d', icon: 'schedule' },
-    'Confirmed': { color: '#4fc3f7', icon: 'check_circle' },
-    'Processing': { color: '#abc7ff', icon: 'autorenew' },
-    'Shipped': { color: '#ba68c8', icon: 'local_shipping' },
-    'Delivered': { color: '#81c784', icon: 'done_all' },
-    'Cancelled': { color: '#e57373', icon: 'cancel' },
-    'Refunded': { color: '#90a4ae', icon: 'replay' },
+    'PENDING': { color: '#ffb74d', icon: 'schedule' },
+    'CONFIRMED': { color: '#4fc3f7', icon: 'check_circle' },
+    'PROCESSING': { color: '#abc7ff', icon: 'autorenew' },
+    'SHIPPED': { color: '#ba68c8', icon: 'local_shipping' },
+    'DELIVERED': { color: '#81c784', icon: 'done_all' },
+    'CANCELLED': { color: '#e57373', icon: 'cancel' },
+    'REFUNDED': { color: '#90a4ae', icon: 'replay' },
   };
 
   ngOnInit(): void {
@@ -67,7 +67,11 @@ export class RecentOrdersComponent implements OnInit {
   }
 
   formatStatus(status: OrderStatus): string {
-    return status.replace(/([A-Z])/g, ' $1').trim();
+    // Convert SCREAMING_SNAKE_CASE to Title Case
+    return status
+      .toLowerCase()
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase());
   }
 
   getTimeAgo(dateString: string): string {

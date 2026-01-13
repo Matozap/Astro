@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, inject, signal, TemplateRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -13,7 +13,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { DataTableComponent, ColumnDef } from '../../../shared/components/data-table/data-table.component';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { OrderService } from '../services/order.service';
-import { Order, OrderFilterInput, OrderSortInput, OrderStatus } from '../../../shared/models/order.model';
+import { Order, OrderFilterInput, OrderSortInput, OrderStatus, ORDER_STATUS_LABELS } from '../../../shared/models/order.model';
 import { DEFAULT_PAGE_SIZE } from '../../../shared/models/table.model';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
@@ -23,6 +23,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -60,13 +61,13 @@ export class OrdersListComponent implements OnInit, AfterViewInit {
   statusFilter: OrderStatus | null = null;
 
   orderStatuses: OrderStatus[] = [
-    'Pending',
-    'Confirmed',
-    'Processing',
-    'Shipped',
-    'Delivered',
-    'Cancelled',
-    'Refunded',
+    'PENDING',
+    'CONFIRMED',
+    'PROCESSING',
+    'SHIPPED',
+    'DELIVERED',
+    'CANCELLED',
+    'REFUNDED',
   ];
 
   private searchSubject = new Subject<string>();
@@ -104,7 +105,7 @@ export class OrdersListComponent implements OnInit, AfterViewInit {
     const filters: OrderFilterInput = {};
 
     if (this.searchTerm) {
-      filters.orderNumber = { contains: this.searchTerm };
+      filters.customerName = { contains: this.searchTerm };
     }
 
     if (this.statusFilter !== null) {
@@ -151,19 +152,23 @@ export class OrdersListComponent implements OnInit, AfterViewInit {
 
   getStatusVariant(status: OrderStatus): 'success' | 'warning' | 'error' | 'info' | 'default' {
     switch (status) {
-      case 'Delivered':
+      case 'DELIVERED':
         return 'success';
-      case 'Pending':
+      case 'PENDING':
         return 'warning';
-      case 'Cancelled':
-      case 'Refunded':
+      case 'CANCELLED':
+      case 'REFUNDED':
         return 'error';
-      case 'Confirmed':
-      case 'Shipped':
+      case 'CONFIRMED':
+      case 'SHIPPED':
         return 'info';
-      case 'Processing':
+      case 'PROCESSING':
       default:
         return 'default';
     }
+  }
+
+  getStatusLabel(status: OrderStatus): string {
+    return ORDER_STATUS_LABELS[status] || status;
   }
 }

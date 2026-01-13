@@ -3,7 +3,7 @@ import { Observable, map, catchError } from 'rxjs';
 import { Apollo } from 'apollo-angular';
 import { Order, OrderFilterInput, OrderSortInput, OrderStatus } from '../../../shared/models/order.model';
 import { PaginatedResult, PaginationParams } from '../../../shared/models/table.model';
-import { GET_ORDERS, GET_ORDER_BY_ID, UPDATE_ORDER_STATUS } from '../graphql/order.queries';
+import { GET_ORDERS, GET_ORDER_BY_ID, UPDATE_ORDER_STATUS, CREATE_ORDER, UPDATE_ORDER, CANCEL_ORDER } from '../graphql/order.queries';
 
 /**
  * GraphQL connection type for HotChocolate cursor-based pagination
@@ -120,6 +120,123 @@ export class OrderService {
   }
 
   /**
+   * Creates a new order
+   * @param command - Create order command with customer info and order details
+   * @returns Observable with the newly created order
+   */
+  createOrder(command: {
+    customerName: string;
+    customerEmail: string;
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    notes?: string;
+    orderDetails: Array<{ productId: string; quantity: number }>;
+    createdBy: string;
+  }): Observable<Order> {
+    this._loading.set(true);
+
+    return this.apollo
+      .mutate<{ createOrder: Order }>({
+        mutation: CREATE_ORDER,
+        variables: { command },
+        refetchQueries: [{ query: GET_ORDERS }],
+      })
+      .pipe(
+        map((result) => {
+          this._loading.set(false);
+          if (!result.data?.createOrder) {
+            throw new Error('No data returned from createOrder mutation');
+          }
+          return result.data.createOrder;
+        }),
+        catchError((error) => {
+          this._loading.set(false);
+          throw error;
+        })
+      );
+  }
+
+  /**
+   * Updates an existing order
+   * @param command - Update order command with optional fields to update
+   * @returns Observable with the updated order
+   */
+  updateOrder(command: {
+    id: string;
+    customerName?: string;
+    customerEmail?: string;
+    street?: string;
+    city?: string;
+    state?: string;
+    postalCode?: string;
+    country?: string;
+    notes?: string;
+    modifiedBy: string;
+  }): Observable<Order> {
+    this._loading.set(true);
+
+    return this.apollo
+      .mutate<{ updateOrder: Order }>({
+        mutation: UPDATE_ORDER,
+        variables: { command },
+        refetchQueries: [{ query: GET_ORDER_BY_ID, variables: { id: command.id } }],
+      })
+      .pipe(
+        map((result) => {
+          this._loading.set(false);
+          if (!result.data?.updateOrder) {
+            throw new Error('No data returned from updateOrder mutation');
+          }
+          return result.data.updateOrder;
+        }),
+        catchError((error) => {
+          this._loading.set(false);
+          throw error;
+        })
+      );
+  }
+
+  /**
+   * Cancels an order
+   * @param orderId - The order UUID to cancel
+   * @param reason - The reason for cancellation
+   * @param cancelledBy - Username of the person cancelling the order
+   * @returns Observable with the cancelled order
+   */
+  cancelOrder(orderId: string, reason: string, cancelledBy: string): Observable<Order> {
+    this._loading.set(true);
+
+    return this.apollo
+      .mutate<{ cancelOrder: Order }>({
+        mutation: CANCEL_ORDER,
+        variables: {
+          command: {
+            orderId,
+            reason,
+            cancelledBy,
+          },
+        },
+        refetchQueries: [{ query: GET_ORDER_BY_ID, variables: { id: orderId } }],
+      })
+      .pipe(
+        map((result) => {
+          this._loading.set(false);
+          if (!result.data?.cancelOrder) {
+            throw new Error('No data returned from cancelOrder mutation');
+          }
+          return result.data.cancelOrder;
+        }),
+        catchError((error) => {
+          this._loading.set(false);
+          throw error;
+        })
+      );
+  }
+
+  /**
    * Updates an order's status
    * @param orderId - The order UUID
    * @param newStatus - The new order status
@@ -129,8 +246,13 @@ export class OrderService {
   updateOrderStatus(orderId: string, newStatus: OrderStatus, modifiedBy: string): Observable<Order | null> {
     this._loading.set(true);
 
+    interface UpdateOrderStatusPayload {
+      order: Order | null;
+      errors: Array<{ message: string }> | null;
+    }
+
     return this.apollo
-      .mutate<{ updateOrderStatus: Order }>({
+      .mutate<{ updateOrderStatus: UpdateOrderStatusPayload }>({
         mutation: UPDATE_ORDER_STATUS,
         variables: {
           command: {
@@ -146,7 +268,18 @@ export class OrderService {
           if (!result.data?.updateOrderStatus) {
             throw new Error('No data returned from updateOrderStatus mutation');
           }
-          return result.data.updateOrderStatus;
+
+          const payload = result.data.updateOrderStatus;
+
+          // Check for errors in the payload
+          if (payload.errors && payload.errors.length > 0) {
+            throw {
+              message: payload.errors[0].message,
+              graphQLErrors: payload.errors.map((e) => ({ message: e.message })),
+            };
+          }
+
+          return payload.order;
         }),
         catchError((error) => {
           this._loading.set(false);

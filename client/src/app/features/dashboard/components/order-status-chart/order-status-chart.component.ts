@@ -30,13 +30,13 @@ export class OrderStatusChartComponent implements OnInit {
   statusData = signal<OrderStatusDistribution[]>([]);
 
   private readonly statusColors: Record<OrderStatus, string> = {
-    'Pending': '#ffb74d',
-    'Confirmed': '#4fc3f7',
-    'Processing': '#abc7ff',
-    'Shipped': '#ba68c8',
-    'Delivered': '#81c784',
-    'Cancelled': '#e57373',
-    'Refunded': '#90a4ae',
+    'PENDING': '#ffb74d',
+    'CONFIRMED': '#4fc3f7',
+    'PROCESSING': '#abc7ff',
+    'SHIPPED': '#ba68c8',
+    'DELIVERED': '#81c784',
+    'CANCELLED': '#e57373',
+    'REFUNDED': '#90a4ae',
   };
 
   ngOnInit(): void {
@@ -122,7 +122,11 @@ export class OrderStatusChartComponent implements OnInit {
   }
 
   formatStatus(status: OrderStatus): string {
-    return status.replace(/([A-Z])/g, ' $1').trim();
+    // Convert SCREAMING_SNAKE_CASE to Title Case
+    return status
+      .toLowerCase()
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase());
   }
 
   getStatusColor(status: OrderStatus): string {

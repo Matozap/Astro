@@ -59,7 +59,7 @@ These transitions are not arbitrary. They reflect real-world constraints—you c
 ## Running It
 
 ```bash
-# The Aspire host orchestrates everything
+# The Aspire host orchestrates everything (you only need docker)
 dotnet run --project Astro.AppHost
 ```
 

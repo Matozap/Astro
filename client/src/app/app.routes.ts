@@ -63,10 +63,24 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'create',
+            loadComponent: () =>
+              import('./features/orders/components/order-create/order-create.component').then(
+                (m) => m.OrderCreateComponent
+              ),
+          },
+          {
             path: ':id',
             loadComponent: () =>
               import('./features/orders/order-detail/order-detail.component').then(
                 (m) => m.OrderDetailComponent
+              ),
+          },
+          {
+            path: ':id/edit',
+            loadComponent: () =>
+              import('./features/orders/components/order-edit/order-edit.component').then(
+                (m) => m.OrderEditComponent
               ),
           },
         ],

@@ -1,0 +1,232 @@
+<div class="create-order-container">
+  <div class="page-header">
+    <h1>Create New Order</h1>
+    <p class="subtitle">Add a new order to the system</p>
+  </div>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Order Information</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
+        <!-- Customer Information Section -->
+        <div class="form-section">
+          <h3 class="section-title">Customer Information</h3>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field-half">
+              <mat-label>Customer Name</mat-label>
+              <mat-icon matPrefix>person</mat-icon>
+              <input matInput formControlName="customerName" placeholder="Enter customer name" />
+              <mat-error *ngIf="orderForm.get('customerName')?.invalid">
+                {{ getErrorMessage('customerName') }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field-half">
+              <mat-label>Customer Email</mat-label>
+              <mat-icon matPrefix>email</mat-icon>
+              <input
+                matInput
+                type="email"
+                formControlName="customerEmail"
+                placeholder="customer@example.com"
+              />
+              <mat-error *ngIf="orderForm.get('customerEmail')?.invalid">
+                {{ getErrorMessage('customerEmail') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Shipping Address Section -->
+        <div class="form-section">
+          <h3 class="section-title">Shipping Address</h3>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field-full">
+              <mat-label>Street Address</mat-label>
+              <mat-icon matPrefix>home</mat-icon>
+              <input matInput formControlName="street" placeholder="123 Main St" />
+              <mat-error *ngIf="orderForm.get('street')?.invalid">
+                {{ getErrorMessage('street') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field-half">
+              <mat-label>City</mat-label>
+              <mat-icon matPrefix>location_city</mat-icon>
+              <input matInput formControlName="city" placeholder="City" />
+              <mat-error *ngIf="orderForm.get('city')?.invalid">
+                {{ getErrorMessage('city') }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field-half">
+              <mat-label>State/Province</mat-label>
+              <mat-icon matPrefix>map</mat-icon>
+              <input matInput formControlName="state" placeholder="State" />
+              <mat-error *ngIf="orderForm.get('state')?.invalid">
+                {{ getErrorMessage('state') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field-half">
+              <mat-label>Postal Code</mat-label>
+              <mat-icon matPrefix>markunread_mailbox</mat-icon>
+              <input matInput formControlName="postalCode" placeholder="12345" />
+              <mat-error *ngIf="orderForm.get('postalCode')?.invalid">
+                {{ getErrorMessage('postalCode') }}
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="form-field-half">
+              <mat-label>Country</mat-label>
+              <mat-icon matPrefix>public</mat-icon>
+              <input matInput formControlName="country" placeholder="Country" />
+              <mat-error *ngIf="orderForm.get('country')?.invalid">
+                {{ getErrorMessage('country') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Order Items Section -->
+        <div class="form-section">
+          <h3 class="section-title">Order Items</h3>
+
+          <!-- Product Search -->
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field-full">
+              <mat-label>{{ loadingProducts() ? 'Loading products...' : 'Search and Add Products' }}</mat-label>
+              <mat-icon matPrefix>{{ loadingProducts() ? 'hourglass_empty' : 'search' }}</mat-icon>
+              <input
+                matInput
+                [formControl]="productSearchControl"
+                [matAutocomplete]="auto"
+                #autoTrigger="matAutocompleteTrigger"
+                (focus)="autoTrigger.openPanel()"
+                placeholder="Type product name or SKU..."
+              />
+              <mat-autocomplete
+                #auto="matAutocomplete"
+                [displayWith]="displayProduct"
+                (optionSelected)="onProductSelected($event.option.value)"
+              >
+                <mat-option *ngFor="let product of filteredProducts$ | async" [value]="product">
+                  {{ product.name }} ({{ product.sku }}) - ${{ product.price.amount }}
+                </mat-option>
+              </mat-autocomplete>
+            </mat-form-field>
+          </div>
+
+          <!-- Selected Products Table -->
+          <div class="products-table" *ngIf="selectedProducts.length > 0">
+            <table>
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>SKU</th>
+                  <th>Unit Price</th>
+                  <th>Quantity</th>
+                  <th>Line Total</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of selectedProducts; let i = index">
+                  <td>{{ item.productName }}</td>
+                  <td>{{ item.productSku }}</td>
+                  <td>${{ item.unitPrice.toFixed(2) }}</td>
+                  <td>
+                    <input
+                      type="number"
+                      min="1"
+                      [value]="item.quantity"
+                      (input)="onQuantityChange(i, $any($event.target).value)"
+                      class="quantity-input"
+                    />
+                  </td>
+                  <td>${{ item.lineTotal.toFixed(2) }}</td>
+                  <td>
+                    <button
+                      type="button"
+                      mat-icon-button
+                      color="warn"
+                      (click)="removeProduct(i)"
+                      aria-label="Remove product"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="order-total">
+              <strong>Order Total: ${{ orderTotal().toFixed(2) }}</strong>
+            </div>
+          </div>
+
+          <div class="no-products" *ngIf="selectedProducts.length === 0">
+            <mat-icon>info</mat-icon>
+            <p>No products added yet - search and select products above to add them to the order.</p>
+          </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="form-section">
+          <h3 class="section-title">Additional Notes (Optional)</h3>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="form-field-full">
+              <mat-label>Order Notes</mat-label>
+              <mat-icon matPrefix>notes</mat-icon>
+              <textarea
+                matInput
+                formControlName="notes"
+                rows="3"
+                placeholder="Add any special instructions or notes..."
+              ></textarea>
+              <mat-hint align="end"
+                >{{ orderForm.get('notes')?.value?.length || 0 }} / 1000</mat-hint
+              >
+              <mat-error *ngIf="orderForm.get('notes')?.invalid">
+                {{ getErrorMessage('notes') }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button
+            type="button"
+            mat-button
+            (click)="onCancel()"
+            [disabled]="isSubmitting()"
+          >
+            <mat-icon>cancel</mat-icon>
+            Cancel
+          </button>
+          <button
+            type="submit"
+            mat-raised-button
+            color="primary"
+            [disabled]="isSubmitting() || orderForm.invalid || selectedProducts.length === 0"
+          >
+            <mat-icon *ngIf="!isSubmitting()">save</mat-icon>
+            <mat-spinner *ngIf="isSubmitting()" diameter="20"></mat-spinner>
+            <span *ngIf="!isSubmitting()">Create Order</span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
