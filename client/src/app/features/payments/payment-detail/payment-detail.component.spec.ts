@@ -15,7 +15,7 @@ describe('PaymentDetailComponent', () => {
   const mockPayment: Payment = {
     id: '1',
     orderId: '1',
-    status: 'Successful',
+    status: 'SUCCESSFUL',
     amount: { amount: 299.99, currency: 'USD' },
     paymentMethod: 'Credit Card',
     transactionId: 'TXN-2024-001-ABC',
@@ -90,15 +90,15 @@ describe('PaymentDetailComponent', () => {
     });
 
     it('should return correct status variant for Successful', () => {
-      expect(component.getStatusVariant('Successful')).toBe('success');
+      expect(component.getStatusVariant('SUCCESSFUL')).toBe('success');
     });
 
     it('should return correct status variant for Pending', () => {
-      expect(component.getStatusVariant('Pending')).toBe('warning');
+      expect(component.getStatusVariant('PENDING')).toBe('warning');
     });
 
     it('should return correct status variant for Failed', () => {
-      expect(component.getStatusVariant('Failed')).toBe('error');
+      expect(component.getStatusVariant('FAILED')).toBe('error');
     });
 
     it('should return correct method icon for credit card', () => {

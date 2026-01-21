@@ -4,10 +4,20 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog } from '@angular/material/dialog';
 import { StatusBadgeComponent } from '../../../shared/components/status-badge/status-badge.component';
 import { PaymentService } from '../services/payment.service';
-import { Payment, PaymentStatus, PAYMENT_STATUS_LABELS } from '../../../shared/models/payment.model';
+import { NotificationService } from '../../../core/services/notification.service';
+import {
+  Payment,
+  PaymentStatus,
+  PAYMENT_STATUS_LABELS,
+  canUpdatePaymentStatus,
+  getAvailablePaymentStatuses,
+} from '../../../shared/models/payment.model';
+import { StatusConfirmDialogComponent, StatusConfirmDialogData } from '../dialogs/status-confirm-dialog/status-confirm-dialog.component';
 
 @Component({
   selector: 'app-payment-detail',
@@ -17,6 +27,7 @@ import { Payment, PaymentStatus, PAYMENT_STATUS_LABELS } from '../../../shared/m
     MatCardModule,
     MatButtonModule,
     MatIconModule,
+    MatMenuModule,
     MatProgressSpinnerModule,
     StatusBadgeComponent,
     CurrencyPipe,
@@ -30,9 +41,12 @@ export class PaymentDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly paymentService = inject(PaymentService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly dialog = inject(MatDialog);
 
   payment = signal<Payment | null>(null);
   loading = signal(true);
+  updatingStatus = signal(false);
 
   ngOnInit(): void {
     const paymentId = this.route.snapshot.paramMap.get('id');
@@ -65,11 +79,11 @@ export class PaymentDetailComponent implements OnInit {
 
   getStatusVariant(status: PaymentStatus): 'success' | 'warning' | 'error' | 'info' | 'default' {
     switch (status) {
-      case 'Successful':
+      case 'SUCCESSFUL':
         return 'success';
-      case 'Pending':
+      case 'PENDING':
         return 'warning';
-      case 'Failed':
+      case 'FAILED':
         return 'error';
       default:
         return 'default';
@@ -96,5 +110,87 @@ export class PaymentDetailComponent implements OnInit {
       return 'g_mobiledata';
     }
     return 'payment';
+  }
+
+  /**
+   * Check if the current payment status can be updated
+   */
+  canUpdateStatus(): boolean {
+    const currentPayment = this.payment();
+    if (!currentPayment) return false;
+    return canUpdatePaymentStatus(currentPayment.status);
+  }
+
+  /**
+   * Get available status options for the current payment
+   */
+  getAvailableStatuses(): PaymentStatus[] {
+    const currentPayment = this.payment();
+    if (!currentPayment) return [];
+    return getAvailablePaymentStatuses(currentPayment.status);
+  }
+
+  /**
+   * Get icon for a status option
+   */
+  getStatusIcon(status: PaymentStatus): string {
+    return status === 'SUCCESSFUL' ? 'check_circle' : 'cancel';
+  }
+
+  /**
+   * Handle status update selection from dropdown menu
+   */
+  onStatusUpdate(newStatus: PaymentStatus): void {
+    const currentPayment = this.payment();
+    if (!currentPayment) return;
+
+    const dialogData: StatusConfirmDialogData = {
+      currentStatus: currentPayment.status,
+      newStatus,
+      transactionId: currentPayment.transactionId,
+      amount: currentPayment.amount,
+    };
+
+    const dialogRef = this.dialog.open(StatusConfirmDialogComponent, {
+      data: dialogData,
+      width: '480px',
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed) => {
+      if (confirmed) {
+        this.updateStatus(newStatus);
+      }
+    });
+  }
+
+  /**
+   * Execute the status update
+   */
+  private updateStatus(newStatus: PaymentStatus): void {
+    const currentPayment = this.payment();
+    if (!currentPayment) return;
+
+    this.updatingStatus.set(true);
+
+    this.paymentService.updatePaymentStatus(currentPayment.id, newStatus).subscribe({
+      next: (updatedPayment) => {
+        this.payment.set(updatedPayment);
+        this.updatingStatus.set(false);
+        this.notificationService.success(`Payment marked as ${this.getStatusLabel(newStatus)}`);
+      },
+      error: (error) => {
+        this.updatingStatus.set(false);
+        console.error('Error updating payment status:', error);
+
+        let errorMessage = 'Failed to update payment status';
+        if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+          errorMessage = error.graphQLErrors[0].message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        this.notificationService.error(errorMessage);
+      },
+    });
   }
 }
