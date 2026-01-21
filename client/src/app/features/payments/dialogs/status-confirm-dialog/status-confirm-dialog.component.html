@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>
+  <mat-icon [color]="getStatusColor()">{{ getStatusIcon() }}</mat-icon>
+  Update Payment Status
+</h2>
+
+<mat-dialog-content>
+  <p class="confirm-text">
+    Are you sure you want to mark this payment as <strong>{{ getStatusLabel(data.newStatus) }}</strong>?
+  </p>
+
+  <div class="payment-info">
+    <p><strong>Transaction ID:</strong> {{ data.transactionId || 'Not assigned' }}</p>
+    <p><strong>Amount:</strong> {{ data.amount.amount | currency:data.amount.currency }}</p>
+    <p><strong>Current Status:</strong> {{ getStatusLabel(data.currentStatus) }}</p>
+    <p><strong>New Status:</strong> {{ getStatusLabel(data.newStatus) }}</p>
+  </div>
+
+  <p class="warning-text" [class.success]="data.newStatus === 'SUCCESSFUL'" [class.failed]="data.newStatus === 'FAILED'">
+    <mat-icon>info</mat-icon>
+    {{ getWarningText() }}
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button [color]="getStatusColor()" (click)="onConfirm()">
+    <mat-icon>{{ getStatusIcon() }}</mat-icon>
+    Mark as {{ getStatusLabel(data.newStatus) }}
+  </button>
+</mat-dialog-actions>

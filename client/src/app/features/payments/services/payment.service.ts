@@ -1,9 +1,10 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, map, catchError } from 'rxjs';
 import { Apollo } from 'apollo-angular';
-import { Payment, PaymentFilterInput, PaymentSortInput } from '../../../shared/models/payment.model';
+import { Payment, PaymentFilterInput, PaymentSortInput, PaymentStatus, CreatePaymentInput } from '../../../shared/models/payment.model';
 import { PaginatedResult, PaginationParams } from '../../../shared/models/table.model';
 import { GET_PAYMENTS, GET_PAYMENT_BY_ID } from '../graphql/payment.queries';
+import { CREATE_PAYMENT, UPDATE_PAYMENT_STATUS } from '../graphql/payment.mutations';
 
 /**
  * GraphQL connection type for HotChocolate cursor-based pagination
@@ -111,6 +112,64 @@ export class PaymentService {
           }
           // Return the first node or null if not found
           return result.data.payments.nodes[0] || null;
+        }),
+        catchError((error) => {
+          this._loading.set(false);
+          throw error;
+        })
+      );
+  }
+
+  /**
+   * Creates a new payment for an order
+   * @param input - The payment creation input
+   * @returns Observable with the created payment
+   */
+  createPayment(input: CreatePaymentInput): Observable<Payment> {
+    this._loading.set(true);
+
+    return this.apollo
+      .mutate<{ createPayment: { payment: Payment } }>({
+        mutation: CREATE_PAYMENT,
+        variables: { command: input },
+        refetchQueries: [{ query: GET_PAYMENTS }],
+      })
+      .pipe(
+        map((result) => {
+          this._loading.set(false);
+          if (!result.data?.createPayment?.payment) {
+            throw new Error('No data returned from createPayment mutation');
+          }
+          return result.data.createPayment.payment;
+        }),
+        catchError((error) => {
+          this._loading.set(false);
+          throw error;
+        })
+      );
+  }
+
+  /**
+   * Updates the status of an existing payment
+   * @param paymentId - The ID of the payment to update
+   * @param newStatus - The new status (Successful or Failed)
+   * @returns Observable with the updated payment
+   */
+  updatePaymentStatus(paymentId: string, newStatus: PaymentStatus): Observable<Payment> {
+    this._loading.set(true);
+
+    return this.apollo
+      .mutate<{ updatePaymentStatus: { payment: Payment } }>({
+        mutation: UPDATE_PAYMENT_STATUS,
+        variables: { command: { paymentId, newStatus } },
+      })
+      .pipe(
+        map((result) => {
+          this._loading.set(false);
+          if (!result.data?.updatePaymentStatus?.payment) {
+            throw new Error('No data returned from updatePaymentStatus mutation');
+          }
+          return result.data.updatePaymentStatus.payment;
         }),
         catchError((error) => {
           this._loading.set(false);

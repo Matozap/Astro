@@ -1,0 +1,155 @@
+.payment-create-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 10px;
+
+  .page-header {
+    margin-bottom: 12px;
+    padding-left: 24px;
+
+    h1 {
+      margin: 0 0 8px 0;
+      font-size: 32px;
+      font-weight: 500;
+      color: var(--mat-grey-900, #fff);
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: 16px;
+      color: var(--mat-grey-600, #eee);
+    }
+  }
+
+  .loading-card {
+    max-width: 400px;
+    margin: 0 auto;
+
+    .loading-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      gap: 16px;
+
+      p {
+        margin: 0;
+        font-size: 16px;
+        color: var(--mat-grey-700, #616161);
+      }
+    }
+  }
+
+  .form-card {
+    .form-section {
+      margin-bottom: 24px;
+
+      .section-title {
+        margin: 0 0 16px 0;
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--mat-grey-800, #eee);
+        border-bottom: 1px solid var(--mat-grey-300, #333);
+        padding-bottom: 8px;
+      }
+    }
+
+    .full-width {
+      width: 100%;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 16px;
+
+      .amount-field {
+        flex: 2;
+      }
+
+      .currency-field {
+        flex: 1;
+      }
+    }
+
+    .selected-order-info {
+      background: var(--mat-grey-100, #1a1a1a);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 8px;
+
+      .order-detail {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--mat-grey-200, #333);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .label {
+          color: var(--mat-grey-600, #999);
+          font-weight: 500;
+        }
+
+        .value {
+          color: var(--mat-grey-900, #fff);
+
+          &.status-badge {
+            background: var(--mat-primary-100, #3949ab);
+            color: var(--mat-primary-contrast, #fff);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            text-transform: uppercase;
+          }
+        }
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--mat-grey-300, #333);
+
+      button {
+        mat-icon {
+          margin-right: 4px;
+        }
+      }
+    }
+  }
+}
+
+// Autocomplete dropdown styling
+.order-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+
+  .order-number {
+    font-weight: 500;
+    min-width: 120px;
+  }
+
+  .customer-name {
+    flex: 1;
+    color: var(--mat-grey-700, #bbb);
+  }
+
+  .order-total {
+    font-weight: 500;
+    color: var(--mat-primary, #3949ab);
+  }
+}
+
+// Payment method select option styling
+::ng-deep .mat-mdc-option mat-icon {
+  margin-right: 8px;
+  color: var(--mat-grey-600, #999);
+}

@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, inject, signal, TemplateRef, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -23,6 +23,7 @@ import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -59,7 +60,7 @@ export class PaymentsListComponent implements OnInit, AfterViewInit {
   searchTerm = '';
   statusFilter: PaymentStatus | null = null;
 
-  paymentStatuses: PaymentStatus[] = ['Pending', 'Successful', 'Failed'];
+  paymentStatuses: PaymentStatus[] = ['PENDING', 'SUCCESSFUL', 'FAILED'];
 
   private searchSubject = new Subject<string>();
 
@@ -152,11 +153,11 @@ export class PaymentsListComponent implements OnInit, AfterViewInit {
 
   getStatusVariant(status: PaymentStatus): 'success' | 'warning' | 'error' | 'info' | 'default' {
     switch (status) {
-      case 'Successful':
+      case 'SUCCESSFUL':
         return 'success';
-      case 'Pending':
+      case 'PENDING':
         return 'warning';
-      case 'Failed':
+      case 'FAILED':
         return 'error';
       default:
         return 'default';

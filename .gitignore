@@ -118,6 +118,7 @@ docker-compose.override.yml
 # Other
 .claude/
 CLAUDE.md
+tmpclaude-*
 
 # Node.js / Angular (client/)
 client/node_modules/

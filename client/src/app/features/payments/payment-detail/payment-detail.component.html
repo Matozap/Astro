@@ -15,11 +15,40 @@
           <p class="page-subtitle">Payment for {{ payment()!.order?.orderNumber || 'Order #' + payment()!.orderId }}</p>
         </div>
       </div>
-      <app-status-badge
-        [label]="getStatusLabel(payment()!.status)"
-        [variant]="getStatusVariant(payment()!.status)"
-        class="status-badge"
-      ></app-status-badge>
+      <div class="header-right">
+        <app-status-badge
+          [label]="getStatusLabel(payment()!.status)"
+          [variant]="getStatusVariant(payment()!.status)"
+          class="status-badge"
+        ></app-status-badge>
+
+        @if (canUpdateStatus()) {
+          <button
+            mat-raised-button
+            color="primary"
+            [matMenuTriggerFor]="statusMenu"
+            [disabled]="updatingStatus()"
+          >
+            @if (updatingStatus()) {
+              <mat-progress-spinner diameter="20" mode="indeterminate"></mat-progress-spinner>
+            } @else {
+              <mat-icon>edit</mat-icon>
+            }
+            Update Status
+            <mat-icon>arrow_drop_down</mat-icon>
+          </button>
+          <mat-menu #statusMenu="matMenu">
+            @for (status of getAvailableStatuses(); track status) {
+              <button mat-menu-item (click)="onStatusUpdate(status)">
+                <mat-icon [class.success-icon]="status === 'SUCCESSFUL'" [class.error-icon]="status === 'FAILED'">
+                  {{ getStatusIcon(status) }}
+                </mat-icon>
+                <span>Mark as {{ getStatusLabel(status) }}</span>
+              </button>
+            }
+          </mat-menu>
+        }
+      </div>
     </div>
 
     <div class="detail-grid">

@@ -1,7 +1,5 @@
 # Astro
 
-*Not a brainrot ☠️*
-
 ---
 
 
@@ -12,7 +10,7 @@ A modular monolith built on .NET 10 and C# 14, exposing a GraphQL API for managi
 ```
 server/
 ├── Astro.Api/            # GraphQL gateway (HotChocolate)
-├── Astro.Application/    # Commands, queries, handlers (MediatR)
+├── Astro.Application/    # Commands, queries, handlers
 ├── Astro.Domain/         # Entities, value objects, domain events
 ├── Astro.Infrastructure/ # Persistence, repositories (EF Core)
 
@@ -30,8 +28,7 @@ Clean Architecture is often described as a set of concentric circles. But circle
 
 The domain layer knows nothing of databases or HTTP. It speaks only of `Products`, `Orders`, `Money`, and `Sku`—concepts that would exist even if computers didn't. The infrastructure layer handles the messy business of making ideas persist beyond the death of a process.
 
-Between them sits the application layer, translating intention into action through commands and queries. MediatR provides the postal service; FluentValidation ensures the letters are legible.
-
+Between them sits the application layer, translating intention into action through commands and queries. 
 ---
 
 ## On Value Objects
@@ -98,30 +95,32 @@ The frontend follows a feature-based architecture with lazy-loaded routes. Each 
 
 This project uses GitHub Actions with two separate workflows:
 
-**CI - Unit Tests** (automatic)
+**Backend - Unit Tests** (automatic)
 - Triggers on every push and pull request to `main`
 - Runs only unit tests from `server/Astro.Tests`
 - Provides fast feedback (typically < 3 minutes)
 - Must pass before merging
 
-**Integration Tests** (manual)
+**Backend - Integration Tests** (manual)
 - Triggered manually via GitHub Actions UI (workflow_dispatch)
 - Runs integration tests from `e2e/Astro.IntegrationTests`
 - Use before releases or after significant changes
 - To run: Go to Actions tab → Integration Tests → Run workflow
 
+**Frontend - Unit Tests** (automatic)
+- Triggers on every push and pull request to `main`
+- Runs only unit tests from `client/Astro.Tests`
+- Provides fast feedback (typically < 3 minutes)
+- Must pass before merging
+
 Both workflows use .NET 10.0.x and include: checkout, restore, build, and test steps.
 
 ---
 
-## A Final Thought
+## Summary
 
 It is hard to find a way of thinking about problems. They make certain solutions easy and certain mistakes hard.
 
 Use it. Break it. Rebuild it better.
 
 The stars don't care. But maybe we should.
-
----
-
-*Built with curiosity and a suspicious amount of caffeine.*

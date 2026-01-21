@@ -45,8 +45,38 @@
   }
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  button {
+    mat-icon {
+      margin-right: 4px;
+
+      &:last-child {
+        margin-right: 0;
+        margin-left: 4px;
+      }
+    }
+
+    mat-progress-spinner {
+      margin-right: 8px;
+    }
+  }
+}
+
 .status-badge {
   font-size: 14px;
+}
+
+// Menu item icons
+.success-icon {
+  color: var(--success, #4caf50) !important;
+}
+
+.error-icon {
+  color: var(--error, #f44336) !important;
 }
 
 .detail-grid {

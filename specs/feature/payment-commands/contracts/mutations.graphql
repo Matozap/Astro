@@ -1,0 +1,153 @@
+# Payment Commands - GraphQL Mutations Contract
+# Feature: Payment Commands
+# Date: 2026-01-15
+#
+# These mutations call existing backend operations.
+# Frontend implementation in: client/src/app/features/payments/graphql/payment.mutations.ts
+
+# =============================================================================
+# CREATE PAYMENT MUTATION
+# =============================================================================
+# Creates a new payment for an existing order.
+# Backend: Astro.Api.Payments.GraphQL.PaymentMutation.CreatePayment
+#
+# Errors:
+#   - ValidationException: Invalid input (amount <= 0, missing orderId)
+#   - OrderNotFoundException: Order with given ID does not exist
+#
+# Usage from Angular:
+#   paymentService.createPayment({ orderId, amount, currency, paymentMethod })
+
+mutation CreatePayment($command: CreatePaymentCommandInput!) {
+  createPayment(input: { command: $command }) {
+    payment {
+      id
+      orderId
+      status
+      amount {
+        amount
+        currency
+      }
+      paymentMethod
+      transactionId
+      createdAt
+      updatedAt
+      order {
+        id
+        orderNumber
+        customerName
+        totalAmount {
+          amount
+          currency
+        }
+      }
+    }
+  }
+}
+
+# CreatePaymentCommandInput schema:
+# {
+#   orderId: UUID!          # Required - Order this payment is for
+#   amount: Decimal!        # Required - Payment amount (must be > 0)
+#   currency: String        # Optional - Defaults to "USD"
+#   paymentMethod: String   # Optional - e.g., "Credit Card", "PayPal"
+# }
+
+
+# =============================================================================
+# UPDATE PAYMENT STATUS MUTATION
+# =============================================================================
+# Updates the status of an existing payment.
+# Backend: Astro.Api.Payments.GraphQL.PaymentMutation.UpdatePaymentStatus
+#
+# Valid Transitions:
+#   - Pending → Successful
+#   - Pending → Failed
+#   - Successful → (none - terminal state)
+#   - Failed → (none - terminal state)
+#
+# Errors:
+#   - ValidationException: Invalid status transition
+#   - PaymentNotFoundException: Payment with given ID does not exist
+#
+# Usage from Angular:
+#   paymentService.updatePaymentStatus(paymentId, newStatus)
+
+mutation UpdatePaymentStatus($command: UpdatePaymentStatusCommandInput!) {
+  updatePaymentStatus(input: { command: $command }) {
+    payment {
+      id
+      orderId
+      status
+      amount {
+        amount
+        currency
+      }
+      paymentMethod
+      transactionId
+      createdAt
+      updatedAt
+    }
+  }
+}
+
+# UpdatePaymentStatusCommandInput schema:
+# {
+#   paymentId: UUID!        # Required - Payment to update
+#   newStatus: PaymentStatus! # Required - Target status (Successful or Failed)
+# }
+
+# PaymentStatus enum:
+# {
+#   Pending     # Initial state when payment is created
+#   Successful  # Payment completed successfully (terminal)
+#   Failed      # Payment failed (terminal)
+# }
+
+
+# =============================================================================
+# TYPESCRIPT IMPLEMENTATION REFERENCE
+# =============================================================================
+# File: client/src/app/features/payments/graphql/payment.mutations.ts
+#
+# import { gql } from 'apollo-angular';
+#
+# export const CREATE_PAYMENT = gql`
+#   mutation CreatePayment($command: CreatePaymentCommandInput!) {
+#     createPayment(input: { command: $command }) {
+#       payment {
+#         id
+#         orderId
+#         status
+#         amount { amount currency }
+#         paymentMethod
+#         transactionId
+#         createdAt
+#         updatedAt
+#         order {
+#           id
+#           orderNumber
+#           customerName
+#           totalAmount { amount currency }
+#         }
+#       }
+#     }
+#   }
+# `;
+#
+# export const UPDATE_PAYMENT_STATUS = gql`
+#   mutation UpdatePaymentStatus($command: UpdatePaymentStatusCommandInput!) {
+#     updatePaymentStatus(input: { command: $command }) {
+#       payment {
+#         id
+#         orderId
+#         status
+#         amount { amount currency }
+#         paymentMethod
+#         transactionId
+#         createdAt
+#         updatedAt
+#       }
+#     }
+#   }
+# `;
