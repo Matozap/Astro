@@ -15,11 +15,35 @@
           <p class="page-subtitle">Order placed on {{ order()!.createdAt | date:'MMM d, y, h:mm a' }}</p>
         </div>
       </div>
-      <app-status-badge
-        [label]="getStatusLabel(order()!.status)"
-        [variant]="getStatusVariant(order()!.status)"
-        class="status-badge"
-      ></app-status-badge>
+      <div class="header-right">
+        <app-status-badge
+          [label]="getStatusLabel(order()!.status)"
+          [variant]="getStatusVariant(order()!.status)"
+          class="status-badge"
+        ></app-status-badge>
+
+        @if (canUpdateStatus()) {
+          <button
+            mat-raised-button
+            color="primary"
+            [matMenuTriggerFor]="statusMenu"
+            [disabled]="updatingStatus()"
+          >
+            @if (updatingStatus()) {
+              <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+              <mat-icon>edit</mat-icon>
+            }
+            Update Status
+            <mat-icon>arrow_drop_down</mat-icon>
+          </button>
+          <mat-menu #statusMenu="matMenu">
+            @for (status of getAvailableStatuses(); track status) {
+              <button mat-menu-item (click)="updateStatus(status)">{{ getStatusLabel(status) }}</button>
+            }
+          </mat-menu>
+        }
+      </div>
     </div>
 
     <div class="detail-grid">
@@ -152,21 +176,6 @@
         <mat-icon>arrow_back</mat-icon>
         Back to Orders
       </button>
-      @if (canUpdateStatus()) {
-        <button mat-flat-button color="primary" [matMenuTriggerFor]="statusMenu" [disabled]="updatingStatus()">
-          @if (updatingStatus()) {
-            <mat-spinner diameter="20"></mat-spinner>
-          } @else {
-            <mat-icon>edit</mat-icon>
-          }
-          Update Status
-        </button>
-        <mat-menu #statusMenu="matMenu">
-          @for (status of getAvailableStatuses(); track status) {
-            <button mat-menu-item (click)="updateStatus(status)">{{ getStatusLabel(status) }}</button>
-          }
-        </mat-menu>
-      }
     </div>
   } @else {
     <div class="not-found">
