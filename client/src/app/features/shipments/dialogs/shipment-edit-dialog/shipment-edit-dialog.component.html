@@ -1,0 +1,49 @@
+<h2 mat-dialog-title>Edit Shipment Details</h2>
+
+<mat-dialog-content>
+  <p class="edit-info">
+    Edit carrier and tracking information for shipment
+    <strong>{{ data.shipment.trackingNumber || 'NEW' }}</strong>
+  </p>
+
+  <form [formGroup]="form" class="edit-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Carrier</mat-label>
+      <mat-select formControlName="carrier">
+        @for (option of carrierOptions; track option.value) {
+          <mat-option [value]="option.value">{{ option.label }}</mat-option>
+        }
+      </mat-select>
+      @if (form.get('carrier')?.invalid && form.get('carrier')?.touched) {
+        <mat-error>{{ getErrorMessage('carrier') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Tracking Number</mat-label>
+      <input
+        matInput
+        formControlName="trackingNumber"
+        placeholder="Enter tracking number"
+        maxlength="50"
+      />
+      <mat-hint>Leave empty if not yet assigned</mat-hint>
+      @if (form.get('trackingNumber')?.invalid && form.get('trackingNumber')?.touched) {
+        <mat-error>{{ getErrorMessage('trackingNumber') }}</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="onSave()"
+    [disabled]="form.invalid || !hasChanges()"
+  >
+    <mat-icon>save</mat-icon>
+    Save Changes
+  </button>
+</mat-dialog-actions>

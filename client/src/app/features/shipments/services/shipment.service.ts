@@ -1,9 +1,16 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, map, catchError } from 'rxjs';
 import { Apollo } from 'apollo-angular';
-import { Shipment, ShipmentFilterInput, ShipmentSortInput } from '../../../shared/models/shipment.model';
+import {
+  Shipment,
+  ShipmentFilterInput,
+  ShipmentSortInput,
+  CreateShipmentInput,
+  UpdateShipmentInput,
+} from '../../../shared/models/shipment.model';
 import { PaginatedResult, PaginationParams } from '../../../shared/models/table.model';
 import { GET_SHIPMENTS, GET_SHIPMENT_BY_ID } from '../graphql/shipment.queries';
+import { CREATE_SHIPMENT, UPDATE_SHIPMENT } from '../graphql/shipment.mutations';
 
 /**
  * GraphQL connection type for HotChocolate cursor-based pagination
@@ -111,6 +118,63 @@ export class ShipmentService {
           }
           // Return the first node or null if not found
           return result.data.shipments.nodes[0] || null;
+        }),
+        catchError((error) => {
+          this._loading.set(false);
+          throw error;
+        })
+      );
+  }
+
+  /**
+   * T007: Creates a new shipment via GraphQL mutation
+   * @param input - The shipment creation input
+   * @returns Observable with the created shipment
+   */
+  createShipment(input: CreateShipmentInput): Observable<Shipment> {
+    this._loading.set(true);
+
+    return this.apollo
+      .mutate<{ createShipment: { shipment: Shipment } }>({
+        mutation: CREATE_SHIPMENT,
+        variables: { command: input },
+        refetchQueries: [{ query: GET_SHIPMENTS, variables: { first: 10 } }],
+      })
+      .pipe(
+        map((result) => {
+          this._loading.set(false);
+          if (!result.data?.createShipment?.shipment) {
+            throw new Error('No data returned from createShipment mutation');
+          }
+          return result.data.createShipment.shipment;
+        }),
+        catchError((error) => {
+          this._loading.set(false);
+          throw error;
+        })
+      );
+  }
+
+  /**
+   * T008: Updates an existing shipment via GraphQL mutation
+   * @param input - The shipment update input
+   * @returns Observable with the updated shipment
+   */
+  updateShipment(input: UpdateShipmentInput): Observable<Shipment> {
+    this._loading.set(true);
+
+    return this.apollo
+      .mutate<{ updateShipment: { shipment: Shipment } }>({
+        mutation: UPDATE_SHIPMENT,
+        variables: { command: input },
+      })
+      .pipe(
+        map((result) => {
+          this._loading.set(false);
+          if (!result.data?.updateShipment?.shipment) {
+            throw new Error('No data returned from updateShipment mutation');
+          }
+          return result.data.updateShipment.shipment;
         }),
         catchError((error) => {
           this._loading.set(false);

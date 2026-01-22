@@ -1,48 +1,61 @@
 import { gql } from 'apollo-angular';
 
-export const GET_SHIPMENTS = gql`
-  query GetShipments(
-    $first: Int
-    $after: String
-    $where: ShipmentFilterInput
-    $order: [ShipmentSortInput!]
-  ) {
-    shipments(first: $first, after: $after, where: $where, order: $order) {
-      nodes {
+export const CREATE_SHIPMENT = gql`
+  mutation CreateShipment($command: CreateShipmentCommandInput!) {
+    createShipment(input: { command: $command }) {
+      shipment {
         id
         orderId
         trackingNumber
         carrier
         status
-        destinationAddress {
+        originAddress {
+          street
           city
           state
+          postalCode
           country
+        }
+        destinationAddress {
+          street
+          city
+          state
+          postalCode
+          country
+        }
+        weight {
+          value
+          unit
+        }
+        dimensions {
+          length
+          width
+          height
+          unit
         }
         shippingCost {
           amount
           currency
         }
         estimatedDeliveryDate
+        items {
+          id
+          productId
+          productName
+          quantity
+        }
         itemCount
         createdAt
-        updatedAt
+        createdBy
       }
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-        startCursor
-        endCursor
-      }
-      totalCount
     }
   }
 `;
 
-export const GET_SHIPMENT_BY_ID = gql`
-  query GetShipmentById($id: UUID!) {
-    shipments(where: { id: { eq: $id } }) {
-      nodes {
+export const UPDATE_SHIPMENT = gql`
+  mutation UpdateShipment($command: UpdateShipmentCommandInput!) {
+    updateShipment(input: { command: $command }) {
+      shipment {
         id
         orderId
         trackingNumber
@@ -92,9 +105,7 @@ export const GET_SHIPMENT_BY_ID = gql`
           quantity
         }
         itemCount
-        createdAt
         updatedAt
-        createdBy
         modifiedBy
       }
     }

@@ -104,11 +104,11 @@ interface ShipmentStatusData {
 }
 
 const MOCK_SHIPMENT_STATUS: ShipmentStatusData[] = [
-  { status: 'Pending', count: 12 },
-  { status: 'PickedUp', count: 8 },
-  { status: 'InTransit', count: 25 },
-  { status: 'OutForDelivery', count: 15 },
-  { status: 'Delivered', count: 156 },
+  { status: 'PENDING', count: 12 },
+  { status: 'PICKED_UP', count: 8 },
+  { status: 'IN_TRANSIT', count: 25 },
+  { status: 'OUT_FOR_DELIVERY', count: 15 },
+  { status: 'DELIVERED', count: 156 },
 ];
 
 @Injectable({

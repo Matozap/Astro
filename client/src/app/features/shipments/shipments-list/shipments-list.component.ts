@@ -61,16 +61,16 @@ export class ShipmentsListComponent implements OnInit, AfterViewInit {
   carrierFilter: string | null = null;
 
   shipmentStatuses: ShipmentStatus[] = [
-    'Pending',
-    'PickedUp',
-    'Shipped',
-    'InTransit',
-    'OutForDelivery',
-    'Delivered',
-    'Delayed',
-    'Failed',
-    'FailedDelivery',
-    'Returned',
+    'PENDING',
+    'PICKED_UP',
+    'SHIPPED',
+    'IN_TRANSIT',
+    'OUT_FOR_DELIVERY',
+    'DELIVERED',
+    'DELAYED',
+    'FAILED',
+    'FAILED_DELIVERY',
+    'RETURNED',
   ];
 
   carriers = ['USPS', 'FedEx', 'UPS', 'DHL'];
@@ -165,25 +165,29 @@ export class ShipmentsListComponent implements OnInit, AfterViewInit {
     this.router.navigate(['/shipments', shipment.id]);
   }
 
+  onCreateShipment(): void {
+    this.router.navigate(['/shipments/create']);
+  }
+
   getStatusLabel(status: ShipmentStatus): string {
     return SHIPMENT_STATUS_LABELS[status] || status;
   }
 
   getStatusVariant(status: ShipmentStatus): 'success' | 'warning' | 'error' | 'info' | 'default' {
     switch (status) {
-      case 'Delivered':
+      case 'DELIVERED':
         return 'success';
-      case 'Pending':
-      case 'Delayed':
+      case 'PENDING':
+      case 'DELAYED':
         return 'warning';
-      case 'Failed':
-      case 'FailedDelivery':
-      case 'Returned':
+      case 'FAILED':
+      case 'FAILED_DELIVERY':
+      case 'RETURNED':
         return 'error';
-      case 'PickedUp':
-      case 'Shipped':
-      case 'InTransit':
-      case 'OutForDelivery':
+      case 'PICKED_UP':
+      case 'SHIPPED':
+      case 'IN_TRANSIT':
+      case 'OUT_FOR_DELIVERY':
         return 'info';
       default:
         return 'default';
@@ -204,7 +208,7 @@ export class ShipmentsListComponent implements OnInit, AfterViewInit {
   }
 
   isOverdue(eta: string, status: ShipmentStatus): boolean {
-    if (['Delivered', 'Returned'].includes(status)) {
+    if (['DELIVERED', 'RETURNED'].includes(status)) {
       return false;
     }
     return new Date(eta) < new Date();

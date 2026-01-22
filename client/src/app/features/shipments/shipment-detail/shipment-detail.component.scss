@@ -25,6 +25,12 @@
   gap: 16px;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .back-button {
   color: var(--text-secondary);
 }
@@ -209,7 +215,7 @@
   color: var(--text-secondary);
 }
 
-.timeline-description {
+.timeline-notes {
   font-size: 14px;
   color: var(--text-secondary);
   margin: 4px 0;
