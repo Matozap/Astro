@@ -19,7 +19,7 @@ describe('ShipmentsListComponent', () => {
     orderId: '223e4567-e89b-12d3-a456-426614174001',
     trackingNumber: 'TRACK123456',
     carrier: 'FedEx',
-    status: 'Pending' as ShipmentStatus,
+    status: 'PENDING' as ShipmentStatus,
     originAddress: {
       street: '100 Warehouse Ave',
       city: 'Chicago',
@@ -154,7 +154,7 @@ describe('ShipmentsListComponent', () => {
 
     it('should reload shipments on status filter change', fakeAsync(() => {
       mockShipmentService.getShipments.calls.reset();
-      component.statusFilter = 'Pending';
+      component.statusFilter = 'PENDING';
       component.onStatusFilterChange();
       tick();
 
@@ -174,7 +174,7 @@ describe('ShipmentsListComponent', () => {
 
     it('should clear all filters', fakeAsync(() => {
       component.searchTerm = 'test';
-      component.statusFilter = 'Pending';
+      component.statusFilter = 'PENDING';
       component.carrierFilter = 'FedEx';
       component.pageIndex = 2;
 
@@ -220,21 +220,21 @@ describe('ShipmentsListComponent', () => {
     }));
 
     it('should return correct status label', () => {
-      expect(component.getStatusLabel('Pending')).toBe('Pending');
-      expect(component.getStatusLabel('InTransit')).toBe('In Transit');
-      expect(component.getStatusLabel('OutForDelivery')).toBe('Out for Delivery');
-      expect(component.getStatusLabel('Delivered')).toBe('Delivered');
+      expect(component.getStatusLabel('PENDING')).toBe('Pending');
+      expect(component.getStatusLabel('IN_TRANSIT')).toBe('In Transit');
+      expect(component.getStatusLabel('OUT_FOR_DELIVERY')).toBe('Out for Delivery');
+      expect(component.getStatusLabel('DELIVERED')).toBe('Delivered');
     });
 
     it('should return correct status variant', () => {
-      expect(component.getStatusVariant('Delivered')).toBe('success');
-      expect(component.getStatusVariant('Pending')).toBe('warning');
-      expect(component.getStatusVariant('Delayed')).toBe('warning');
-      expect(component.getStatusVariant('Failed')).toBe('error');
-      expect(component.getStatusVariant('FailedDelivery')).toBe('error');
-      expect(component.getStatusVariant('Returned')).toBe('error');
-      expect(component.getStatusVariant('Shipped')).toBe('info');
-      expect(component.getStatusVariant('InTransit')).toBe('info');
+      expect(component.getStatusVariant('DELIVERED')).toBe('success');
+      expect(component.getStatusVariant('PENDING')).toBe('warning');
+      expect(component.getStatusVariant('DELAYED')).toBe('warning');
+      expect(component.getStatusVariant('FAILED')).toBe('error');
+      expect(component.getStatusVariant('FAILED_DELIVERY')).toBe('error');
+      expect(component.getStatusVariant('RETURNED')).toBe('error');
+      expect(component.getStatusVariant('SHIPPED')).toBe('info');
+      expect(component.getStatusVariant('IN_TRANSIT')).toBe('info');
     });
 
     it('should return correct carrier icon', () => {
@@ -252,14 +252,14 @@ describe('ShipmentsListComponent', () => {
       pastDate.setDate(pastDate.getDate() - 7);
 
       // Not overdue if delivered
-      expect(component.isOverdue(pastDate.toISOString(), 'Delivered')).toBeFalse();
-      expect(component.isOverdue(pastDate.toISOString(), 'Returned')).toBeFalse();
+      expect(component.isOverdue(pastDate.toISOString(), 'DELIVERED')).toBeFalse();
+      expect(component.isOverdue(pastDate.toISOString(), 'RETURNED')).toBeFalse();
 
       // Overdue if past date and not delivered
-      expect(component.isOverdue(pastDate.toISOString(), 'InTransit')).toBeTrue();
+      expect(component.isOverdue(pastDate.toISOString(), 'IN_TRANSIT')).toBeTrue();
 
       // Not overdue if future date
-      expect(component.isOverdue(futureDate.toISOString(), 'InTransit')).toBeFalse();
+      expect(component.isOverdue(futureDate.toISOString(), 'IN_TRANSIT')).toBeFalse();
     });
   });
 });

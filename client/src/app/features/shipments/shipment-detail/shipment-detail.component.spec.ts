@@ -26,7 +26,7 @@ describe('ShipmentDetailComponent', () => {
     orderId: '223e4567-e89b-12d3-a456-426614174001',
     trackingNumber: 'TRACK123456',
     carrier: 'FedEx',
-    status: 'Pending' as ShipmentStatus,
+    status: 'PENDING' as ShipmentStatus,
     originAddress: {
       street: '100 Warehouse Ave',
       city: 'Chicago',
@@ -64,7 +64,7 @@ describe('ShipmentDetailComponent', () => {
 
   const mockDeliveredShipment: Shipment = {
     ...mockShipment,
-    status: 'Delivered' as ShipmentStatus,
+    status: 'DELIVERED' as ShipmentStatus,
     actualDeliveryDate: '2026-01-24T14:30:00Z',
   };
 
@@ -144,16 +144,16 @@ describe('ShipmentDetailComponent', () => {
     }));
 
     it('should return correct status label', () => {
-      expect(component.getStatusLabel('Pending')).toBe('Pending');
-      expect(component.getStatusLabel('InTransit')).toBe('In Transit');
-      expect(component.getStatusLabel('OutForDelivery')).toBe('Out for Delivery');
+      expect(component.getStatusLabel('PENDING')).toBe('Pending');
+      expect(component.getStatusLabel('IN_TRANSIT')).toBe('In Transit');
+      expect(component.getStatusLabel('OUT_FOR_DELIVERY')).toBe('Out for Delivery');
     });
 
     it('should return correct status variant', () => {
-      expect(component.getStatusVariant('Delivered')).toBe('success');
-      expect(component.getStatusVariant('Pending')).toBe('warning');
-      expect(component.getStatusVariant('Failed')).toBe('error');
-      expect(component.getStatusVariant('InTransit')).toBe('info');
+      expect(component.getStatusVariant('DELIVERED')).toBe('success');
+      expect(component.getStatusVariant('PENDING')).toBe('warning');
+      expect(component.getStatusVariant('FAILED')).toBe('error');
+      expect(component.getStatusVariant('IN_TRANSIT')).toBe('info');
     });
   });
 
@@ -179,7 +179,7 @@ describe('ShipmentDetailComponent', () => {
     }));
 
     it('should return false for Returned status', fakeAsync(() => {
-      const returnedShipment = { ...mockShipment, status: 'Returned' as ShipmentStatus };
+      const returnedShipment = { ...mockShipment, status: 'RETURNED' as ShipmentStatus };
       mockShipmentService.getShipmentById.and.returnValue(of(returnedShipment));
       fixture = TestBed.createComponent(ShipmentDetailComponent);
       component = fixture.componentInstance;
@@ -209,7 +209,7 @@ describe('ShipmentDetailComponent', () => {
       tick();
 
       const statuses = component.getAvailableStatuses();
-      expect(statuses).toContain('Shipped');
+      expect(statuses).toContain('SHIPPED');
     }));
 
     it('should return empty array for terminal status', fakeAsync(() => {
@@ -239,19 +239,19 @@ describe('ShipmentDetailComponent', () => {
       } as MatDialogRef<unknown>;
       mockDialog.open.and.returnValue(mockDialogRef);
 
-      component.openStatusDialog('Shipped');
+      component.openStatusDialog('SHIPPED');
 
       expect(mockDialog.open).toHaveBeenCalled();
       const dialogCall = mockDialog.open.calls.mostRecent();
       expect(dialogCall.args[1]?.data).toEqual({
         shipment: mockShipment,
-        newStatus: 'Shipped',
+        newStatus: 'SHIPPED',
       });
     });
 
     it('should call updateStatus when dialog returns result', fakeAsync(() => {
       const dialogResult: StatusUpdateDialogResult = {
-        status: 'Shipped',
+        status: 'SHIPPED',
         location: 'Chicago, IL',
         notes: 'Package picked up',
       };
@@ -261,10 +261,10 @@ describe('ShipmentDetailComponent', () => {
       } as MatDialogRef<unknown>;
       mockDialog.open.and.returnValue(mockDialogRef);
 
-      const updatedShipment = { ...mockShipment, status: 'Shipped' as ShipmentStatus };
+      const updatedShipment = { ...mockShipment, status: 'SHIPPED' as ShipmentStatus };
       mockShipmentService.updateShipment.and.returnValue(of(updatedShipment));
 
-      component.openStatusDialog('Shipped');
+      component.openStatusDialog('SHIPPED');
       tick();
 
       expect(mockShipmentService.updateShipment).toHaveBeenCalled();
@@ -276,7 +276,7 @@ describe('ShipmentDetailComponent', () => {
       } as MatDialogRef<unknown>;
       mockDialog.open.and.returnValue(mockDialogRef);
 
-      component.openStatusDialog('Shipped');
+      component.openStatusDialog('SHIPPED');
       tick();
 
       expect(mockShipmentService.updateShipment).not.toHaveBeenCalled();
@@ -294,20 +294,20 @@ describe('ShipmentDetailComponent', () => {
 
     it('should update shipment status successfully', fakeAsync(() => {
       const dialogResult: StatusUpdateDialogResult = {
-        status: 'Shipped',
+        status: 'SHIPPED',
         location: 'Chicago, IL',
         notes: 'Package picked up',
       };
 
       const updatedShipment: Shipment = {
         ...mockShipment,
-        status: 'Shipped',
+        status: 'SHIPPED',
         trackingDetails: [
           {
             id: 'td-001',
             timestamp: '2026-01-21T12:00:00Z',
             location: 'Chicago, IL',
-            status: 'Shipped',
+            status: 'SHIPPED',
             notes: 'Package picked up',
           },
         ],
@@ -319,7 +319,7 @@ describe('ShipmentDetailComponent', () => {
 
       expect(mockShipmentService.updateShipment).toHaveBeenCalledWith({
         id: mockShipment.id,
-        status: 'Shipped',
+        status: 'SHIPPED',
         statusLocation: 'Chicago, IL',
         statusNotes: 'Package picked up',
         modifiedBy: 'current-user@astro.com',
@@ -331,7 +331,7 @@ describe('ShipmentDetailComponent', () => {
 
     it('should handle GraphQL errors', fakeAsync(() => {
       const dialogResult: StatusUpdateDialogResult = {
-        status: 'Shipped',
+        status: 'SHIPPED',
       };
 
       const graphQLError = {
@@ -348,7 +348,7 @@ describe('ShipmentDetailComponent', () => {
 
     it('should handle generic errors', fakeAsync(() => {
       const dialogResult: StatusUpdateDialogResult = {
-        status: 'Shipped',
+        status: 'SHIPPED',
       };
 
       const genericError = new Error('Network error');
@@ -363,10 +363,10 @@ describe('ShipmentDetailComponent', () => {
 
     it('should set updating state while updating', fakeAsync(() => {
       const dialogResult: StatusUpdateDialogResult = {
-        status: 'Shipped',
+        status: 'SHIPPED',
       };
 
-      const updatedShipment = { ...mockShipment, status: 'Shipped' as ShipmentStatus };
+      const updatedShipment = { ...mockShipment, status: 'SHIPPED' as ShipmentStatus };
       // Use delay to make the observable async so we can check the updating state
       mockShipmentService.updateShipment.and.returnValue(of(updatedShipment).pipe(delay(100)));
 
@@ -435,7 +435,7 @@ describe('ShipmentDetailComponent', () => {
     }));
 
     it('should return false for Shipped status', fakeAsync(() => {
-      const shippedShipment = { ...mockShipment, status: 'Shipped' as ShipmentStatus };
+      const shippedShipment = { ...mockShipment, status: 'SHIPPED' as ShipmentStatus };
       mockShipmentService.getShipmentById.and.returnValue(of(shippedShipment));
       fixture = TestBed.createComponent(ShipmentDetailComponent);
       component = fixture.componentInstance;

@@ -18,7 +18,7 @@ describe('ShipmentEditDialogComponent', () => {
     orderId: '223e4567-e89b-12d3-a456-426614174001',
     trackingNumber: 'TRACK123456',
     carrier: 'FedEx',
-    status: 'Pending' as ShipmentStatus,
+    status: 'PENDING' as ShipmentStatus,
     originAddress: {
       street: '100 Warehouse Ave',
       city: 'Chicago',

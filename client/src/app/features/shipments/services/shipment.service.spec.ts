@@ -19,7 +19,7 @@ describe('ShipmentService', () => {
     orderId: '223e4567-e89b-12d3-a456-426614174001',
     trackingNumber: 'TRACK123456',
     carrier: 'FedEx',
-    status: 'Pending' as ShipmentStatus,
+    status: 'PENDING' as ShipmentStatus,
     originAddress: {
       street: '100 Warehouse Ave',
       city: 'Chicago',
@@ -142,7 +142,7 @@ describe('ShipmentService', () => {
       service.createShipment(createInput).subscribe({
         next: (shipment) => {
           expect(shipment).toEqual(mockShipment);
-          expect(shipment.status).toBe('Pending');
+          expect(shipment.status).toBe('PENDING');
           expect(service.loading()).toBeFalse();
           done();
         },
@@ -252,13 +252,13 @@ describe('ShipmentService', () => {
 
     const updatedShipmentShipped: Shipment = {
       ...mockShipment,
-      status: 'Shipped' as ShipmentStatus,
+      status: 'SHIPPED' as ShipmentStatus,
       trackingDetails: [
         {
           id: 'td-001',
           timestamp: '2026-01-21T12:00:00Z',
           location: 'Chicago, IL',
-          status: 'Shipped',
+          status: 'SHIPPED',
           notes: 'Package picked up by carrier',
         },
       ],
@@ -268,7 +268,7 @@ describe('ShipmentService', () => {
     it('should set loading to true when updating a shipment', (done) => {
       const updateInput: UpdateShipmentInput = {
         id: shipmentId,
-        status: 'Shipped',
+        status: 'SHIPPED',
         statusLocation: 'Chicago, IL',
         statusNotes: 'Package picked up by carrier',
         modifiedBy: 'admin@astro.com',
@@ -285,7 +285,7 @@ describe('ShipmentService', () => {
     it('should update shipment status successfully', (done) => {
       const updateInput: UpdateShipmentInput = {
         id: shipmentId,
-        status: 'Shipped',
+        status: 'SHIPPED',
         statusLocation: 'Chicago, IL',
         statusNotes: 'Package picked up by carrier',
         modifiedBy: 'admin@astro.com',
@@ -294,7 +294,7 @@ describe('ShipmentService', () => {
       service.updateShipment(updateInput).subscribe({
         next: (shipment) => {
           expect(shipment).toEqual(updatedShipmentShipped);
-          expect(shipment.status).toBe('Shipped');
+          expect(shipment.status).toBe('SHIPPED');
           expect(shipment.trackingDetails.length).toBe(1);
           expect(service.loading()).toBeFalse();
           done();
@@ -350,7 +350,7 @@ describe('ShipmentService', () => {
     it('should handle errors when updating a shipment', (done) => {
       const updateInput: UpdateShipmentInput = {
         id: shipmentId,
-        status: 'Shipped',
+        status: 'SHIPPED',
         modifiedBy: 'admin@astro.com',
       };
 
@@ -373,7 +373,7 @@ describe('ShipmentService', () => {
     it('should throw error when no data is returned', (done) => {
       const updateInput: UpdateShipmentInput = {
         id: shipmentId,
-        status: 'Shipped',
+        status: 'SHIPPED',
         modifiedBy: 'admin@astro.com',
       };
 
@@ -396,7 +396,7 @@ describe('ShipmentService', () => {
     it('should handle invalid status transition errors', (done) => {
       const updateInput: UpdateShipmentInput = {
         id: shipmentId,
-        status: 'Delivered',
+        status: 'DELIVERED',
         modifiedBy: 'admin@astro.com',
       };
 
