@@ -35,12 +35,12 @@
 
         @if (canUpdateStatus()) {
           <button
-            mat-flat-button
+            mat-raised-button
             color="primary"
             [matMenuTriggerFor]="statusMenu"
             [disabled]="updating()"
           >
-            <mat-icon>sync</mat-icon>
+            <mat-icon>edit</mat-icon>
             Update Status
             <mat-icon>arrow_drop_down</mat-icon>
           </button>
