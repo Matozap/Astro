@@ -1,0 +1,68 @@
+.status-change-info {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+
+  .status-transition {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 8px;
+
+    mat-icon {
+      color: #ccc;
+    }
+
+    .status-label {
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 14px;
+
+      &.current {
+        background: #ccc;
+        color: #000;
+      }
+
+      &.new {
+        background: var(--mdc-theme-primary, #3f51b5);
+        color: white;
+      }
+    }
+  }
+
+  .tracking-info {
+    text-align: center;
+    margin: 0;
+    color: #fff;
+    font-size: 0.9em;
+  }
+}
+
+.status-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-dialog-content {
+  min-width: 400px;
+
+  @media (max-width: 500px) {
+    min-width: auto;
+  }
+}
+
+mat-dialog-actions {
+  button {
+    mat-icon {
+      margin-right: 4px;
+    }
+  }
+}

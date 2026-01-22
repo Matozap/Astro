@@ -1,0 +1,56 @@
+<h2 mat-dialog-title>Update Shipment Status</h2>
+
+<mat-dialog-content>
+  <div class="status-change-info">
+    <div class="status-transition">
+      <span class="status-label current">{{ currentStatusLabel }}</span>
+      <mat-icon>arrow_forward</mat-icon>
+      <span class="status-label new">{{ newStatusLabel }}</span>
+    </div>
+    <p class="tracking-info">Tracking: {{ data.shipment.trackingNumber }}</p>
+  </div>
+
+  <form [formGroup]="form" class="status-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Location</mat-label>
+      <input
+        matInput
+        formControlName="location"
+        placeholder="e.g., Chicago, IL"
+        maxlength="200"
+      />
+      <mat-hint>Where is the package now?</mat-hint>
+      @if (form.get('location')?.invalid && form.get('location')?.touched) {
+        <mat-error>{{ getErrorMessage('location') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Notes</mat-label>
+      <textarea
+        matInput
+        formControlName="notes"
+        placeholder="Additional details about this status update..."
+        rows="3"
+        maxlength="500"
+      ></textarea>
+      <mat-hint align="end">{{ form.get('notes')?.value?.length || 0 }}/500</mat-hint>
+      @if (form.get('notes')?.invalid && form.get('notes')?.touched) {
+        <mat-error>{{ getErrorMessage('notes') }}</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="onConfirm()"
+    [disabled]="form.invalid"
+  >
+    <mat-icon>check</mat-icon>
+    Confirm Status Update
+  </button>
+</mat-dialog-actions>

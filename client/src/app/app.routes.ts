@@ -122,6 +122,13 @@ export const routes: Routes = [
               ).then((m) => m.ShipmentsListComponent),
           },
           {
+            path: 'create',
+            loadComponent: () =>
+              import(
+                './features/shipments/components/shipment-create/shipment-create.component'
+              ).then((m) => m.ShipmentCreateComponent),
+          },
+          {
             path: ':id',
             loadComponent: () =>
               import(

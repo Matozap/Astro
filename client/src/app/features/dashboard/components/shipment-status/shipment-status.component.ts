@@ -36,16 +36,16 @@ export class ShipmentStatusComponent implements OnInit {
   totalShipments = signal(0);
 
   private readonly statusConfig: Record<ShipmentStatus, { color: string; icon: string; label: string }> = {
-    'Pending': { color: '#ffb74d', icon: 'schedule', label: 'Pending' },
-    'PickedUp': { color: '#4fc3f7', icon: 'inventory', label: 'Picked Up' },
-    'Shipped': { color: '#4fc3f7', icon: 'inventory', label: 'Shipped' },
-    'InTransit': { color: '#abc7ff', icon: 'local_shipping', label: 'In Transit' },
-    'OutForDelivery': { color: '#ba68c8', icon: 'delivery_dining', label: 'Out for Delivery' },
-    'Delivered': { color: '#81c784', icon: 'check_circle', label: 'Delivered' },
-    'Delayed': { color: '#ffb74d', icon: 'warning', label: 'Delayed' },
-    'Failed': { color: '#e57373', icon: 'error', label: 'Failed' },
-    'FailedDelivery': { color: '#e57373', icon: 'error', label: 'Failed Delivery' },
-    'Returned': { color: '#90a4ae', icon: 'keyboard_return', label: 'Returned' },
+    'PENDING': { color: '#ffb74d', icon: 'schedule', label: 'Pending' },
+    'PICKED_UP': { color: '#4fc3f7', icon: 'inventory', label: 'Picked Up' },
+    'SHIPPED': { color: '#4fc3f7', icon: 'inventory', label: 'Shipped' },
+    'IN_TRANSIT': { color: '#abc7ff', icon: 'local_shipping', label: 'In Transit' },
+    'OUT_FOR_DELIVERY': { color: '#ba68c8', icon: 'delivery_dining', label: 'Out for Delivery' },
+    'DELIVERED': { color: '#81c784', icon: 'check_circle', label: 'Delivered' },
+    'DELAYED': { color: '#ffb74d', icon: 'warning', label: 'Delayed' },
+    'FAILED': { color: '#e57373', icon: 'error', label: 'Failed' },
+    'FAILED_DELIVERY': { color: '#e57373', icon: 'error', label: 'Failed Delivery' },
+    'RETURNED': { color: '#90a4ae', icon: 'keyboard_return', label: 'Returned' },
   };
 
   ngOnInit(): void {

@@ -13,10 +13,32 @@ export const GET_ORDERS = gql`
         orderNumber
         customerName
         customerEmail
+        shippingAddress {
+          street
+          city
+          state
+          postalCode
+          country
+        }
         status
         totalAmount {
           amount
           currency
+        }
+        details {
+          id
+          productId
+          productName
+          productSku
+          quantity
+          unitPrice {
+            amount
+            currency
+          }
+          lineTotal {
+            amount
+            currency
+          }
         }
         itemCount
         createdAt

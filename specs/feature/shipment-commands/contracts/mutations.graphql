@@ -1,0 +1,216 @@
+# Shipment Commands - GraphQL Mutations
+# Feature: Shipment Commands
+# Date: 2026-01-21
+#
+# These mutations are used by the Angular frontend to create and update shipments.
+# The backend mutations already exist in Astro.Api.Shipments.GraphQL.Mutation.
+
+# =============================================================================
+# CREATE SHIPMENT
+# =============================================================================
+
+mutation CreateShipment($command: CreateShipmentCommandInput!) {
+  createShipment(input: { command: $command }) {
+    shipment {
+      id
+      orderId
+      trackingNumber
+      carrier
+      status
+      originAddress {
+        street
+        city
+        state
+        postalCode
+        country
+      }
+      destinationAddress {
+        street
+        city
+        state
+        postalCode
+        country
+      }
+      weight {
+        value
+        unit
+      }
+      dimensions {
+        length
+        width
+        height
+        unit
+      }
+      shippingCost {
+        amount
+        currency
+      }
+      estimatedDeliveryDate
+      items {
+        id
+        productId
+        productName
+        quantity
+      }
+      itemCount
+      createdAt
+      createdBy
+    }
+  }
+}
+
+# CreateShipmentCommandInput type (for reference):
+# {
+#   orderId: UUID!
+#   carrier: String!
+#   trackingNumber: String
+#   originStreet: String!
+#   originCity: String!
+#   originState: String!
+#   originPostalCode: String!
+#   originCountry: String!
+#   destinationStreet: String!
+#   destinationCity: String!
+#   destinationState: String!
+#   destinationPostalCode: String!
+#   destinationCountry: String!
+#   weight: Decimal!
+#   weightUnit: WeightUnit!
+#   length: Decimal!
+#   width: Decimal!
+#   height: Decimal!
+#   dimensionUnit: DimensionUnit!
+#   shippingCost: Decimal!
+#   estimatedDeliveryDate: DateTime
+#   createdBy: String!
+#   items: [CreateShipmentItemDtoInput!]!
+# }
+#
+# CreateShipmentItemDtoInput type:
+# {
+#   orderDetailId: UUID!
+#   productId: UUID!
+#   productName: String!
+#   productSku: String!
+#   quantity: Int!
+# }
+
+# =============================================================================
+# UPDATE SHIPMENT
+# =============================================================================
+
+mutation UpdateShipment($command: UpdateShipmentCommandInput!) {
+  updateShipment(input: { command: $command }) {
+    shipment {
+      id
+      orderId
+      trackingNumber
+      carrier
+      status
+      originAddress {
+        street
+        city
+        state
+        postalCode
+        country
+      }
+      destinationAddress {
+        street
+        city
+        state
+        postalCode
+        country
+      }
+      weight {
+        value
+        unit
+      }
+      dimensions {
+        length
+        width
+        height
+        unit
+      }
+      shippingCost {
+        amount
+        currency
+      }
+      estimatedDeliveryDate
+      actualDeliveryDate
+      trackingDetails {
+        id
+        timestamp
+        location
+        status
+        description
+      }
+      items {
+        id
+        productId
+        productName
+        quantity
+      }
+      itemCount
+      updatedAt
+      modifiedBy
+    }
+  }
+}
+
+# UpdateShipmentCommandInput type (for reference):
+# {
+#   id: UUID!
+#   carrier: String
+#   trackingNumber: String
+#   status: ShipmentStatus
+#   statusLocation: String
+#   statusNotes: String
+#   modifiedBy: String!
+# }
+#
+# ShipmentStatus enum:
+# - PENDING
+# - SHIPPED
+# - IN_TRANSIT
+# - OUT_FOR_DELIVERY
+# - DELIVERED
+# - DELAYED
+# - FAILED_DELIVERY
+# - RETURNED
+
+# =============================================================================
+# ENUMS (Backend Definitions)
+# =============================================================================
+
+# enum WeightUnit {
+#   KILOGRAMS
+#   POUNDS
+# }
+#
+# enum DimensionUnit {
+#   CENTIMETERS
+#   INCHES
+# }
+#
+# enum ShipmentStatus {
+#   PENDING
+#   SHIPPED
+#   IN_TRANSIT
+#   OUT_FOR_DELIVERY
+#   DELIVERED
+#   DELAYED
+#   FAILED_DELIVERY
+#   RETURNED
+# }
+
+# =============================================================================
+# ERROR TYPES
+# =============================================================================
+
+# Possible errors from createShipment:
+# - ValidationException: Invalid input data
+#
+# Possible errors from updateShipment:
+# - ValidationException: Invalid input data
+# - ShipmentNotFoundException: Shipment with given ID not found
+# - InvalidShipmentStatusTransitionException: Invalid status transition attempted

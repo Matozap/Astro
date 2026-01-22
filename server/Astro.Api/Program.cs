@@ -30,6 +30,7 @@ builder.Services.AddInfrastructure();
 builder.Services
     .AddGraphQLServer()
     .ModifyCostOptions(options => options.EnforceCostLimits = !builder.Environment.IsDevelopment())
+    .ModifyPagingOptions(options => options.MaxPageSize = 100)
     // Register root types with utility operations
     .AddQueryType<Query>()
     .AddMutationType<Mutation>()
@@ -52,7 +53,7 @@ builder.Services
     .AddSorting()
     .AddMutationConventions()
     .AddInMemorySubscriptions()
-    .ModifyRequestOptions(opt => opt.IncludeExceptionDetails = builder.Environment.IsDevelopment())
+    .ModifyRequestOptions(options => options.IncludeExceptionDetails = builder.Environment.IsDevelopment())
     .InitializeOnStartup();
 
 // Add CORS for Angular frontend
@@ -60,7 +61,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:4200", "https://localhost:4200", "http://localhost:5000", "https://localhost:5001","http://localhost:5003")
+        policy.WithOrigins("http://localhost:4200", "https://localhost:4200", "http://localhost:5000", "https://localhost:5001")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

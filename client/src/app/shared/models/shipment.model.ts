@@ -1,16 +1,16 @@
 import { Money, Address, Weight, Dimensions, StringFilterInput, DateTimeFilterInput } from './common.model';
 
 export type ShipmentStatus =
-  | 'Pending'
-  | 'PickedUp'
-  | 'Shipped'
-  | 'InTransit'
-  | 'OutForDelivery'
-  | 'Delivered'
-  | 'Delayed'
-  | 'Failed'
-  | 'FailedDelivery'
-  | 'Returned';
+  | 'PENDING'
+  | 'PICKED_UP'
+  | 'SHIPPED'
+  | 'IN_TRANSIT'
+  | 'OUT_FOR_DELIVERY'
+  | 'DELIVERED'
+  | 'DELAYED'
+  | 'FAILED'
+  | 'FAILED_DELIVERY'
+  | 'RETURNED';
 
 export interface Shipment {
   id: string;
@@ -37,9 +37,9 @@ export interface Shipment {
 export interface TrackingDetail {
   id: string;
   timestamp: string;
-  location: string;
+  location: string | null;
   status: string;
-  description: string;
+  notes: string | null;
 }
 
 export interface ShipmentItem {
@@ -69,27 +69,140 @@ export interface ShipmentSortInput {
 
 // Shipment status display helpers
 export const SHIPMENT_STATUS_COLORS: Record<ShipmentStatus, string> = {
-  Pending: 'warning',
-  PickedUp: 'info',
-  Shipped: 'info',
-  InTransit: 'primary',
-  OutForDelivery: 'primary',
-  Delivered: 'success',
-  Delayed: 'warning',
-  Failed: 'error',
-  FailedDelivery: 'error',
-  Returned: 'error',
+  PENDING: 'warning',
+  PICKED_UP: 'info',
+  SHIPPED: 'info',
+  IN_TRANSIT: 'primary',
+  OUT_FOR_DELIVERY: 'primary',
+  DELIVERED: 'success',
+  DELAYED: 'warning',
+  FAILED: 'error',
+  FAILED_DELIVERY: 'error',
+  RETURNED: 'error',
 };
 
 export const SHIPMENT_STATUS_LABELS: Record<ShipmentStatus, string> = {
-  Pending: 'Pending',
-  PickedUp: 'Picked Up',
-  Shipped: 'Shipped',
-  InTransit: 'In Transit',
-  OutForDelivery: 'Out for Delivery',
-  Delivered: 'Delivered',
-  Delayed: 'Delayed',
-  Failed: 'Failed',
-  FailedDelivery: 'Failed Delivery',
-  Returned: 'Returned',
+  PENDING: 'Pending',
+  PICKED_UP: 'Picked Up',
+  SHIPPED: 'Shipped',
+  IN_TRANSIT: 'In Transit',
+  OUT_FOR_DELIVERY: 'Out for Delivery',
+  DELIVERED: 'Delivered',
+  DELAYED: 'Delayed',
+  FAILED: 'Failed',
+  FAILED_DELIVERY: 'Failed Delivery',
+  RETURNED: 'Returned',
 };
+
+// T001: Input types for mutations
+export type WeightUnit = 'KILOGRAMS' | 'POUNDS';
+export type DimensionUnit = 'CENTIMETERS' | 'INCHES';
+
+export interface CreateShipmentInput {
+  orderId: string;
+  carrier: string;
+  trackingNumber?: string;
+  originStreet: string;
+  originCity: string;
+  originState: string;
+  originPostalCode: string;
+  originCountry: string;
+  destinationStreet: string;
+  destinationCity: string;
+  destinationState: string;
+  destinationPostalCode: string;
+  destinationCountry: string;
+  weight: number;
+  weightUnit: WeightUnit;
+  length: number;
+  width: number;
+  height: number;
+  dimensionUnit: DimensionUnit;
+  shippingCost: number;
+  estimatedDeliveryDate?: string;
+  createdBy: string;
+  items: CreateShipmentItemInput[];
+}
+
+export interface CreateShipmentItemInput {
+  orderDetailId: string;
+  productId: string;
+  productName: string;
+  productSku: string;
+  quantity: number;
+}
+
+// T002: Update shipment input type
+export interface UpdateShipmentInput {
+  id: string;
+  carrier?: string;
+  trackingNumber?: string;
+  status?: ShipmentStatus;
+  statusLocation?: string;
+  statusNotes?: string;
+  modifiedBy: string;
+}
+
+// T003: Status transitions for the state machine
+export const SHIPMENT_STATUS_TRANSITIONS: Record<ShipmentStatus, ShipmentStatus[]> = {
+  PENDING: ['SHIPPED'],
+  PICKED_UP: ['SHIPPED', 'IN_TRANSIT'],
+  SHIPPED: ['IN_TRANSIT', 'DELAYED', 'FAILED_DELIVERY'],
+  IN_TRANSIT: ['OUT_FOR_DELIVERY', 'DELAYED', 'FAILED_DELIVERY'],
+  OUT_FOR_DELIVERY: ['DELIVERED', 'FAILED_DELIVERY', 'DELAYED'],
+  DELAYED: ['IN_TRANSIT', 'OUT_FOR_DELIVERY', 'FAILED_DELIVERY'],
+  FAILED: ['RETURNED', 'IN_TRANSIT'],
+  FAILED_DELIVERY: ['RETURNED', 'IN_TRANSIT'],
+  DELIVERED: [],
+  RETURNED: [],
+};
+
+export function isTerminalStatus(status: ShipmentStatus): boolean {
+  return status === 'DELIVERED' || status === 'RETURNED';
+}
+
+export function getAvailableTransitions(currentStatus: ShipmentStatus): ShipmentStatus[] {
+  return SHIPMENT_STATUS_TRANSITIONS[currentStatus] || [];
+}
+
+// T004: Dialog data interfaces
+export interface StatusUpdateDialogData {
+  shipment: Shipment;
+  newStatus: ShipmentStatus;
+}
+
+export interface StatusUpdateDialogResult {
+  status: ShipmentStatus;
+  location?: string;
+  notes?: string;
+}
+
+export interface ShipmentEditDialogData {
+  shipment: Shipment;
+}
+
+export interface ShipmentEditDialogResult {
+  carrier: string;
+  trackingNumber?: string;
+}
+
+// T005: Form option constants
+export const CARRIER_OPTIONS = [
+  { value: 'USPS', label: 'USPS' },
+  { value: 'FedEx', label: 'FedEx' },
+  { value: 'UPS', label: 'UPS' },
+  { value: 'DHL', label: 'DHL' },
+  { value: 'Other', label: 'Other' },
+];
+
+export const WEIGHT_UNIT_OPTIONS: { value: WeightUnit; label: string }[] = [
+  { value: 'POUNDS', label: 'lb' },
+  { value: 'KILOGRAMS', label: 'kg' },
+];
+
+export const DIMENSION_UNIT_OPTIONS: { value: DimensionUnit; label: string }[] = [
+  { value: 'INCHES', label: 'in' },
+  { value: 'CENTIMETERS', label: 'cm' },
+];
+
+export const CURRENCY_OPTIONS = ['USD', 'EUR', 'GBP', 'CAD', 'AUD'];
