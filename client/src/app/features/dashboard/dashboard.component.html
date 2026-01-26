@@ -5,6 +5,14 @@
     <p class="page-subtitle">Welcome back! Here's what's happening with your business.</p>
   </div>
 
+  <!-- Error Message -->
+  @if (error()) {
+    <div class="error-banner">
+      <span class="error-icon">⚠️</span>
+      <span class="error-message">Failed to load dashboard data. Please try refreshing the page.</span>
+    </div>
+  }
+
   <!-- Metric Cards Grid -->
   <div class="metrics-grid">
     @for (card of metricCards(); track card.id) {
@@ -17,7 +25,7 @@
         [loading]="loading()"
       ></app-metric-card>
     }
-    @if (loading() && metricCards().length === 0) {
+    @if (loading() || (metricCards().length === 0 && !error())) {
       @for (i of [1, 2, 3, 4]; track i) {
         <app-metric-card
           title="Loading..."

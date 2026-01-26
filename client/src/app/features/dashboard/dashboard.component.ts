@@ -26,10 +26,15 @@ export class DashboardComponent implements OnInit {
   private readonly dashboardService = inject(DashboardService);
 
   readonly loading = this.dashboardService.loading;
+  readonly error = this.dashboardService.error;
   readonly metricCards = this.dashboardService.metricCards;
 
   ngOnInit(): void {
-    this.dashboardService.loadDashboardMetrics().subscribe();
+    this.dashboardService.loadDashboardMetrics().subscribe({
+      error: () => {
+        // Error is already handled in the service and stored in the error signal
+      },
+    });
   }
 
   asVariant(variant: string): MetricCardVariant {

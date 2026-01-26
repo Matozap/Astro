@@ -90,9 +90,9 @@ export class PaymentCreateComponent implements OnInit {
     // Load orders that can have payments (not cancelled/refunded)
     this.orderService.getOrders({ page: 0, pageSize: 50 }).subscribe({
       next: (result) => {
-        // Filter orders that are eligible for payment (not CANCELLED or REFUNDED)
+        // Filter orders that are eligible for payment (not CANCELLED)
         const eligibleOrders = result.items.filter(
-          (o) => o.status !== 'CANCELLED' && o.status !== 'REFUNDED'
+          (o) => o.status !== 'CANCELLED'
         );
         this.orders$.next(eligibleOrders);
         this.loadingOrders.set(false);

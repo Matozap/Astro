@@ -7,6 +7,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
 import { DashboardService } from '../../services/dashboard.service';
 import { Order, OrderStatus } from '../../../../shared/models/order.model';
+import {
+  ORDER_STATUS_CONFIG,
+  DEFAULT_STATUS_COLOR,
+  DEFAULT_STATUS_ICON,
+} from '../../../../shared/constants';
 
 @Component({
   selector: 'app-recent-orders',
@@ -31,16 +36,6 @@ export class RecentOrdersComponent implements OnInit {
   orders = signal<Partial<Order>[]>([]);
   displayedColumns = ['id', 'customer', 'status', 'total', 'date'];
 
-  private readonly statusConfig: Record<OrderStatus, { color: string; icon: string }> = {
-    'PENDING': { color: '#ffb74d', icon: 'schedule' },
-    'CONFIRMED': { color: '#4fc3f7', icon: 'check_circle' },
-    'PROCESSING': { color: '#abc7ff', icon: 'autorenew' },
-    'SHIPPED': { color: '#ba68c8', icon: 'local_shipping' },
-    'DELIVERED': { color: '#81c784', icon: 'done_all' },
-    'CANCELLED': { color: '#e57373', icon: 'cancel' },
-    'REFUNDED': { color: '#90a4ae', icon: 'replay' },
-  };
-
   ngOnInit(): void {
     this.loadData();
   }
@@ -59,15 +54,14 @@ export class RecentOrdersComponent implements OnInit {
   }
 
   getStatusColor(status: OrderStatus): string {
-    return this.statusConfig[status]?.color || '#90a4ae';
+    return ORDER_STATUS_CONFIG[status]?.color || DEFAULT_STATUS_COLOR;
   }
 
   getStatusIcon(status: OrderStatus): string {
-    return this.statusConfig[status]?.icon || 'help';
+    return ORDER_STATUS_CONFIG[status]?.icon || DEFAULT_STATUS_ICON;
   }
 
   formatStatus(status: OrderStatus): string {
-    // Convert SCREAMING_SNAKE_CASE to Title Case
     return status
       .toLowerCase()
       .replace(/_/g, ' ')

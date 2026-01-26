@@ -7,6 +7,7 @@ import { NgxEchartsDirective, provideEcharts } from 'ngx-echarts';
 import { EChartsOption } from 'echarts';
 import { DashboardService } from '../../services/dashboard.service';
 import { RevenueDataPoint } from '../../../../shared/models/dashboard.model';
+import { CHART_COLORS, TOOLTIP_COLORS } from '../../../../shared/constants';
 
 @Component({
   selector: 'app-revenue-chart',
@@ -29,6 +30,7 @@ export class RevenueChartComponent implements OnInit {
   loading = signal(true);
   chartOption = signal<EChartsOption>({});
   viewMode = signal<'revenue' | 'orders'>('revenue');
+  hasData = signal(false);
 
   ngOnInit(): void {
     this.loadData();
@@ -38,10 +40,12 @@ export class RevenueChartComponent implements OnInit {
     this.loading.set(true);
     this.dashboardService.getRevenueData().subscribe({
       next: (data) => {
+        this.hasData.set(data.length > 0);
         this.updateChart(data);
         this.loading.set(false);
       },
       error: () => {
+        this.hasData.set(false);
         this.loading.set(false);
       },
     });
@@ -56,18 +60,23 @@ export class RevenueChartComponent implements OnInit {
 
   private updateChart(data: RevenueDataPoint[]): void {
     const isRevenue = this.viewMode() === 'revenue';
+    const chartColor = isRevenue ? CHART_COLORS.PRIMARY : CHART_COLORS.SUCCESS;
+    const chartColorLight = isRevenue ? CHART_COLORS.PRIMARY_LIGHT : CHART_COLORS.SUCCESS_LIGHT;
+    const chartColorTransparent = isRevenue
+      ? CHART_COLORS.PRIMARY_TRANSPARENT
+      : CHART_COLORS.SUCCESS_TRANSPARENT;
 
     const option: EChartsOption = {
-      backgroundColor: 'transparent',
+      backgroundColor: CHART_COLORS.BACKGROUND_TRANSPARENT,
       tooltip: {
         trigger: 'axis',
-        backgroundColor: 'rgba(37, 37, 58, 0.95)',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: TOOLTIP_COLORS.BACKGROUND,
+        borderColor: TOOLTIP_COLORS.BORDER,
         textStyle: {
-          color: '#e0e0e0',
+          color: TOOLTIP_COLORS.TEXT,
         },
-        formatter: (params: any) => {
-          const param = params[0];
+        formatter: (params: unknown) => {
+          const param = (params as Array<{ name: string; value: number }>)[0];
           const value = isRevenue
             ? `$${param.value.toLocaleString()}`
             : param.value.toLocaleString();
@@ -87,11 +96,11 @@ export class RevenueChartComponent implements OnInit {
         data: data.map((d) => this.formatMonth(d.date)),
         axisLine: {
           lineStyle: {
-            color: 'rgba(255, 255, 255, 0.1)',
+            color: CHART_COLORS.BORDER_LIGHT,
           },
         },
         axisLabel: {
-          color: 'rgba(255, 255, 255, 0.6)',
+          color: CHART_COLORS.TEXT_SECONDARY,
           fontSize: 11,
         },
         axisTick: {
@@ -104,7 +113,7 @@ export class RevenueChartComponent implements OnInit {
           show: false,
         },
         axisLabel: {
-          color: 'rgba(255, 255, 255, 0.6)',
+          color: CHART_COLORS.TEXT_SECONDARY,
           fontSize: 11,
           formatter: (value: number) => {
             if (isRevenue) {
@@ -115,7 +124,7 @@ export class RevenueChartComponent implements OnInit {
         },
         splitLine: {
           lineStyle: {
-            color: 'rgba(255, 255, 255, 0.05)',
+            color: CHART_COLORS.BORDER_SUBTLE,
           },
         },
       },
@@ -129,11 +138,11 @@ export class RevenueChartComponent implements OnInit {
           data: data.map((d) => (isRevenue ? d.revenue.amount : d.orders)),
           lineStyle: {
             width: 3,
-            color: isRevenue ? '#abc7ff' : '#81c784',
+            color: chartColor,
           },
           itemStyle: {
-            color: isRevenue ? '#abc7ff' : '#81c784',
-            borderColor: '#25253a',
+            color: chartColor,
+            borderColor: CHART_COLORS.BACKGROUND_DARK,
             borderWidth: 2,
           },
           areaStyle: {
@@ -146,11 +155,11 @@ export class RevenueChartComponent implements OnInit {
               colorStops: [
                 {
                   offset: 0,
-                  color: isRevenue ? 'rgba(171, 199, 255, 0.3)' : 'rgba(129, 199, 132, 0.3)',
+                  color: chartColorLight,
                 },
                 {
                   offset: 1,
-                  color: isRevenue ? 'rgba(171, 199, 255, 0.0)' : 'rgba(129, 199, 132, 0.0)',
+                  color: chartColorTransparent,
                 },
               ],
             },
@@ -163,7 +172,7 @@ export class RevenueChartComponent implements OnInit {
   }
 
   private formatMonth(date: string): string {
-    const [year, month] = date.split('-');
+    const [, month] = date.split('-');
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return months[parseInt(month, 10) - 1];
   }

@@ -1,5 +1,5 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { Observable, of, delay, map } from 'rxjs';
+import { Observable, map, catchError, of, forkJoin } from 'rxjs';
 import { Apollo } from 'apollo-angular';
 import {
   DashboardMetrics,
@@ -9,107 +9,77 @@ import {
 } from '../../../shared/models/dashboard.model';
 import { Order, OrderStatus } from '../../../shared/models/order.model';
 import { ShipmentStatus } from '../../../shared/models/shipment.model';
+import {
+  GET_DASHBOARD_METRICS,
+  GET_REVENUE_DATA,
+  GET_ORDER_STATUS_DISTRIBUTION,
+  GET_RECENT_ORDERS,
+  GET_SHIPMENT_STATUS_DISTRIBUTION,
+} from '../graphql/dashboard.queries';
 
-// Mock data for development - will be replaced with GraphQL queries
-const MOCK_METRICS: DashboardMetrics = {
-  totalRevenue: { amount: 284592.5, currency: 'USD' },
-  revenueChange: 12.5,
-  monthlyRevenue: { amount: 45800, currency: 'USD' },
-  revenueGrowth: 8.3,
-  totalOrders: 1284,
-  ordersChange: 8.3,
-  pendingOrders: 45,
-  processingOrders: 52,
-  completedOrders: 1150,
-  cancelledOrders: 37,
-  totalProducts: 456,
-  activeProducts: 420,
-  lowStockProducts: 23,
-  pendingShipments: 42,
-  shipmentsChange: -5.2,
-  totalShipments: 1100,
-  inTransitShipments: 89,
-  deliveredShipments: 950,
-  delayedShipments: 19,
-  totalPayments: 1284,
-  pendingPayments: 12,
-  successfulPayments: 1250,
-  failedPayments: 22,
-};
-
-const MOCK_REVENUE_DATA: RevenueDataPoint[] = [
-  { date: '2024-01', revenue: { amount: 18500, currency: 'USD' }, orders: 98 },
-  { date: '2024-02', revenue: { amount: 22300, currency: 'USD' }, orders: 112 },
-  { date: '2024-03', revenue: { amount: 19800, currency: 'USD' }, orders: 105 },
-  { date: '2024-04', revenue: { amount: 25600, currency: 'USD' }, orders: 134 },
-  { date: '2024-05', revenue: { amount: 28900, currency: 'USD' }, orders: 148 },
-  { date: '2024-06', revenue: { amount: 32400, currency: 'USD' }, orders: 165 },
-  { date: '2024-07', revenue: { amount: 29800, currency: 'USD' }, orders: 152 },
-  { date: '2024-08', revenue: { amount: 35200, currency: 'USD' }, orders: 178 },
-  { date: '2024-09', revenue: { amount: 31500, currency: 'USD' }, orders: 162 },
-  { date: '2024-10', revenue: { amount: 38700, currency: 'USD' }, orders: 195 },
-  { date: '2024-11', revenue: { amount: 42100, currency: 'USD' }, orders: 212 },
-  { date: '2024-12', revenue: { amount: 45800, currency: 'USD' }, orders: 231 },
-];
-
-const MOCK_ORDER_STATUS: OrderStatusDistribution[] = [
-  { status: 'PENDING', count: 45, percentage: 15 },
-  { status: 'CONFIRMED', count: 78, percentage: 26 },
-  { status: 'PROCESSING', count: 52, percentage: 17.3 },
-  { status: 'SHIPPED', count: 89, percentage: 29.7 },
-  { status: 'DELIVERED', count: 36, percentage: 12 },
-];
-
-const MOCK_RECENT_ORDERS: Partial<Order>[] = [
-  {
-    id: 'ORD-001',
-    customerName: 'John Smith',
-    status: 'PENDING',
-    total: { amount: 299.99, currency: 'USD' },
-    createdAt: new Date(Date.now() - 3600000).toISOString(),
-  },
-  {
-    id: 'ORD-002',
-    customerName: 'Sarah Johnson',
-    status: 'PROCESSING',
-    total: { amount: 549.5, currency: 'USD' },
-    createdAt: new Date(Date.now() - 7200000).toISOString(),
-  },
-  {
-    id: 'ORD-003',
-    customerName: 'Mike Wilson',
-    status: 'SHIPPED',
-    total: { amount: 129.0, currency: 'USD' },
-    createdAt: new Date(Date.now() - 14400000).toISOString(),
-  },
-  {
-    id: 'ORD-004',
-    customerName: 'Emily Brown',
-    status: 'CONFIRMED',
-    total: { amount: 899.99, currency: 'USD' },
-    createdAt: new Date(Date.now() - 21600000).toISOString(),
-  },
-  {
-    id: 'ORD-005',
-    customerName: 'David Lee',
-    status: 'DELIVERED',
-    total: { amount: 199.0, currency: 'USD' },
-    createdAt: new Date(Date.now() - 28800000).toISOString(),
-  },
-];
-
-interface ShipmentStatusData {
+export interface ShipmentStatusData {
   status: ShipmentStatus;
   count: number;
 }
 
-const MOCK_SHIPMENT_STATUS: ShipmentStatusData[] = [
-  { status: 'PENDING', count: 12 },
-  { status: 'PICKED_UP', count: 8 },
-  { status: 'IN_TRANSIT', count: 25 },
-  { status: 'OUT_FOR_DELIVERY', count: 15 },
-  { status: 'DELIVERED', count: 156 },
-];
+interface DashboardMetricsResponse {
+  orders: { totalCount: number };
+  pendingOrders: { totalCount: number };
+  processingOrders: { totalCount: number };
+  completedOrders: { totalCount: number };
+  cancelledOrders: { totalCount: number };
+  products: { totalCount: number };
+  activeProducts: { totalCount: number };
+  payments: { totalCount: number };
+  pendingPayments: { totalCount: number };
+  successfulPayments: { totalCount: number };
+  failedPayments: { totalCount: number };
+  shipments: { totalCount: number };
+  pendingShipments: { totalCount: number };
+  inTransitShipments: { totalCount: number };
+  deliveredShipments: { totalCount: number };
+}
+
+interface RevenueDataResponse {
+  orders: {
+    nodes: Array<{
+      id: string;
+      totalAmount: { amount: number; currency: string };
+      createdAt: string;
+    }>;
+    totalCount: number;
+  };
+}
+
+interface OrderStatusDistributionResponse {
+  pendingOrders: { totalCount: number };
+  confirmedOrders: { totalCount: number };
+  processingOrders: { totalCount: number };
+  shippedOrders: { totalCount: number };
+  deliveredOrders: { totalCount: number };
+  cancelledOrders: { totalCount: number };
+}
+
+interface RecentOrdersResponse {
+  orders: {
+    nodes: Array<{
+      id: string;
+      orderNumber: string;
+      customerName: string;
+      status: OrderStatus;
+      totalAmount: { amount: number; currency: string };
+      createdAt: string;
+    }>;
+  };
+}
+
+interface ShipmentStatusDistributionResponse {
+  pendingShipments: { totalCount: number };
+  shippedShipments: { totalCount: number };
+  inTransitShipments: { totalCount: number };
+  outForDeliveryShipments: { totalCount: number };
+  deliveredShipments: { totalCount: number };
+}
 
 @Injectable({
   providedIn: 'root',
@@ -151,7 +121,7 @@ export class DashboardService {
         title: 'Active Products',
         value: m.activeProducts.toLocaleString(),
         icon: 'inventory_2',
-        change: 2.1,
+        change: 0,
         variant: 'info',
       },
       {
@@ -178,30 +148,208 @@ export class DashboardService {
     this._loading.set(true);
     this._error.set(null);
 
-    // Mock implementation
-    return of(MOCK_METRICS).pipe(
-      delay(800),
-      map((metrics) => {
-        this._metrics.set(metrics);
+    return forkJoin({
+      metrics: this.apollo
+        .query<DashboardMetricsResponse>({
+          query: GET_DASHBOARD_METRICS,
+          fetchPolicy: 'network-only',
+        })
+        .pipe(map((result) => result.data)),
+      revenue: this.apollo
+        .query<RevenueDataResponse>({
+          query: GET_REVENUE_DATA,
+          fetchPolicy: 'network-only',
+        })
+        .pipe(map((result) => result.data)),
+    }).pipe(
+      map(({ metrics, revenue }) => {
+        const totalRevenue = this.calculateTotalRevenue(revenue?.orders.nodes ?? []);
+        const dashboardMetrics = this.mapToDashboardMetrics(metrics!, totalRevenue);
+        this._metrics.set(dashboardMetrics);
         this._loading.set(false);
-        return metrics;
+        return dashboardMetrics;
+      }),
+      catchError((error) => {
+        this._error.set(error.message || 'Failed to load dashboard metrics');
+        this._loading.set(false);
+        throw error;
       })
     );
   }
 
+  private calculateTotalRevenue(
+    orders: Array<{ totalAmount: { amount: number; currency: string } }>
+  ): number {
+    return orders.reduce((sum, order) => sum + order.totalAmount.amount, 0);
+  }
+
+  private mapToDashboardMetrics(
+    response: DashboardMetricsResponse,
+    totalRevenue: number
+  ): DashboardMetrics {
+    const delayedShipments =
+      response.shipments.totalCount -
+      response.pendingShipments.totalCount -
+      response.inTransitShipments.totalCount -
+      response.deliveredShipments.totalCount;
+
+    return {
+      totalRevenue: { amount: totalRevenue, currency: 'USD' },
+      revenueChange: 0, // Would need historical data to calculate
+      monthlyRevenue: { amount: totalRevenue / 12, currency: 'USD' }, // Simplified
+      revenueGrowth: 0, // Would need historical data to calculate
+
+      totalOrders: response.orders.totalCount,
+      ordersChange: 0, // Would need historical data to calculate
+      pendingOrders: response.pendingOrders.totalCount,
+      processingOrders: response.processingOrders.totalCount,
+      completedOrders: response.completedOrders.totalCount,
+      cancelledOrders: response.cancelledOrders.totalCount,
+
+      totalProducts: response.products.totalCount,
+      activeProducts: response.activeProducts.totalCount,
+      lowStockProducts: 0, // Would need to add this query
+
+      totalPayments: response.payments.totalCount,
+      pendingPayments: response.pendingPayments.totalCount,
+      successfulPayments: response.successfulPayments.totalCount,
+      failedPayments: response.failedPayments.totalCount,
+
+      totalShipments: response.shipments.totalCount,
+      pendingShipments: response.pendingShipments.totalCount,
+      shipmentsChange: 0, // Would need historical data to calculate
+      inTransitShipments: response.inTransitShipments.totalCount,
+      deliveredShipments: response.deliveredShipments.totalCount,
+      delayedShipments: Math.max(0, delayedShipments),
+    };
+  }
+
   getRevenueData(): Observable<RevenueDataPoint[]> {
-    return of(MOCK_REVENUE_DATA).pipe(delay(600));
+    return this.apollo
+      .query<RevenueDataResponse>({
+        query: GET_REVENUE_DATA,
+        fetchPolicy: 'network-only',
+      })
+      .pipe(
+        map((result) => this.aggregateRevenueByMonth(result.data?.orders.nodes ?? [])),
+        catchError(() => of([]))
+      );
+  }
+
+  private aggregateRevenueByMonth(
+    orders: Array<{
+      id: string;
+      totalAmount: { amount: number; currency: string };
+      createdAt: string;
+    }>
+  ): RevenueDataPoint[] {
+    const monthlyData = new Map<string, { revenue: number; orders: number; currency: string }>();
+
+    for (const order of orders) {
+      const date = new Date(order.createdAt);
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+      const existing = monthlyData.get(monthKey) || {
+        revenue: 0,
+        orders: 0,
+        currency: order.totalAmount.currency,
+      };
+      existing.revenue += order.totalAmount.amount;
+      existing.orders += 1;
+      monthlyData.set(monthKey, existing);
+    }
+
+    // Sort by date and return last 12 months
+    return Array.from(monthlyData.entries())
+      .sort(([a], [b]) => a.localeCompare(b))
+      .slice(-12)
+      .map(([date, data]) => ({
+        date,
+        revenue: { amount: data.revenue, currency: data.currency },
+        orders: data.orders,
+      }));
   }
 
   getOrderStatusDistribution(): Observable<OrderStatusDistribution[]> {
-    return of(MOCK_ORDER_STATUS).pipe(delay(500));
+    return this.apollo
+      .query<OrderStatusDistributionResponse>({
+        query: GET_ORDER_STATUS_DISTRIBUTION,
+        fetchPolicy: 'network-only',
+      })
+      .pipe(
+        map((result) => this.mapToOrderStatusDistribution(result.data!)),
+        catchError(() => of([]))
+      );
+  }
+
+  private mapToOrderStatusDistribution(
+    response: OrderStatusDistributionResponse
+  ): OrderStatusDistribution[] {
+    const statusCounts: Array<{ status: OrderStatus; count: number }> = [
+      { status: 'PENDING', count: response.pendingOrders.totalCount },
+      { status: 'CONFIRMED', count: response.confirmedOrders.totalCount },
+      { status: 'PROCESSING', count: response.processingOrders.totalCount },
+      { status: 'SHIPPED', count: response.shippedOrders.totalCount },
+      { status: 'DELIVERED', count: response.deliveredOrders.totalCount },
+      { status: 'CANCELLED', count: response.cancelledOrders.totalCount },
+    ];
+
+    // Filter out statuses with zero count
+    const nonZeroStatuses = statusCounts.filter((s) => s.count > 0);
+    const total = nonZeroStatuses.reduce((sum, s) => sum + s.count, 0);
+
+    return nonZeroStatuses.map((s) => ({
+      status: s.status,
+      count: s.count,
+      percentage: total > 0 ? Math.round((s.count / total) * 1000) / 10 : 0,
+    }));
   }
 
   getRecentOrders(): Observable<Partial<Order>[]> {
-    return of(MOCK_RECENT_ORDERS).pipe(delay(700));
+    return this.apollo
+      .query<RecentOrdersResponse>({
+        query: GET_RECENT_ORDERS,
+        fetchPolicy: 'network-only',
+      })
+      .pipe(
+        map((result) =>
+          (result.data?.orders.nodes ?? []).map((order) => ({
+            id: order.id,
+            orderNumber: order.orderNumber,
+            customerName: order.customerName,
+            status: order.status,
+            total: order.totalAmount,
+            createdAt: order.createdAt,
+          }))
+        ),
+        catchError(() => of([]))
+      );
   }
 
   getShipmentStatusData(): Observable<ShipmentStatusData[]> {
-    return of(MOCK_SHIPMENT_STATUS).pipe(delay(550));
+    return this.apollo
+      .query<ShipmentStatusDistributionResponse>({
+        query: GET_SHIPMENT_STATUS_DISTRIBUTION,
+        fetchPolicy: 'network-only',
+      })
+      .pipe(
+        map((result) => this.mapToShipmentStatusData(result.data!)),
+        catchError(() => of([]))
+      );
+  }
+
+  private mapToShipmentStatusData(
+    response: ShipmentStatusDistributionResponse
+  ): ShipmentStatusData[] {
+    const statusData: ShipmentStatusData[] = [
+      { status: 'PENDING', count: response.pendingShipments.totalCount },
+      { status: 'SHIPPED', count: response.shippedShipments.totalCount },
+      { status: 'IN_TRANSIT', count: response.inTransitShipments.totalCount },
+      { status: 'OUT_FOR_DELIVERY', count: response.outForDeliveryShipments.totalCount },
+      { status: 'DELIVERED', count: response.deliveredShipments.totalCount },
+    ];
+
+    // Filter out statuses with zero count
+    return statusData.filter((s) => s.count > 0);
   }
 }

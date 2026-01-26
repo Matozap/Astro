@@ -6,8 +6,7 @@ export type OrderStatus =
   | 'PROCESSING'
   | 'SHIPPED'
   | 'DELIVERED'
-  | 'CANCELLED'
-  | 'REFUNDED';
+  | 'CANCELLED';
 
 export interface Order {
   id: string;
@@ -76,7 +75,6 @@ export const ORDER_STATUS_COLORS: Record<OrderStatus, string> = {
   SHIPPED: 'primary',
   DELIVERED: 'success',
   CANCELLED: 'error',
-  REFUNDED: 'secondary',
 };
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
@@ -86,5 +84,4 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   SHIPPED: 'Shipped',
   DELIVERED: 'Delivered',
   CANCELLED: 'Cancelled',
-  REFUNDED: 'Refunded',
 };

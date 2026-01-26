@@ -20,12 +20,18 @@
       <div class="chart-skeleton">
         <div class="skeleton-line"></div>
       </div>
-    } @else {
+    } @else if (hasData()) {
       <div
         echarts
         [options]="chartOption()"
         class="chart-container"
       ></div>
+    } @else {
+      <div class="empty-state">
+        <mat-icon class="empty-icon">show_chart</mat-icon>
+        <p class="empty-text">No revenue data available yet</p>
+        <p class="empty-subtext">Revenue will appear here once orders are placed</p>
+      </div>
     }
   </mat-card-content>
 </mat-card>

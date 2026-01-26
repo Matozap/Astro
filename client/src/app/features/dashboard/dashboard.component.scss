@@ -22,6 +22,27 @@
   margin: 0;
 }
 
+// Error Banner
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background-color: rgba(229, 115, 115, 0.1);
+  border: 1px solid rgba(229, 115, 115, 0.3);
+  border-radius: var(--radius-lg);
+  color: var(--error-color, #e57373);
+
+  .error-icon {
+    font-size: 20px;
+  }
+
+  .error-message {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
 // Metrics Grid - 4 columns on desktop
 .metrics-grid {
   display: grid;

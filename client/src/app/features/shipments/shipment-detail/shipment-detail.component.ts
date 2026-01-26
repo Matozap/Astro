@@ -90,11 +90,9 @@ export class ShipmentDetailComponent implements OnInit {
       case 'PENDING':
       case 'DELAYED':
         return 'warning';
-      case 'FAILED':
       case 'FAILED_DELIVERY':
       case 'RETURNED':
         return 'error';
-      case 'PICKED_UP':
       case 'SHIPPED':
       case 'IN_TRANSIT':
       case 'OUT_FOR_DELIVERY':

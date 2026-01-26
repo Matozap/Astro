@@ -534,15 +534,10 @@ describe('PaymentCreateComponent', () => {
         id: 'cancelled-order',
         status: 'CANCELLED',
       };
-      const refundedOrder: Order = {
-        ...mockOrder,
-        id: 'refunded-order',
-        status: 'REFUNDED',
-      };
 
       const mixedOrdersResult: PaginatedResult<Order> = {
-        items: [mockOrder, cancelledOrder, refundedOrder],
-        totalCount: 3,
+        items: [mockOrder, cancelledOrder],
+        totalCount: 2,
         page: 0,
         pageSize: 50,
         totalPages: 1,

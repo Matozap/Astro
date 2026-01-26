@@ -62,13 +62,11 @@ export class ShipmentsListComponent implements OnInit, AfterViewInit {
 
   shipmentStatuses: ShipmentStatus[] = [
     'PENDING',
-    'PICKED_UP',
     'SHIPPED',
     'IN_TRANSIT',
     'OUT_FOR_DELIVERY',
     'DELIVERED',
     'DELAYED',
-    'FAILED',
     'FAILED_DELIVERY',
     'RETURNED',
   ];
@@ -180,11 +178,9 @@ export class ShipmentsListComponent implements OnInit, AfterViewInit {
       case 'PENDING':
       case 'DELAYED':
         return 'warning';
-      case 'FAILED':
       case 'FAILED_DELIVERY':
       case 'RETURNED':
         return 'error';
-      case 'PICKED_UP':
       case 'SHIPPED':
       case 'IN_TRANSIT':
       case 'OUT_FOR_DELIVERY':
