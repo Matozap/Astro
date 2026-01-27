@@ -230,7 +230,6 @@ describe('ShipmentsListComponent', () => {
       expect(component.getStatusVariant('DELIVERED')).toBe('success');
       expect(component.getStatusVariant('PENDING')).toBe('warning');
       expect(component.getStatusVariant('DELAYED')).toBe('warning');
-      expect(component.getStatusVariant('FAILED')).toBe('error');
       expect(component.getStatusVariant('FAILED_DELIVERY')).toBe('error');
       expect(component.getStatusVariant('RETURNED')).toBe('error');
       expect(component.getStatusVariant('SHIPPED')).toBe('info');

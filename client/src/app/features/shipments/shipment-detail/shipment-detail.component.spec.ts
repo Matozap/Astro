@@ -152,7 +152,7 @@ describe('ShipmentDetailComponent', () => {
     it('should return correct status variant', () => {
       expect(component.getStatusVariant('DELIVERED')).toBe('success');
       expect(component.getStatusVariant('PENDING')).toBe('warning');
-      expect(component.getStatusVariant('FAILED')).toBe('error');
+      expect(component.getStatusVariant('FAILED_DELIVERY')).toBe('error');
       expect(component.getStatusVariant('IN_TRANSIT')).toBe('info');
     });
   });

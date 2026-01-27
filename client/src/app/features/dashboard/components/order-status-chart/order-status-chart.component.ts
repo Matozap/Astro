@@ -7,6 +7,12 @@ import { EChartsOption } from 'echarts';
 import { DashboardService } from '../../services/dashboard.service';
 import { OrderStatusDistribution } from '../../../../shared/models/dashboard.model';
 import { OrderStatus } from '../../../../shared/models/order.model';
+import {
+  CHART_COLORS,
+  TOOLTIP_COLORS,
+  ORDER_STATUS_COLORS,
+  DEFAULT_STATUS_COLOR,
+} from '../../../../shared/constants';
 
 @Component({
   selector: 'app-order-status-chart',
@@ -29,16 +35,6 @@ export class OrderStatusChartComponent implements OnInit {
   chartOption = signal<EChartsOption>({});
   statusData = signal<OrderStatusDistribution[]>([]);
 
-  private readonly statusColors: Record<OrderStatus, string> = {
-    'PENDING': '#ffb74d',
-    'CONFIRMED': '#4fc3f7',
-    'PROCESSING': '#abc7ff',
-    'SHIPPED': '#ba68c8',
-    'DELIVERED': '#81c784',
-    'CANCELLED': '#e57373',
-    'REFUNDED': '#90a4ae',
-  };
-
   ngOnInit(): void {
     this.loadData();
   }
@@ -59,18 +55,19 @@ export class OrderStatusChartComponent implements OnInit {
 
   private updateChart(data: OrderStatusDistribution[]): void {
     const option: EChartsOption = {
-      backgroundColor: 'transparent',
+      backgroundColor: CHART_COLORS.BACKGROUND_TRANSPARENT,
       tooltip: {
         trigger: 'item',
-        backgroundColor: 'rgba(37, 37, 58, 0.95)',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: TOOLTIP_COLORS.BACKGROUND,
+        borderColor: TOOLTIP_COLORS.BORDER,
         textStyle: {
-          color: '#e0e0e0',
+          color: TOOLTIP_COLORS.TEXT,
         },
-        formatter: (params: any) => {
-          return `<strong>${params.name}</strong><br/>
-                  Orders: ${params.value}<br/>
-                  Percentage: ${params.percent}%`;
+        formatter: (params: unknown) => {
+          const p = params as { name: string; value: number; percent: number };
+          return `<strong>${p.name}</strong><br/>
+                  Orders: ${p.value}<br/>
+                  Percentage: ${p.percent}%`;
         },
       },
       legend: {
@@ -85,7 +82,7 @@ export class OrderStatusChartComponent implements OnInit {
           avoidLabelOverlap: false,
           itemStyle: {
             borderRadius: 4,
-            borderColor: '#25253a',
+            borderColor: CHART_COLORS.BACKGROUND_DARK,
             borderWidth: 2,
           },
           label: {
@@ -96,7 +93,7 @@ export class OrderStatusChartComponent implements OnInit {
               show: true,
               fontSize: 14,
               fontWeight: 'bold',
-              color: '#e0e0e0',
+              color: CHART_COLORS.TEXT_PRIMARY,
             },
             itemStyle: {
               shadowBlur: 10,
@@ -111,7 +108,7 @@ export class OrderStatusChartComponent implements OnInit {
             value: d.count,
             name: this.formatStatus(d.status),
             itemStyle: {
-              color: this.statusColors[d.status] || '#90a4ae',
+              color: ORDER_STATUS_COLORS[d.status] || DEFAULT_STATUS_COLOR,
             },
           })),
         },
@@ -122,7 +119,6 @@ export class OrderStatusChartComponent implements OnInit {
   }
 
   formatStatus(status: OrderStatus): string {
-    // Convert SCREAMING_SNAKE_CASE to Title Case
     return status
       .toLowerCase()
       .replace(/_/g, ' ')
@@ -130,6 +126,6 @@ export class OrderStatusChartComponent implements OnInit {
   }
 
   getStatusColor(status: OrderStatus): string {
-    return this.statusColors[status] || '#90a4ae';
+    return ORDER_STATUS_COLORS[status] || DEFAULT_STATUS_COLOR;
   }
 }

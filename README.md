@@ -5,7 +5,8 @@
 
 ## What It this useless project
 
-A modular monolith built on .NET 10 and C# 14, exposing a GraphQL API for managing products and orders. Orchestrated through .NET Aspire.
+- A fully functional and completely wired commerce backoffice: frontend → backend → database
+- A modular monolith built on .NET 10 and C# 14, exposing a performant GraphQL API. Orchestrated through .NET Aspire.
 
 ```
 server/
@@ -26,9 +27,8 @@ client/                   # Angular 19 frontend
 
 Clean Architecture is often described as a set of concentric circles. But circles imply closure—completeness. Software is never complete. It is, at best, *momentarily coherent*.
 
-The domain layer knows nothing of databases or HTTP. It speaks only of `Products`, `Orders`, `Money`, and `Sku`—concepts that would exist even if computers didn't. The infrastructure layer handles the messy business of making ideas persist beyond the death of a process.
-
-Between them sits the application layer, translating intention into action through commands and queries. 
+The domain layer knows nothing of databases or HTTP. It speaks only of `Products`, `Orders`, `Money`, and `Sku` concepts that would exist even if computers didn't. The infrastructure layer handles the messy business of making ideas persist beyond the death of a process.
+ Between them sits the application layer, translating intention into action through commands and queries. 
 ---
 
 ## On Value Objects
@@ -60,7 +60,7 @@ These transitions are not arbitrary. They reflect real-world constraints—you c
 dotnet run --project Astro.AppHost
 ```
 
-The database creates itself. Seed data appears: 10 products with descriptions and images, 10 orders in various states of completion. The GraphQL playground awaits at `/graphql`.
+The database creates itself. Seed data appears: 10 products with descriptions and images, 10 orders in various states of completion, payments and shipments. The GraphQL playground awaits at `/graphql`.
 
 ---
 

@@ -67,7 +67,6 @@ export class OrdersListComponent implements OnInit, AfterViewInit {
     'SHIPPED',
     'DELIVERED',
     'CANCELLED',
-    'REFUNDED',
   ];
 
   private searchSubject = new Subject<string>();
@@ -157,7 +156,6 @@ export class OrdersListComponent implements OnInit, AfterViewInit {
       case 'PENDING':
         return 'warning';
       case 'CANCELLED':
-      case 'REFUNDED':
         return 'error';
       case 'CONFIRMED':
       case 'SHIPPED':

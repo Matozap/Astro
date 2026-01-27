@@ -85,7 +85,6 @@ export class OrderDetailComponent implements OnInit {
       case 'PENDING':
         return 'warning';
       case 'CANCELLED':
-      case 'REFUNDED':
         return 'error';
       case 'CONFIRMED':
       case 'SHIPPED':
@@ -99,7 +98,7 @@ export class OrderDetailComponent implements OnInit {
   canUpdateStatus(): boolean {
     const order = this.order();
     if (!order) return false;
-    return !['DELIVERED', 'CANCELLED', 'REFUNDED'].includes(order.status);
+    return !['DELIVERED', 'CANCELLED'].includes(order.status);
   }
 
   getAvailableStatuses(): OrderStatus[] {
@@ -114,7 +113,6 @@ export class OrderDetailComponent implements OnInit {
       'SHIPPED': ['DELIVERED'],
       'DELIVERED': [],
       'CANCELLED': [],
-      'REFUNDED': [],
     };
 
     const availableStatuses = statusTransitions[order.status] || [];

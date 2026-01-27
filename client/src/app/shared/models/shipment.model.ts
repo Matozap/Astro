@@ -2,13 +2,11 @@ import { Money, Address, Weight, Dimensions, StringFilterInput, DateTimeFilterIn
 
 export type ShipmentStatus =
   | 'PENDING'
-  | 'PICKED_UP'
   | 'SHIPPED'
   | 'IN_TRANSIT'
   | 'OUT_FOR_DELIVERY'
   | 'DELIVERED'
   | 'DELAYED'
-  | 'FAILED'
   | 'FAILED_DELIVERY'
   | 'RETURNED';
 
@@ -70,26 +68,22 @@ export interface ShipmentSortInput {
 // Shipment status display helpers
 export const SHIPMENT_STATUS_COLORS: Record<ShipmentStatus, string> = {
   PENDING: 'warning',
-  PICKED_UP: 'info',
   SHIPPED: 'info',
   IN_TRANSIT: 'primary',
   OUT_FOR_DELIVERY: 'primary',
   DELIVERED: 'success',
   DELAYED: 'warning',
-  FAILED: 'error',
   FAILED_DELIVERY: 'error',
   RETURNED: 'error',
 };
 
 export const SHIPMENT_STATUS_LABELS: Record<ShipmentStatus, string> = {
   PENDING: 'Pending',
-  PICKED_UP: 'Picked Up',
   SHIPPED: 'Shipped',
   IN_TRANSIT: 'In Transit',
   OUT_FOR_DELIVERY: 'Out for Delivery',
   DELIVERED: 'Delivered',
   DELAYED: 'Delayed',
-  FAILED: 'Failed',
   FAILED_DELIVERY: 'Failed Delivery',
   RETURNED: 'Returned',
 };
@@ -146,12 +140,10 @@ export interface UpdateShipmentInput {
 // T003: Status transitions for the state machine
 export const SHIPMENT_STATUS_TRANSITIONS: Record<ShipmentStatus, ShipmentStatus[]> = {
   PENDING: ['SHIPPED'],
-  PICKED_UP: ['SHIPPED', 'IN_TRANSIT'],
   SHIPPED: ['IN_TRANSIT', 'DELAYED', 'FAILED_DELIVERY'],
   IN_TRANSIT: ['OUT_FOR_DELIVERY', 'DELAYED', 'FAILED_DELIVERY'],
   OUT_FOR_DELIVERY: ['DELIVERED', 'FAILED_DELIVERY', 'DELAYED'],
   DELAYED: ['IN_TRANSIT', 'OUT_FOR_DELIVERY', 'FAILED_DELIVERY'],
-  FAILED: ['RETURNED', 'IN_TRANSIT'],
   FAILED_DELIVERY: ['RETURNED', 'IN_TRANSIT'],
   DELIVERED: [],
   RETURNED: [],
