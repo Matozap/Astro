@@ -2,7 +2,7 @@ using Astro.Domain.Shipments.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Astro.Infrastructure.Shipments.Persistence.Configuration;
+namespace Astro.Infrastructure.DataAccess.Shipments.Persistence.Configuration;
 
 /// <summary>
 /// EF Core configuration for ShipmentItem child entity.

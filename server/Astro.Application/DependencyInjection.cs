@@ -3,7 +3,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Astro.Application.Common;
+namespace Astro.Application;
 
 /// <summary>
 /// Extension methods for registering Application layer services.

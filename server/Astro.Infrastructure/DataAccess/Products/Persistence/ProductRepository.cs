@@ -1,9 +1,9 @@
 using Astro.Domain.Products.Abstractions;
 using Astro.Domain.Products.Entities;
-using Astro.Infrastructure.Common;
+using Astro.Infrastructure.DataAccess.Common;
 using Microsoft.EntityFrameworkCore;
 
-namespace Astro.Infrastructure.Products.Persistence;
+namespace Astro.Infrastructure.DataAccess.Products.Persistence;
 
 /// <summary>
 /// EF Core implementation of the Product repository.

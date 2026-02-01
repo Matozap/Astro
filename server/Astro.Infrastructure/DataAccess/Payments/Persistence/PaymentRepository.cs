@@ -1,9 +1,9 @@
 using Astro.Domain.Payments.Abstractions;
 using Astro.Domain.Payments.Entities;
-using Astro.Infrastructure.Common;
+using Astro.Infrastructure.DataAccess.Common;
 using Microsoft.EntityFrameworkCore;
 
-namespace Astro.Infrastructure.Payments.Persistence;
+namespace Astro.Infrastructure.DataAccess.Payments.Persistence;
 
 /// <summary>
 /// EF Core implementation of the Payment repository

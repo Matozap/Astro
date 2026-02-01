@@ -3,7 +3,7 @@ using Astro.Domain.Orders.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Astro.Infrastructure.Orders.Persistence;
+namespace Astro.Infrastructure.DataAccess.Orders.Persistence;
 
 /// <summary>
 /// EF Core configuration for the Order aggregate root.

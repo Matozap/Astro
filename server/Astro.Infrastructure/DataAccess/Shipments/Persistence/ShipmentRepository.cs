@@ -1,9 +1,9 @@
 using Astro.Domain.Shipments.Abstractions;
 using Astro.Domain.Shipments.Entities;
-using Astro.Infrastructure.Common;
+using Astro.Infrastructure.DataAccess.Common;
 using Microsoft.EntityFrameworkCore;
 
-namespace Astro.Infrastructure.Shipments.Persistence;
+namespace Astro.Infrastructure.DataAccess.Shipments.Persistence;
 
 /// <summary>
 /// EF Core implementation of the Shipment repository.

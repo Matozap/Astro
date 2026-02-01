@@ -1,9 +1,9 @@
 using Astro.Domain.Orders.Abstractions;
 using Astro.Domain.Orders.Entities;
-using Astro.Infrastructure.Common;
+using Astro.Infrastructure.DataAccess.Common;
 using Microsoft.EntityFrameworkCore;
 
-namespace Astro.Infrastructure.Orders.Persistence;
+namespace Astro.Infrastructure.DataAccess.Orders.Persistence;
 
 /// <summary>
 /// EF Core implementation of the Order repository.

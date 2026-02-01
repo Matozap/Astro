@@ -2,6 +2,7 @@ import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { DOCUMENT } from '@angular/common';
 
 import { routes } from './app.routes';
 import { provideGraphQL } from './core/graphql/graphql.provider';
@@ -12,6 +13,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimationsAsync(),
+    { provide: DOCUMENT, useValue: document },
     ...provideGraphQL(),
   ],
 };
