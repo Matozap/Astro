@@ -2,7 +2,7 @@ using Astro.Domain.Payments.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Astro.Infrastructure.Payments.Persistence;
+namespace Astro.Infrastructure.DataAccess.Payments.Persistence;
 
 /// <summary>
 /// EF Core configuration for the Payment aggregate root

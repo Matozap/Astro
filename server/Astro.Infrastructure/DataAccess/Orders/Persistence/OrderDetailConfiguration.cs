@@ -2,7 +2,7 @@ using Astro.Domain.Orders.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Astro.Infrastructure.Orders.Persistence;
+namespace Astro.Infrastructure.DataAccess.Orders.Persistence;
 
 /// <summary>
 /// EF Core configuration for OrderDetail child entity.

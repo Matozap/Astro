@@ -3,7 +3,7 @@ using Astro.Domain.Products.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Astro.Infrastructure.Products.Persistence;
+namespace Astro.Infrastructure.DataAccess.Products.Persistence;
 
 /// <summary>
 /// EF Core configuration for the Product aggregate root.

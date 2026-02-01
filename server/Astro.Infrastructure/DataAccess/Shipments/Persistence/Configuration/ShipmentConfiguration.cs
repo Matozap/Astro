@@ -3,7 +3,7 @@ using Astro.Domain.Shipments.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Astro.Infrastructure.Shipments.Persistence.Configuration;
+namespace Astro.Infrastructure.DataAccess.Shipments.Persistence.Configuration;
 
 /// <summary>
 /// EF Core configuration for the Shipment aggregate root.

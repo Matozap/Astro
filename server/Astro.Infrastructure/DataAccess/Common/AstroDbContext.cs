@@ -4,7 +4,7 @@ using Astro.Domain.Products.Entities;
 using Astro.Domain.Shipments.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Astro.Infrastructure.Common;
+namespace Astro.Infrastructure.DataAccess.Common;
 
 /// <summary>
 /// Unified DbContext for all domain modules in the modular monolith.

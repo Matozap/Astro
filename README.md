@@ -3,7 +3,7 @@
 ---
 
 
-## What It this useless project
+## What Is this application
 
 - A fully functional and completely wired commerce backoffice: frontend → backend → database
 - A modular monolith built on .NET 10 and C# 14, exposing a performant GraphQL API. Orchestrated through .NET Aspire.
@@ -26,8 +26,7 @@ client/                   # Angular 19 frontend
 ## The Architecture
 
 Clean Architecture is often described as a set of concentric circles. But circles imply closure—completeness. Software is never complete. It is, at best, *momentarily coherent*.
-
-The domain layer knows nothing of databases or HTTP. It speaks only of `Products`, `Orders`, `Money`, and `Sku` concepts that would exist even if computers didn't. The infrastructure layer handles the messy business of making ideas persist beyond the death of a process.
+ The domain layer knows nothing of databases or HTTP. It speaks only of `Products`, `Orders`, `Money`, and `Sku` concepts that would exist even if computers didn't. The infrastructure layer handles the messy business of making ideas persist beyond the death of a process.
  Between them sits the application layer, translating intention into action through commands and queries. 
 ---
 

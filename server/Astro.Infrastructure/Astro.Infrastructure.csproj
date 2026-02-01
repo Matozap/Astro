@@ -21,4 +21,8 @@
     <ProjectReference Include="..\Astro.Application\Astro.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DataAccess\" />
+  </ItemGroup>
+
 </Project>

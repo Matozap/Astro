@@ -2,7 +2,7 @@ using Astro.Domain.Products.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Astro.Infrastructure.Products.Persistence;
+namespace Astro.Infrastructure.DataAccess.Products.Persistence;
 
 /// <summary>
 /// EF Core configuration for ProductDetail child entity.

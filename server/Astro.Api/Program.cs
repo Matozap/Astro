@@ -4,10 +4,11 @@ using Astro.Api.Orders.GraphQL;
 using Astro.Api.Payments.GraphQL;
 using Astro.Api.Products.GraphQL;
 using Astro.Api.Shipments.GraphQL;
+using Astro.Application;
 using Astro.Application.Common;
-using Astro.Infrastructure.Common;
+using Astro.Infrastructure;
 using Astro.ServiceDefaults;
-using static Astro.Infrastructure.Common.DatabaseSeeder;
+using static Astro.Infrastructure.DataAccess.Common.DatabaseSeeder;
 
 var builder = WebApplication.CreateBuilder(args);
 

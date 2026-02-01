@@ -1,6 +1,6 @@
 using Astro.Application.Common;
 
-namespace Astro.Infrastructure.Common;
+namespace Astro.Infrastructure.DataAccess.Common;
 
 /// <summary>
 /// Implementation of Unit of Work pattern using EF Core.

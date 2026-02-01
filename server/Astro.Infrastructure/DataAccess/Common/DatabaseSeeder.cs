@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Astro.Infrastructure.Common;
+namespace Astro.Infrastructure.DataAccess.Common;
 
 /// <summary>
 /// Database seeder for initial product and order data.
