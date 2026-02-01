@@ -182,7 +182,39 @@ public sealed class ProductSeeder : ISeeder
             },
             [("desk-main.jpg", "https://picsum.photos/seed/18/200/300.jpg", true),
              ("desk-raised.jpg", "https://picsum.photos/seed/19/200/300.jpg", false),
-             ("desk-lowered.jpg", "https://picsum.photos/seed/20/200/300.jpg", false)])
+             ("desk-lowered.jpg", "https://picsum.photos/seed/20/200/300.jpg", false)]),
+
+        CreateProduct(
+            "Noise Cancelling Earbuds",
+            "True wireless earbuds with hybrid active noise cancellation, transparency mode, and 24-hour total battery life. IPX4 water resistant.",
+            179.99m, "NCE008", 90, 18,
+            new Dictionary<string, string>
+            {
+                { "Brand", "AudioTech" },
+                { "Driver Size", "11mm" },
+                { "Battery Life", "8h + 16h case" },
+                { "Noise Cancellation", "Hybrid ANC" },
+                { "Water Resistance", "IPX4" },
+                { "Codec Support", "AAC, SBC, LDAC" }
+            },
+            [("earbuds-main.jpg", "https://picsum.photos/seed/21/200/300.jpg", true),
+             ("earbuds-case.jpg", "https://picsum.photos/seed/22/200/300.jpg", false)]),
+
+        CreateProduct(
+            "Laptop Cooling Pad",
+            "Ultra-slim cooling pad with 5 quiet fans, adjustable height settings, and RGB lighting. Compatible with laptops up to 17 inches.",
+            49.99m, "LCP009", 120, 25,
+            new Dictionary<string, string>
+            {
+                { "Brand", "CoolMaster" },
+                { "Fan Count", "5" },
+                { "Max Laptop Size", "17 inches" },
+                { "USB Ports", "2" },
+                { "Noise Level", "<21 dB" },
+                { "Height Positions", "6" }
+            },
+            [("coolingpad-main.jpg", "https://picsum.photos/seed/23/200/300.jpg", true),
+             ("coolingpad-rgb.jpg", "https://picsum.photos/seed/24/200/300.jpg", false)])
     ];
 
     private static Product CreateProduct(
