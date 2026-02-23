@@ -62,7 +62,13 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:4200", "https://localhost:4200", "http://localhost:5000", "https://localhost:5001")
+        // In production, read from configuration / environment variables:
+        //   Cors__AllowedOrigins__0=https://your-static-app.azurestaticapps.net
+        // Falls back to localhost defaults for development
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+            ?? ["http://localhost:4200", "https://localhost:4200", "http://localhost:5000", "https://localhost:5001"];
+
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
