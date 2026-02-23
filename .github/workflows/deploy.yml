@@ -1,0 +1,77 @@
+name: Azure Deployment
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # ─────────────────────────────────────────────────
+  # Backend: Build & push Docker image to ACR
+  # ─────────────────────────────────────────────────
+  deploy-backend:
+    name: Backend → Azure Container Registry
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Azure Container Registry
+        uses: azure/docker-login@v2
+        with:
+          login-server: ${{ secrets.ACR_LOGIN_SERVER }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build \
+            -t ${{ secrets.ACR_LOGIN_SERVER }}/astro-api:${{ github.sha }} \
+            -t ${{ secrets.ACR_LOGIN_SERVER }}/astro-api:latest \
+            -f Dockerfile .
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/astro-api:${{ github.sha }}
+          docker push ${{ secrets.ACR_LOGIN_SERVER }}/astro-api:latest
+
+  # ─────────────────────────────────────────────────
+  # Frontend: Build Angular & deploy to Static Web Apps
+  # ─────────────────────────────────────────────────
+  deploy-frontend:
+    name: Frontend → Azure Static Web Apps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        working-directory: client
+        run: npm ci
+
+      - name: Inject API URL into production environment
+        working-directory: client
+        run: |
+          sed -i "s|REPLACE_WITH_CONTAINER_APP_URL|${{ secrets.API_BASE_URL }}|g" src/environments/environment.prod.ts
+
+      - name: Build Angular app (production)
+        working-directory: client
+        run: npm run build
+
+      - name: Copy static web app config to build output
+        run: cp client/src/staticwebapp.config.json client/dist/client/browser/staticwebapp.config.json
+
+      - name: Deploy to Azure Static Web Apps
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          # Angular 19 application build output structure
+          app_location: "client/dist/client/browser"
+          skip_app_build: true
+          skip_api_build: true
