@@ -4,7 +4,7 @@
 # ---------------------------------------------------------
 
 # Build stage
-FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 # Copy project files for layer-cached restore
@@ -24,7 +24,7 @@ COPY server/ server/
 RUN dotnet publish server/Astro.Api/Astro.Api.csproj -c Release -o /app/publish --no-restore
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-preview AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
 EXPOSE 8080
