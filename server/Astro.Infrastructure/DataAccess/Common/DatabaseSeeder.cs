@@ -2,6 +2,7 @@ using Astro.Infrastructure.DataAccess.Orders.Persistence;
 using Astro.Infrastructure.DataAccess.Payments.Persistence;
 using Astro.Infrastructure.DataAccess.Products.Persistence;
 using Astro.Infrastructure.DataAccess.Shipments.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -45,6 +46,7 @@ public static class DatabaseSeeder
 
                 if (!await context.Database.CanConnectAsync())
                 {
+                    logger.LogInformation("Can't connect to database with correct connection string {Connection}", context.Database.GetConnectionString());
                     throw new InvalidOperationException("Database is not available");
                 }
 
