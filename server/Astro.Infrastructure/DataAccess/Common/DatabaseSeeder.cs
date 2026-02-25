@@ -46,7 +46,6 @@ public static class DatabaseSeeder
 
                 if (!await context.Database.CanConnectAsync())
                 {
-                    logger.LogInformation("Can't connect to database with correct connection string {Connection}", context.Database.GetConnectionString());
                     throw new InvalidOperationException("Database is not available");
                 }
 
