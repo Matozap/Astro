@@ -30,7 +30,11 @@ builder.Services.AddInfrastructure();
 // Add GraphQL with HotChocolate
 builder.Services
     .AddGraphQLServer()
-    .ModifyCostOptions(options => options.EnforceCostLimits = !builder.Environment.IsDevelopment())
+    .ModifyCostOptions(options =>
+    {
+        options.EnforceCostLimits = !builder.Environment.IsDevelopment();
+        options.MaxFieldCost = 20000;
+    })
     .ModifyPagingOptions(options => options.MaxPageSize = 100)
     // Register root types with utility operations
     .AddQueryType<Query>()
